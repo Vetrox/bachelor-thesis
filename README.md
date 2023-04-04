@@ -62,3 +62,41 @@ As described earlier we can easily bruteforce $2^{16}$ guesses to get
 $(s_1 \cdot P)$. In this updated version we thus have all we need except
 $adin_1$, which we would need to guess??? or we could use the cycling property???.
 
+
+## Specification (2012)
+[Speclink](https://nvlpubs.nist.gov/nistpubs/Legacy/SP/nistspecialpublication800-90a.pdf)
+
+- Formally known as: Dual_EC_DRBG
+(Dual Elliptic Curve Deterministic Random Bit Generator)
+- Initial seed $2 \cdot security\\_strength$ bits in length.
+- Generates $outlen$-bits pseudorandom strings.
+- Curve is defined over a field of "approximately" $2^m$ size.
+ - Recommended curves are $m = 2 \cdot security\\_strength$ and $m \ge 256$
+ - $m \equiv seedlen$
+- Appendix A.1 specifies the selection of appropriate elliptic curves for
+the desired security strength.
+- Section 8.6. specifies the requirements of the **seed**. See also Section 10.4.1 for instantiating the seed.
+- The maximum security strength supported by DualEC is equal to the security strength of
+the used curve specified in [SP 800-57 Part 1](https://nvlpubs.nist.gov/nistpubs/SpecialPublications/NIST.SP.800-57pt1r5.pdf), [SP 800-57 Part 2](https://nvlpubs.nist.gov/nistpubs/SpecialPublications/NIST.SP.800-57pt2r1.pdf) and [SP 800-57 Part 3](https://nvlpubs.nist.gov/nistpubs/SpecialPublications/NIST.SP.800-57Pt3r1.pdf)
+- internal state:
+ - $working\\_state$ consists of:
+  - $s$: Determines the current position on the curve.
+  - $(seedlen, p, a, b, n)$
+   - $seedlen$: length of the seed
+   - $p$: prime that defines the base field $F_p$
+   - $a$ and $b$: "two field elements that define the equation of the curve"
+   - $n$: "the order of the point $G$"
+  - $P$ and $Q$: Points on the curve.
+  - $reseed\\_counter$ indicating the number of blocks of random data since the
+  initial seeding or the previous reseeding.
+ - Administrative information
+  - $security\\_strength$
+  - $prediction\\_resistance\\_flag$: "Indicates whether prediction resistance is
+required by the DRBG instantiation."
+- "When selecting the curve in step 4 below, it is recommended that the default values be
+used for P and Q as given in Appendix A.1. However, an implementation may use
+different pairs of points, provided that they are verifiably random, as evidenced by the
+use of the procedure specified in Appendix A.2.1 and the self-test procedure described
+in Appendix A.2.2."
+
+TODO: continue at 10.3.1.2 Instantiation of Dual_EC_DRBG
