@@ -98,5 +98,7 @@ used for P and Q as given in Appendix A.1. However, an implementation may use
 different pairs of points, provided that they are verifiably random, as evidenced by the
 use of the procedure specified in Appendix A.2.1 and the self-test procedure described
 in Appendix A.2.2."
+- Dual_EC_DRBG_Instantiate_algorithm is pseudocode
 
-TODO: continue at 10.3.1.2 Instantiation of Dual_EC_DRBG
+
+
