@@ -2,8 +2,8 @@
 Practically exploiting the DualEC random number generator backdoor
 
 ## Branches
-The content is spread across the following branches
+The content is spread across the following locations
 
-- [Scratchpad](../../tree/scratchpad)
-- [DualEC implementation](../../tree/dualec-impl)
-- [References](../../tree/references)
+- [Scratchpad](./scratchpad)
+- [DualEC implementation](./dualec-impl)
+- [References](./REFERENCES.md)
