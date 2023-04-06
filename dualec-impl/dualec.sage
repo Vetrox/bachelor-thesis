@@ -225,5 +225,48 @@ def Dual_EC_DRBG_Generate(working_state: WorkingState, requested_number_of_bits,
 def XOR(a, b):
     return a ^^ b
 
+class Curve:
+    def __init__(self, p, n, b):
+        """
+        An elliptic curve is defined by the following equation:
+        y² = x³ + a*x + b (mod p)
+
+        Note: a is set to be (-3) in the above equation.
+
+        :param p: Order of the field Fp, given in decimal
+        :param n: Order of the Elliptic Curve Group, in decimal
+        :param b: Coefficient in the above equation
+        """
+        # Note: The x and y coordinates of the base point, i.e., generator G, are the same as for the point P.
+        # ???
+        self.p = p
+        self.n = n
+        self.a = -3 # Note: a is set to be (-3) in the above equation.
+        self.b = b
+
+class Dual_EC_Curve:
+    def __init__(self, curve, P, Q):
+        self.curve = curve
+        self.P = P
+        self.Q = Q
+
+class Point:
+    def __init__(self, x, y):
+        self.x = x
+        self.y = y
+
+Dual_EC_P256 = Dual_EC_Curve(
+        Curve(
+            115792089210356248762697446949407573530086143415290314195533631308867097853951,
+            115792089210356248762697446949407573529996955224135760342422259061068512044369,
+            0x5ac635d8_aa3a93e7_b3ebbd55_769886bc_651d06b0_cc53b0f6_3bce3c3e_27d2604b),
+        Point(
+            0x6b17d1f2_e12c4247_f8bce6e5_63a440f2_77037d81_2deb33a0_f4a13945_d898c296,
+            0x4fe342e2_fe1a7f9b_8ee7eb4a_7c0f9e16_2bce3357_6b315ece_cbb64068_37bf51f5),
+        Point(
+            0xc97445f4_5cdef9f0_d3e05e1e_585fc297_235b82b5_be8ff3ef_ca67c598_52018192,
+            0xb28ef557_ba31dfcb_dd21ac46_e2a91e3c_304f44cb_87058ada_2cb81515_1e610046))
+
+
 
 
