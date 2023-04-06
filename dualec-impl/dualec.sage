@@ -1,3 +1,8 @@
+import hashlib
+
+highest_supported_security_strength = None # TODO
+
+
 class Dual_EC_DRBG:
     def __init__(self, working_state: WorkingState, security_strength, prediction_resistance_flag):
         """
@@ -6,6 +11,9 @@ class Dual_EC_DRBG:
         """
         self.working_state = working_state
         self.security_strength = security_strength
+        self.required_minimum_entropy_for_instantiate_and_reseed = security_strength
+        self.min_length = security_strength
+        self.max_length = 2^13 # TODO: continue here in Table 4
         self.prediction_resistance_flag = prediction_resistance_flag
 
 class WorkingState:
@@ -25,6 +33,7 @@ reseeding.
         """
         this.s = s # secret value
         this.seedlen = seedlen
+        this.max_outlen = None # TODO: largest multiple of 8 less than (size of the base field) - (13 + log2(the cofactor))
         this.p = p
         this.a = a
         this.b = b
@@ -48,14 +57,17 @@ def Dual_EC_DRBG_Instantiate(entropy_input, nonce,
 
 
     # 1. seed_material = entropy_input || nonce || personalization_string.
+    seed_material = ConcatBitStr(ConcatBitStr(entropy_input, nonce, personalization_string))
 
     # 2. s = Hash_df(seed_material, seedlen).
     # Note: Assert bitlen(s) = seedlen
+    # TODO:
 
     # 3. reseed_counter = 0.
     reseed_counter = 0
 
     # 4. Using the security_strength and Table 4 in Section 10.3.1, select the smallest available curve that has a security strength >= security_strength. The values for seedlen, p, a, b, n, P, Q are determined by the curve
+    #TODO:
 
     # 5. Return s, seedlen, p, a, b, n, P, Q, and a reseed_counter for the initial_working_state.
     return WorkingState(s, seedlen, p, a, b, n, P, Q, reseed_counter)
@@ -94,9 +106,9 @@ integer.
     # 4. For i = 1 to len do
     for i in range(1, len_ + 1): # TODO: check off by one error
         # 4.1 temp = temp || Hash(counter || no_of_bits_to_return || input_string)
-        temp = JoinBitString(temp,
-                             Hash(JoinBitString(
-                                     JoinBitString(counter,no_of_bits_to_return),
+        temp = ConcatBitStr(temp,
+                             Hash(ConcatBitStr(
+                                     ConcatBitStr(counter,no_of_bits_to_return),
                                      input_string)))
 
         # 4.2 counter = counter + 1.
@@ -108,7 +120,7 @@ integer.
     # 6. Return SUCCESS and requested_bits.
     return ("SUCCESS", requested_bits)
 
-def JoinBitString(a,b):
+def ConcatBitStr(a,b):
     raise NotImplementedError("Not implemented yet")
 
 def Dual_EC_DRBG_Reseed(working_state, entropy_input,
@@ -225,6 +237,9 @@ def Dual_EC_DRBG_Generate(working_state: WorkingState, requested_number_of_bits,
 def XOR(a, b):
     return a ^^ b
 
+def Hash(byte_array: bytes) -> bytes:
+    return hashlib.sha256(byte_array).digest()
+
 class Curve:
     def __init__(self, p, n, b):
         """
@@ -266,7 +281,5 @@ Dual_EC_P256 = Dual_EC_Curve(
         Point(
             0xc97445f4_5cdef9f0_d3e05e1e_585fc297_235b82b5_be8ff3ef_ca67c598_52018192,
             0xb28ef557_ba31dfcb_dd21ac46_e2a91e3c_304f44cb_87058ada_2cb81515_1e610046))
-
-
 
 
