@@ -1,9 +1,29 @@
-class WorkingState():
+class Dual_EC_DRBG:
+    def __init__(self, working_state: WorkingState, security_strength, prediction_resistance_flag):
+        """
+        :param security_strength: Security strenght provided by the DRBG instantiation
+        :param prediction_resistance_flag: Indicates whether prediction resistance is required by the DRBG instantiation.
+        """
+        self.working_state = working_state
+        self.security_strength = security_strength
+        self.prediction_resistance_flag = prediction_resistance_flag
+
+class WorkingState:
     def __init__(self, s, seedlen, p, a, b, n, P, Q, reseed_counter):
         """
+        :param s: Determines the current position on the curve.
+        :param seedlen: The length of the seed
+        :param p: The prime that defines the base field Fp
+        :param a: A Field element that defines the equation of the curve
+        :param b: A Field element that defines the equation of the curve
+        :param n: The order of the point G.
+        :param P: Point P on the curve.
+        :param Q: Point Q on the curve.
+        :param reseed_counter: A counter that indicates the number of blocks of random data
+produced by the Dual_EC_DRBG since the initial seeding or the previous
+reseeding.
         """
-        # TODO: explain parameters and types
-        this.s = s
+        this.s = s # secret value
         this.seedlen = seedlen
         this.p = p
         this.a = a
@@ -204,3 +224,6 @@ def Dual_EC_DRBG_Generate(working_state: WorkingState, requested_number_of_bits,
 
 def XOR(a, b):
     return a ^^ b
+
+
+
