@@ -99,6 +99,6 @@ different pairs of points, provided that they are verifiably random, as evidence
 use of the procedure specified in Appendix A.2.1 and the self-test procedure described
 in Appendix A.2.2."
 - Dual_EC_DRBG_Instantiate_algorithm is pseudocode
-
+- D.5 Dual_EC_DRBG Example
 
 
