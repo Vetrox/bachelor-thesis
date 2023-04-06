@@ -43,7 +43,7 @@ class Point:
         self.y = y
 
 class Dual_EC_DRBG:
-    def __init__(self, working_state: WorkingState, security_strength, prediction_resistance_flag):
+    def __init__(self, working_state, security_strength, prediction_resistance_flag):
         """
         :param security_strength: Security strength provided by the DRBG instantiation
         :param prediction_resistance_flag: Indicates whether prediction resistance is required by the DRBG instantiation.
@@ -69,20 +69,16 @@ class WorkingState:
 produced by the Dual_EC_DRBG since the initial seeding or the previous
 reseeding.
         """
-        this.s = s # secret value
-        this.seedlen = seedlen
-
-        # Largest multiple of 8 less than (size of the base field) - (13 + log2(the cofactor))
-        this.max_outlen = 8*floor(this.seedlen / 8) - (13 + log(8)/log(2))
-        # TODO: the cofactor of 8 is only retrieved by trail and error. Recommended values are lower than 4, so something has to be off.
-
-        this.p = p
-        this.a = a
-        this.b = b
-        this.n = n
-        this.P = P
-        this.Q = Q
-        this.reseed_counter = reseed_counter
+        self.s = s # secret value
+        self.seedlen = seedlen
+        self.max_outlen = calculate_max_outlen(seedlen)
+        self.p = p
+        self.a = a
+        self.b = b
+        self.n = n
+        self.P = P
+        self.Q = Q
+        self.reseed_counter = reseed_counter
 
 """Functions"""
 def Dual_EC_DRBG_Instantiate(entropy_input, nonce,
@@ -97,10 +93,12 @@ def Dual_EC_DRBG_Instantiate(entropy_input, nonce,
     """
 
     # 1. seed_material = entropy_input || nonce || personalization_string.
-    seed_material = ConcatBitStr(ConcatBitStr(entropy_input, nonce, personalization_string))
+    seed_material = ConcatBitStr(ConcatBitStr(entropy_input, nonce), personalization_string)
 
     # 2. s = Hash_df(seed_material, seedlen).
-    s = Hash_df(seed_material, seedlen)
+    # Note: Following the spec leaves us in a state where seedlen isn't defined at this point...
+    seedlen = pick_seedlen(security_strength)
+    s = Hash_df(seed_material, seedlen, calculate_max_outlen(seedlen))
     # TODO: Assert bitlen(s) = seedlen
 
     # 3. reseed_counter = 0.
@@ -112,7 +110,7 @@ def Dual_EC_DRBG_Instantiate(entropy_input, nonce,
     # 5. Return s, seedlen, p, a, b, n, P, Q, and a reseed_counter for the initial_working_state.
     return WorkingState(s, seedlen, curve.ec.p, curve.ec.a, curve.ec.b, curve.ec.n, curve.P, curve.Q, reseed_counter)
 
-def Hash_df(input_string, no_of_bits_to_return):
+def Hash_df(input_string, no_of_bits_to_return, max_outlen):
     """
     The hash-based derivation function hashes an input
     string and returns the requested number of bits. Let Hash be the hash function used by the DRBG mechanism, and let outlen be its output length.
@@ -132,9 +130,11 @@ integer.
     # Hash gets selected from Table 4 in 10.3.1
     # Note: Since it's allowed for every allowed curve (P-256, P-384, P-521) we use SHA-256.
 
+    # The outlen of SHA-256 is TODO
+    outlen = min(hash_outlen(), max_outlen)
+
     # 1. temp = the Null string
-    # TODO: ???
-    temp = ""
+    temp = 0
 
     # 2. len = ceil(no_of_bits_to_return / outlen)
     len_ = ceil(no_of_bits_to_return / outlen)
@@ -161,7 +161,8 @@ integer.
     return ("SUCCESS", requested_bits)
 
 def ConcatBitStr(a,b):
-    raise NotImplementedError("Not implemented yet")
+    print(f"a {type(a)} b {type(b)}")
+    return (a << bitlen(b)) | b
 
 def Dual_EC_DRBG_Reseed(working_state, entropy_input,
                         additional_input):
@@ -235,6 +236,7 @@ def Dual_EC_DRBG_Generate(working_state: WorkingState, requested_number_of_bits,
 
     # 3. temp = the Null string
     # ???
+    temp = b""
 
     # 4. i=0
     i = 0
@@ -277,8 +279,23 @@ def Dual_EC_DRBG_Generate(working_state: WorkingState, requested_number_of_bits,
 def XOR(a, b):
     return a ^^ b
 
-def Hash(byte_array: bytes) -> bytes:
-    return hashlib.sha256(byte_array).digest()
+def Hash(num):
+    """
+    :param num: a number
+    """
+    byte_array = bytes_from_number_padded_with_zeros_on_the_left(num)
+    return num_from_bytes(hashlib.sha256(byte_array).digest())
+
+def bytes_from_number_padded_with_zeros_on_the_left(num):
+    h = num.hex()
+    if len(h) % 2 != 0:
+        h = b"0" + h
+    return bytes.fromhex(h)
+
+def num_from_bytes(byte_array):
+    ret = int(byte_array.hex(), 16)
+    print(type(ret))
+    return ret
 
 def rightmost_outlen_bits_of(x, outlen):
     return x & (2^outlen - 1)
@@ -287,7 +304,7 @@ def leftmost_no_of_bits_to_return_from(x, no_of_bits_to_return):
     return x >> (bitlen(x) - no_of_bits_to_return)
 
 def bitlen(x):
-    raise NotImplementedError(f"The bitlen is not implemented for {type(x)}")
+    return x.bit_length()
 
 """Curves"""
 Dual_EC_P256 = Dual_EC_Curve(
@@ -312,7 +329,7 @@ Dual_EC_P384 = Dual_EC_Curve(
         Point(
             0x8e722de3_125bddb0_5580164b_fe20b8b4_32216a62_926c5750_2ceede31_c47816ed_d1e89769_124179d0_b6951064_28815065,
             0x023b1660_dd701d08_39fd45ee_c36f9ee7_b32e13b3_15dc0261_0aa1b636_e346df67_1f790f84_c5e09b05_674dbb7e_45c803dd))
-Dual_EC_P256 = Dual_EC_Curve(
+Dual_EC_P521 = Dual_EC_Curve(
         Curve(
             6864797660130609714981900799081393217269435300143305409394463459185543183397656052122559640661454554977296311391480858037121987999716643812574028291115057151,
             6864797660130609714981900799081393217269435300143305409394463459185543183397655394245057746333217197532963996371363321113864768612440380340372808892707005449,
@@ -336,3 +353,24 @@ def pick_curve(security_strength):
     if security_strength <= 256:
         return Dual_EC_P521
     raise ValueError("Invalid Security strength requested.")
+
+def pick_seedlen(security_strength):
+    if security_strength <= 128:
+        return 256
+    if security_strength <= 192:
+        return 384
+    if security_strength <= 256:
+        return 521
+    raise ValueError("Invalid Security strength requested.")
+
+def calculate_max_outlen(seedlen):
+    # Largest multiple of 8 less than (size of the base field) - (13 + log2(the cofactor))
+    # TODO: the cofactor of 8 is only retrieved by trail and error. Recommended values are lower than 4, so something has to be off.
+    return 8*floor(seedlen / 8) - (13 + log(8)/log(2))
+
+def hash_outlen():
+    ret = bitlen(Hash(b""))
+    print(f"Expect SHA-256 to return 256 number of bits and got {ret}")
+    return ret
+
+Dual_EC_DRBG_Instantiate(1337133713371337, 0, 0, Dual_EC_Security_Strength_256)
