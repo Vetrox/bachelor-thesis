@@ -1,5 +1,6 @@
 import hashlib # SHA-256
 import time
+import secrets # True random input seed entropy
 
 """Constants"""
 max_length = 2^13
@@ -295,7 +296,7 @@ def Hash(num):
 def bytes_from_number_padded_with_zeros_on_the_left(num):
     h = num.hex()
     if len(h) % 2 != 0:
-        h = b"0" + h
+        h = "0" + h
     return bytes.fromhex(h)
 
 def hex_from_number_padded_to_num_of_bits(num, amount_of_bits):
@@ -382,15 +383,35 @@ def calculate_max_outlen(seedlen):
 def hash_outlen():
     return bitlen(Hash(b""))
 
-working_state = Dual_EC_DRBG_Instantiate(1337133713371337, 0, 0, Dual_EC_Security_Strength_128)
-print(f"WorkingState(outlen = {working_state.outlen}, seedlen = {working_state.seedlen})")
-requested_amount_of_bits = 121
 
-start_time = time.monotonic()
-for i in range(2^13):
-    status, returned_bits, working_state = Dual_EC_DRBG_Generate(working_state, requested_amount_of_bits, 0)
-    if bitlen(returned_bits) < requested_amount_of_bits - 10:
-        print(f"i: {i}, status: {status}, returned bits (len = {bitlen(returned_bits)}):\n{hex_from_number_padded_to_num_of_bits(returned_bits,requested_amount_of_bits)}")
-        diff = time.monotonic() - start_time
-        print(f"Time: {diff:.5f}, {diff / i * 1000:.2f}ms / iteration")
-        break
+def main():
+    test_iterations = 100
+    work = 4
+    requested_bitlen = 32
+
+    average_iterations = 0
+    average_delta_time = 0
+    for i in range(test_iterations):
+        input_randomness = Integer(secrets.randbelow(2^64-1))
+        print(f"Picking random input entropy: {input_randomness}")
+        iteration, delta_time = test_for(input_randomness, work, requested_bitlen)
+        average_iterations += (0.0 + iteration) / test_iterations
+        average_delta_time += (0.0 + delta_time) / test_iterations
+    print(f"AVG iterations: {average_iterations:.2f}, AVG time per iteration: {average_delta_time:.2f} ms")
+
+def test_for(input_randomness, work, requested_bitlen):
+    working_state = Dual_EC_DRBG_Instantiate(input_randomness, 0, 0, Dual_EC_Security_Strength_256)
+    # print(f"WorkingState(outlen = {working_state.outlen}, seedlen = {working_state.seedlen})")
+    requested_amount_of_bits = requested_bitlen
+
+    start_time = time.monotonic()
+    for i in range(1, 2^13):
+        status, returned_bits, working_state = Dual_EC_DRBG_Generate(working_state, requested_amount_of_bits, 0)
+        if bitlen(returned_bits) < requested_amount_of_bits - work:
+            print(f"i: {i}, status: {status}, returned bits (len = {bitlen(returned_bits)}):\n{hex_from_number_padded_to_num_of_bits(returned_bits,requested_amount_of_bits)}")
+            diff = time.monotonic() - start_time
+            return i, (diff / i * 1000)
+            break
+
+if __name__ == "__main__":
+    main()
