@@ -1,4 +1,5 @@
 import hashlib # SHA-256
+import time
 
 """Constants"""
 max_length = 2^13
@@ -25,7 +26,6 @@ class Curve:
         :param b: Coefficient in the above equation
         """
         # Note: The x and y coordinates of the base point, i.e., generator G, are the same as for the point P.
-        # ???
         self.p = p
         self.n = n
         self.a = -3 # Note: a is set to be (-3) in the above equation.
@@ -111,7 +111,7 @@ def Dual_EC_DRBG_Instantiate(entropy_input, nonce,
     curve = pick_curve(security_strength)
 
     # 5. Return s, seedlen, p, a, b, n, P, Q, and a reseed_counter for the initial_working_state.
-    return WorkingState(s, seedlen, curve, reseed_counter, min(hash_outlen(), calculate_max_outlen(seedlen)))
+    return WorkingState(s, seedlen, curve, reseed_counter, calculate_max_outlen(seedlen)) #min(hash_outlen(), calculate_max_outlen(seedlen)))
 
 def Hash_df(input_string, no_of_bits_to_return, max_outlen):
     """
@@ -134,7 +134,7 @@ integer.
     # Note: Since it's allowed for every allowed curve (P-256, P-384, P-521) we use SHA-256.
 
     # The outlen of SHA-256 is TODO
-    outlen = min(hash_outlen(), max_outlen)
+    outlen = max_outlen # min(hash_outlen(), max_outlen)
 
     # 1. temp = the Null string
     temp = 0
@@ -298,6 +298,16 @@ def bytes_from_number_padded_with_zeros_on_the_left(num):
         h = b"0" + h
     return bytes.fromhex(h)
 
+def hex_from_number_padded_to_num_of_bits(num, amount_of_bits):
+    actual_nibbles = ceil(bitlen(num) / 4)
+    amount_of_nibbles = ceil(amount_of_bits / 4)
+    if actual_nibbles > amount_of_nibbles:
+        raise ValueError("Requested less nibbles than the minimum to represent this number")
+    ret = ""
+    for i in range(amount_of_nibbles - actual_nibbles):
+        ret += "0"
+    return ret + num.hex()
+
 def num_from_bytes(byte_array):
     return Integer(byte_array.hex(), 16)
 
@@ -351,31 +361,36 @@ def pick_curve(security_strength):
     https://nvlpubs.nist.gov/nistpubs/SpecialPublications/NIST.SP.800-57pt1r5.pdf#%5B%7B%22num%22%3A196%2C%22gen%22%3A0%7D%2C%7B%22name%22%3A%22XYZ%22%7D%2C319%2C345%2C0%5D
     """
     if security_strength <= 128:
+        print("Picking P-256")
         return Dual_EC_P256
     if security_strength <= 192:
+        print("Picking P-384")
         return Dual_EC_P384
     if security_strength <= 256:
+        print("Picking P-521")
         return Dual_EC_P521
     raise ValueError("Invalid Security strength requested.")
 
 def pick_seedlen(security_strength):
-    if security_strength <= 128:
-        return 256
-    if security_strength <= 192:
-        return 384
-    if security_strength <= 256:
-        return 521
-    raise ValueError("Invalid Security strength requested.")
+    return 2 * security_strength
 
 def calculate_max_outlen(seedlen):
     # Largest multiple of 8 less than (size of the base field) - (13 + log2(the cofactor))
     # TODO: the cofactor of 8 is only retrieved by trail and error. Recommended values are lower than 4, so something has to be off.
-    return 8*floor(seedlen / 8) - (13 + log(8)/log(2))
+    return Integer(8*floor(seedlen / 8) - (13 + log(8)/log(2)))
 
 def hash_outlen():
     return bitlen(Hash(b""))
 
-working_state = Dual_EC_DRBG_Instantiate(1337133713371337, 0, 0, Dual_EC_Security_Strength_256)
-for i in range(10):
-    status, returned_bits, working_state = Dual_EC_DRBG_Generate(working_state, 123, 0)
-    print(f"Status: {status}, returned bits (len = {bitlen(returned_bits)}):\n{returned_bits}")
+working_state = Dual_EC_DRBG_Instantiate(1337133713371337, 0, 0, Dual_EC_Security_Strength_128)
+print(f"WorkingState(outlen = {working_state.outlen}, seedlen = {working_state.seedlen})")
+requested_amount_of_bits = 121
+
+start_time = time.monotonic()
+for i in range(2^13):
+    status, returned_bits, working_state = Dual_EC_DRBG_Generate(working_state, requested_amount_of_bits, 0)
+    if bitlen(returned_bits) < requested_amount_of_bits - 10:
+        print(f"i: {i}, status: {status}, returned bits (len = {bitlen(returned_bits)}):\n{hex_from_number_padded_to_num_of_bits(returned_bits,requested_amount_of_bits)}")
+        diff = time.monotonic() - start_time
+        print(f"Time: {diff:.5f}, {diff / i * 1000:.2f}ms / iteration")
+        break
