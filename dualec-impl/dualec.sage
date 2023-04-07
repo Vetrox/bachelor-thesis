@@ -387,7 +387,7 @@ def hash_outlen():
 
 def main():
     test_iterations = 1000
-    work = 1
+    work = 0
     requested_bitlen = 10
 
     average_iterations = 0
