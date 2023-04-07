@@ -1,6 +1,7 @@
 import hashlib # SHA-256
 import time
 import secrets # True random input seed entropy
+import csv # Save the data points
 
 """Constants"""
 max_length = 2^13
@@ -385,22 +386,27 @@ def hash_outlen():
 
 
 def main():
-    test_iterations = 100
-    work = 4
-    requested_bitlen = 32
+    test_iterations = 1000
+    work = 1
+    requested_bitlen = 10
 
     average_iterations = 0
     average_delta_time = 0
+
+    iteration_data = []
     for i in range(test_iterations):
         input_randomness = Integer(secrets.randbelow(2^64-1))
         print(f"Picking random input entropy: {input_randomness}")
         iteration, delta_time = test_for(input_randomness, work, requested_bitlen)
+        iteration_data.append(iteration)
         average_iterations += (0.0 + iteration) / test_iterations
         average_delta_time += (0.0 + delta_time) / test_iterations
     print(f"AVG iterations: {average_iterations:.2f}, AVG time per iteration: {average_delta_time:.2f} ms")
+    with open('data.csv', 'w') as f:
+        csv.writer(f).writerow(iteration_data)
 
 def test_for(input_randomness, work, requested_bitlen):
-    working_state = Dual_EC_DRBG_Instantiate(input_randomness, 0, 0, Dual_EC_Security_Strength_256)
+    working_state = Dual_EC_DRBG_Instantiate(input_randomness, 0, 0, Dual_EC_Security_Strength_128)
     # print(f"WorkingState(outlen = {working_state.outlen}, seedlen = {working_state.seedlen})")
     requested_amount_of_bits = requested_bitlen
 
