@@ -1,4 +1,4 @@
-import hashlib
+import hashlib # SHA-256
 
 """Constants"""
 max_length = 2^13
@@ -31,11 +31,18 @@ class Curve:
         self.a = -3 # Note: a is set to be (-3) in the above equation.
         self.b = b
 
+def Elliptic_Curve_from(curve):
+    FF = GF(curve.p) # construct finite field from prime p
+    EC = EllipticCurve([FF(curve.a), FF(curve.b)]) # sage ec
+    return (FF, EC)
+
 class Dual_EC_Curve:
     def __init__(self, ec, P, Q):
-        self.ec = ec
-        self.P = P
-        self.Q = Q
+        FF, EC = Elliptic_Curve_from(ec)
+        self.FF = FF
+        self.EC = EC
+        self.P = EC(FF(P.x), FF(P.y)) # this is also the base in our case
+        self.Q = EC(FF(Q.x), FF(Q.y))
 
 class Point:
     def __init__(self, x, y):
@@ -55,16 +62,16 @@ class Dual_EC_DRBG:
         self.prediction_resistance_flag = prediction_resistance_flag
 
 class WorkingState:
-    def __init__(self, s, seedlen, p, a, b, n, P, Q, reseed_counter):
+    def __init__(self, s, seedlen, curve, reseed_counter, outlen):
         """
         :param s: Determines the current position on the curve.
         :param seedlen: The length of the seed
-        :param p: The prime that defines the base field Fp
-        :param a: A Field element that defines the equation of the curve
-        :param b: A Field element that defines the equation of the curve
-        :param n: The order of the point G.
-        :param P: Point P on the curve.
-        :param Q: Point Q on the curve.
+        :param curve: (p: The prime that defines the base field Fp
+            :param a: A Field element that defines the equation of the curve
+            :param b: A Field element that defines the equation of the curve
+            :param n: The order of the point G.
+            :param P: Point P on the curve.
+            :param Q: Point Q on the curve.)
         :param reseed_counter: A counter that indicates the number of blocks of random data
 produced by the Dual_EC_DRBG since the initial seeding or the previous
 reseeding.
@@ -72,13 +79,9 @@ reseeding.
         self.s = s # secret value
         self.seedlen = seedlen
         self.max_outlen = calculate_max_outlen(seedlen)
-        self.p = p
-        self.a = a
-        self.b = b
-        self.n = n
-        self.P = P
-        self.Q = Q
+        self.dual_ec_curve = curve
         self.reseed_counter = reseed_counter
+        self.outlen = outlen
 
 """Functions"""
 def Dual_EC_DRBG_Instantiate(entropy_input, nonce,
@@ -98,7 +101,7 @@ def Dual_EC_DRBG_Instantiate(entropy_input, nonce,
     # 2. s = Hash_df(seed_material, seedlen).
     # Note: Following the spec leaves us in a state where seedlen isn't defined at this point...
     seedlen = pick_seedlen(security_strength)
-    s = Hash_df(seed_material, seedlen, calculate_max_outlen(seedlen))
+    status, s = Hash_df(seed_material, seedlen, calculate_max_outlen(seedlen))
     # TODO: Assert bitlen(s) = seedlen
 
     # 3. reseed_counter = 0.
@@ -108,7 +111,7 @@ def Dual_EC_DRBG_Instantiate(entropy_input, nonce,
     curve = pick_curve(security_strength)
 
     # 5. Return s, seedlen, p, a, b, n, P, Q, and a reseed_counter for the initial_working_state.
-    return WorkingState(s, seedlen, curve.ec.p, curve.ec.a, curve.ec.b, curve.ec.n, curve.P, curve.Q, reseed_counter)
+    return WorkingState(s, seedlen, curve, reseed_counter, min(hash_outlen(), calculate_max_outlen(seedlen)))
 
 def Hash_df(input_string, no_of_bits_to_return, max_outlen):
     """
@@ -161,7 +164,6 @@ integer.
     return ("SUCCESS", requested_bits)
 
 def ConcatBitStr(a,b):
-    print(f"a {type(a)} b {type(b)}")
     return (a << bitlen(b)) | b
 
 def Dual_EC_DRBG_Reseed(working_state, entropy_input,
@@ -181,7 +183,9 @@ def Dual_EC_Truncate(bitstring, in_len, out_len):
     the bitstring is padded on the right with (out_len - in_len) zeroes, and the result
     is returned.
     """
-    raise NotImplementedError("Not implemented yet")
+    shift = in_len - out_len
+    return bitstring >> shift
+
 def Dual_EC_x(A):
     """
     Is the x-coordinate of the point A on the curve, given in affine coordinates.
@@ -189,7 +193,9 @@ def Dual_EC_x(A):
     coordinate systems; for instance, when efficiency is a primary concern. In this
     case, a point shall be translated back to affine coordinates before x() is applied.
     """
-    raise NotImplementedError("Not implemented yet")
+    x,y = A.xy()
+    return x
+
 def Dual_EC_phi(x):
     """
     Maps field elements to non-negative integers, taking the bit vector
@@ -197,12 +203,12 @@ def Dual_EC_phi(x):
     an integer.
     Note: Further details depend on the implementation of the field
     """
-    raise NotImplementedError("Not implemented yet")
+    return x.lift() # TODO: figure out what to do here
 def Dual_EC_mul(scalar, A):
     """
     representing scalar multiplication of a point on the curve
     """
-    raise NotImplementedError("Not implemented yet")
+    return scalar * A
 
 def Dual_EC_DRBG_Generate(working_state: WorkingState, requested_number_of_bits, additional_input):
     """
@@ -236,7 +242,7 @@ def Dual_EC_DRBG_Generate(working_state: WorkingState, requested_number_of_bits,
 
     # 3. temp = the Null string
     # ???
-    temp = b""
+    temp = 0
 
     # 4. i=0
     i = 0
@@ -246,13 +252,13 @@ def Dual_EC_DRBG_Generate(working_state: WorkingState, requested_number_of_bits,
         t = XOR(working_state.s, additional_input)
 
         # 6. s = phi(x(t * P)).
-        working_state.s = Dual_EC_phi(Dual_EC_x(Dual_EC_mul(t, working_state.P)))
+        working_state.s = Dual_EC_phi(Dual_EC_x(Dual_EC_mul(t, working_state.dual_ec_curve.P)))
 
         # 7. r = phi(x(s * Q)).
-        r = Dual_EC_phi(Dual_EC_x(Dual_EC_mul(working_state.s, working_state.Q)))
+        r = Dual_EC_phi(Dual_EC_x(Dual_EC_mul(working_state.s, working_state.dual_ec_curve.Q)))
 
         # 8. temp = temp || (rightmost outlen bits of r).
-        temp = ConcatBitStr(temp, rightmost_outlen_bits_of(r, outlen))
+        temp = ConcatBitStr(temp, rightmost_outlen_bits_of(r, working_state.outlen))
 
         # 9. additional_input=0
         additional_input = 0
@@ -267,11 +273,11 @@ def Dual_EC_DRBG_Generate(working_state: WorkingState, requested_number_of_bits,
         if not (bitlen(temp) < requested_number_of_bits):
             break
 
-    # 13. returned_bits = Truncate (temp, i outlen, requested_number_of_bits).
-    returned_bits = Dual_EC_Truncate(temp, i, outlen, requested_number_of_bits)
+    # 13. returned_bits = Truncate (temp, i * outlen, requested_number_of_bits).
+    returned_bits = Dual_EC_Truncate(temp, i * working_state.outlen, requested_number_of_bits)
 
     # 14. s = phi(x(s * P)).
-    working_state.s = Dual_EC_phi(Dual_EC_x(Dual_EC_mul(working_state.s, working_state.P)))
+    working_state.s = Dual_EC_phi(Dual_EC_x(Dual_EC_mul(working_state.s, working_state.dual_ec_curve.P)))#.lift()
 
     # 15. Return SUCCESS, returned_bits, and s, seedlen, p, a, b, n, P, Q, and a reseed_counter for the new_working_state.
     return ("SUCCESS", returned_bits, working_state)
@@ -293,9 +299,7 @@ def bytes_from_number_padded_with_zeros_on_the_left(num):
     return bytes.fromhex(h)
 
 def num_from_bytes(byte_array):
-    ret = int(byte_array.hex(), 16)
-    print(type(ret))
-    return ret
+    return Integer(byte_array.hex(), 16)
 
 def rightmost_outlen_bits_of(x, outlen):
     return x & (2^outlen - 1)
@@ -312,7 +316,7 @@ Dual_EC_P256 = Dual_EC_Curve(
             115792089210356248762697446949407573530086143415290314195533631308867097853951,
             115792089210356248762697446949407573529996955224135760342422259061068512044369,
             0x5ac635d8_aa3a93e7_b3ebbd55_769886bc_651d06b0_cc53b0f6_3bce3c3e_27d2604b),
-        Point(
+        Point( # Base point for P-256 and also P
             0x6b17d1f2_e12c4247_f8bce6e5_63a440f2_77037d81_2deb33a0_f4a13945_d898c296,
             0x4fe342e2_fe1a7f9b_8ee7eb4a_7c0f9e16_2bce3357_6b315ece_cbb64068_37bf51f5),
         Point(
@@ -369,8 +373,9 @@ def calculate_max_outlen(seedlen):
     return 8*floor(seedlen / 8) - (13 + log(8)/log(2))
 
 def hash_outlen():
-    ret = bitlen(Hash(b""))
-    print(f"Expect SHA-256 to return 256 number of bits and got {ret}")
-    return ret
+    return bitlen(Hash(b""))
 
-Dual_EC_DRBG_Instantiate(1337133713371337, 0, 0, Dual_EC_Security_Strength_256)
+working_state = Dual_EC_DRBG_Instantiate(1337133713371337, 0, 0, Dual_EC_Security_Strength_256)
+for i in range(10):
+    status, returned_bits, working_state = Dual_EC_DRBG_Generate(working_state, 123, 0)
+    print(f"Status: {status}, returned bits (len = {bitlen(returned_bits)}):\n{returned_bits}")
