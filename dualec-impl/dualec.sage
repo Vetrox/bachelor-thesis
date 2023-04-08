@@ -2,6 +2,7 @@ import hashlib # SHA-256
 import time
 import secrets # True random input seed entropy
 import csv # Save the data points
+import sys # command line arguments
 
 """Constants"""
 max_length = 2^13
@@ -39,7 +40,8 @@ def Elliptic_Curve_from(curve):
     return (FF, EC)
 
 class Dual_EC_Curve:
-    def __init__(self, ec, P, Q):
+    def __init__(self, name, ec, P, Q):
+        self.name = name
         FF, EC = Elliptic_Curve_from(ec)
         self.FF = FF
         self.EC = EC
@@ -323,7 +325,7 @@ def bitlen(x):
     return x.bit_length()
 
 """Curves"""
-Dual_EC_P256 = Dual_EC_Curve(
+Dual_EC_P256 = Dual_EC_Curve("P-256",
         Curve(
             115792089210356248762697446949407573530086143415290314195533631308867097853951,
             115792089210356248762697446949407573529996955224135760342422259061068512044369,
@@ -334,7 +336,7 @@ Dual_EC_P256 = Dual_EC_Curve(
         Point(
             0xc97445f4_5cdef9f0_d3e05e1e_585fc297_235b82b5_be8ff3ef_ca67c598_52018192,
             0xb28ef557_ba31dfcb_dd21ac46_e2a91e3c_304f44cb_87058ada_2cb81515_1e610046))
-Dual_EC_P384 = Dual_EC_Curve(
+Dual_EC_P384 = Dual_EC_Curve("P-384",
         Curve(
             39402006196394479212279040100143613805079739270465446667948293404245721771496870329047266088258938001861606973112319,
             39402006196394479212279040100143613805079739270465446667946905279627659399113263569398956308152294913554433653942643,
@@ -345,7 +347,7 @@ Dual_EC_P384 = Dual_EC_Curve(
         Point(
             0x8e722de3_125bddb0_5580164b_fe20b8b4_32216a62_926c5750_2ceede31_c47816ed_d1e89769_124179d0_b6951064_28815065,
             0x023b1660_dd701d08_39fd45ee_c36f9ee7_b32e13b3_15dc0261_0aa1b636_e346df67_1f790f84_c5e09b05_674dbb7e_45c803dd))
-Dual_EC_P521 = Dual_EC_Curve(
+Dual_EC_P521 = Dual_EC_Curve("P-521",
         Curve(
             6864797660130609714981900799081393217269435300143305409394463459185543183397656052122559640661454554977296311391480858037121987999716643812574028291115057151,
             6864797660130609714981900799081393217269435300143305409394463459185543183397655394245057746333217197532963996371363321113864768612440380340372808892707005449,
@@ -363,13 +365,10 @@ def pick_curve(security_strength):
     https://nvlpubs.nist.gov/nistpubs/SpecialPublications/NIST.SP.800-57pt1r5.pdf#%5B%7B%22num%22%3A196%2C%22gen%22%3A0%7D%2C%7B%22name%22%3A%22XYZ%22%7D%2C319%2C345%2C0%5D
     """
     if security_strength <= 128:
-        print("Picking P-256")
         return Dual_EC_P256
     if security_strength <= 192:
-        print("Picking P-384")
         return Dual_EC_P384
     if security_strength <= 256:
-        print("Picking P-521")
         return Dual_EC_P521
     raise ValueError("Invalid Security strength requested.")
 
@@ -385,39 +384,29 @@ def hash_outlen():
     return bitlen(Hash(b""))
 
 
-def main():
-    test_iterations = 1000
-    work = 0
-    requested_bitlen = 10
+def main(requested_bitlen, security_strength):
+    curve_name = pick_curve(security_strength).name
+    print(f"Picking {curve_name}")
 
-    average_iterations = 0
-    average_delta_time = 0
+    input_randomness = Integer(secrets.randbelow(2^64-1))
+    output_randomness, delta_time = test_for(input_randomness, requested_bitlen, security_strength)
+    print(f"Generation took: {delta_time:.2f} ms")
+    bits = output_randomness.bits()
+    with open(f"{curve_name}.csv", 'w') as f:
+        writer = csv.writer(f)
+        writer.writerow(["bit"])
+        for bit in bits:
+            writer.writerow([bit])
 
-    iteration_data = []
-    for i in range(test_iterations):
-        input_randomness = Integer(secrets.randbelow(2^64-1))
-        print(f"Picking random input entropy: {input_randomness}")
-        iteration, delta_time = test_for(input_randomness, work, requested_bitlen)
-        iteration_data.append(iteration)
-        average_iterations += (0.0 + iteration) / test_iterations
-        average_delta_time += (0.0 + delta_time) / test_iterations
-    print(f"AVG iterations: {average_iterations:.2f}, AVG time per iteration: {average_delta_time:.2f} ms")
-    with open('data.csv', 'w') as f:
-        csv.writer(f).writerow(iteration_data)
-
-def test_for(input_randomness, work, requested_bitlen):
-    working_state = Dual_EC_DRBG_Instantiate(input_randomness, 0, 0, Dual_EC_Security_Strength_128)
-    # print(f"WorkingState(outlen = {working_state.outlen}, seedlen = {working_state.seedlen})")
-    requested_amount_of_bits = requested_bitlen
+def test_for(input_randomness, requested_amount_of_bits, security_strength):
+    working_state = Dual_EC_DRBG_Instantiate(input_randomness, 0, 0, security_strength)
 
     start_time = time.monotonic()
-    for i in range(1, 2^13):
-        status, returned_bits, working_state = Dual_EC_DRBG_Generate(working_state, requested_amount_of_bits, 0)
-        if bitlen(returned_bits) < requested_amount_of_bits - work:
-            print(f"i: {i}, status: {status}, returned bits (len = {bitlen(returned_bits)}):\n{hex_from_number_padded_to_num_of_bits(returned_bits,requested_amount_of_bits)}")
-            diff = time.monotonic() - start_time
-            return i, (diff / i * 1000)
-            break
+    status, returned_bits, working_state = Dual_EC_DRBG_Generate(working_state, requested_amount_of_bits, 0)
+    diff = time.monotonic() - start_time
+    return returned_bits, (diff * 1000)
 
 if __name__ == "__main__":
-    main()
+    if len(sys.argv) != 3:
+        raise ValueError("Wrong number of command line arguments")
+    main(int(sys.argv[1]), int(sys.argv[2]))
