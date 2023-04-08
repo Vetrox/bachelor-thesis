@@ -105,7 +105,7 @@ def Dual_EC_DRBG_Instantiate(entropy_input, nonce,
     # 2. s = Hash_df(seed_material, seedlen).
     # Note: Following the spec leaves us in a state where seedlen isn't defined at this point...
     seedlen = pick_seedlen(security_strength)
-    status, s = Hash_df(seed_material, seedlen, calculate_max_outlen(seedlen))
+    s = Hash_df(seed_material, seedlen, calculate_max_outlen(seedlen))
     # TODO: Assert bitlen(s) = seedlen
 
     # 3. reseed_counter = 0.
@@ -141,13 +141,12 @@ integer.
     outlen = max_outlen # min(hash_outlen(), max_outlen)
 
     # 1. temp = the Null string
-    temp = 0
+    temp = 0.bits()
 
     # 2. len = ceil(no_of_bits_to_return / outlen)
     len_ = ceil(no_of_bits_to_return / outlen)
 
     # 3. counter = an 8-bit binary value representing the integer "1".
-    # ???
     counter = 1
 
     # 4. For i = 1 to len do
@@ -155,7 +154,8 @@ integer.
         # 4.1 temp = temp || Hash(counter || no_of_bits_to_return || input_string)
         temp = ConcatBitStr(temp,
                              Hash(ConcatBitStr(
-                                     ConcatBitStr(counter,no_of_bits_to_return),
+                                     ConcatBitStr(cast_to_bitlen(counter, 8),
+                                                  cast_to_bitlen(no_of_bits_to_return, 32)),
                                      input_string)))
 
         # 4.2 counter = counter + 1.
@@ -165,10 +165,10 @@ integer.
     requested_bits = leftmost_no_of_bits_to_return_from(temp, no_of_bits_to_return)
 
     # 6. Return SUCCESS and requested_bits.
-    return ("SUCCESS", requested_bits)
+    return requested_bits
 
-def ConcatBitStr(a,b):
-    return (a << bitlen(b)) | b
+def ConcatBitStr(bitstr_a,bitstr_b):
+    return bitstr_a + bitstr_b
 
 def Dual_EC_DRBG_Reseed(working_state, entropy_input,
                         additional_input):
@@ -187,8 +187,10 @@ def Dual_EC_Truncate(bitstring, in_len, out_len):
     the bitstring is padded on the right with (out_len - in_len) zeroes, and the result
     is returned.
     """
-    shift = in_len - out_len
-    return bitstring >> shift
+    amount_to_add = out_len - in_len
+    if amount_to_add > 0:
+        bitstring = bitstring + [0]*amount_to_add
+    return bitstring[:out_len]
 
 def Dual_EC_x(A):
     """
@@ -242,30 +244,30 @@ def Dual_EC_DRBG_Generate(working_state: WorkingState, requested_number_of_bits,
     # Note: This isn't implemented yet
 
     # 2. If additional_input_string??? = Null then additional_input = 0 else ...
-    additional_input = 0
+    # additional_input = 0.bits()
+    # Note: we don't perform a check here, because the case Null can' happen
 
     # 3. temp = the Null string
-    # ???
-    temp = 0
+    temp = 0.bits()
 
     # 4. i=0
     i = 0
 
     while True:
         # 5. t = s XOR additional_input.
-        t = XOR(working_state.s, additional_input)
+        t = XOR(num_from_bitstr(working_state.s), num_from_bitstr(additional_input))
 
         # 6. s = phi(x(t * P)).
-        working_state.s = Dual_EC_phi(Dual_EC_x(Dual_EC_mul(t, working_state.dual_ec_curve.P)))
+        working_state.s = cast_to_bitlen(Dual_EC_phi(Dual_EC_x(Dual_EC_mul(t, working_state.dual_ec_curve.P))), working_state.seedlen)
 
         # 7. r = phi(x(s * Q)).
-        r = Dual_EC_phi(Dual_EC_x(Dual_EC_mul(working_state.s, working_state.dual_ec_curve.Q)))
+        r = Dual_EC_phi(Dual_EC_x(Dual_EC_mul(num_from_bitstr(working_state.s), working_state.dual_ec_curve.Q)))
 
         # 8. temp = temp || (rightmost outlen bits of r).
-        temp = ConcatBitStr(temp, rightmost_outlen_bits_of(r, working_state.outlen))
+        temp = ConcatBitStr(temp, cast_to_bitlen(r, working_state.outlen))
 
         # 9. additional_input=0
-        additional_input = 0
+        additional_input = 0.bits()
 
         # 10. reseed_counter = reseed_counter + 1.
         working_state.reseed_counter = working_state.reseed_counter + 1
@@ -274,33 +276,52 @@ def Dual_EC_DRBG_Generate(working_state: WorkingState, requested_number_of_bits,
         i = i + 1
 
         # 12. If (len (temp) < requested_number_of_bits), then go to step 5.
-        if not (bitlen(temp) < requested_number_of_bits):
+        if not (len(temp) < requested_number_of_bits):
             break
 
     # 13. returned_bits = Truncate (temp, i * outlen, requested_number_of_bits).
+    if (len(temp) != i * working_state.outlen):
+        raise AssertionError("Temp should be a multiple of outlen")
     returned_bits = Dual_EC_Truncate(temp, i * working_state.outlen, requested_number_of_bits)
 
     # 14. s = phi(x(s * P)).
-    working_state.s = Dual_EC_phi(Dual_EC_x(Dual_EC_mul(working_state.s, working_state.dual_ec_curve.P)))#.lift()
+    working_state.s = Dual_EC_phi(Dual_EC_x(Dual_EC_mul(num_from_bitstr(working_state.s), working_state.dual_ec_curve.P)))
 
     # 15. Return SUCCESS, returned_bits, and s, seedlen, p, a, b, n, P, Q, and a reseed_counter for the new_working_state.
-    return ("SUCCESS", returned_bits, working_state)
+    return returned_bits, working_state
 
 def XOR(a, b):
     return a ^^ b
 
-def Hash(num):
-    """
-    :param num: a number
-    """
-    byte_array = bytes_from_number_padded_with_zeros_on_the_left(num)
-    return num_from_bytes(hashlib.sha256(byte_array).digest())
+def bits_from_byte(byte):
+    ret = []
+    for i in range(8):
+        masked = (byte & (i << i)) != 0
+        if masked == True:
+            ret.append(1)
+        else:
+            ret.append(0)
+    return ret
 
-def bytes_from_number_padded_with_zeros_on_the_left(num):
-    h = num.hex()
-    if len(h) % 2 != 0:
-        h = "0" + h
-    return bytes.fromhex(h)
+def bitstr_from_bytes(byte_array):
+    ret = []
+    for byte in byte_array:
+        ret += bits_from_byte(byte)
+    return ret
+
+def Hash(bitstr):
+    return bitstr_from_bytes(hashlib.sha256(bytes_from_bitstr(bitstr)).digest())
+
+def bytes_from_bitstr(bitstr):
+    ret = []
+    while len(bitstr) >= 8:
+        byte = bitstr[:8]
+        bitstr = bitstr[8:]
+        ret.append(num_from_bitstr(byte))
+    if len(bitstr) > 0:
+        ret.append(num_from_bitstr(bitstr))
+    ret = bytes(ret)
+    return ret
 
 def hex_from_number_padded_to_num_of_bits(num, amount_of_bits):
     actual_nibbles = ceil(bitlen(num) / 4)
@@ -315,11 +336,20 @@ def hex_from_number_padded_to_num_of_bits(num, amount_of_bits):
 def num_from_bytes(byte_array):
     return Integer(byte_array.hex(), 16)
 
-def rightmost_outlen_bits_of(x, outlen):
-    return x & (2^outlen - 1)
+def cast_to_bitlen(num, outlen):
+    """This also inserts 0s on the left if outlen > bitlen(x)"""
+    masked_num = num & (2^outlen - 1)
+    bitstr = masked_num.bits()
+    filler_amount = outlen - len(bitstr)
+    if filler_amount > 0:
+        for i in range(filler_amount):
+            bitstr = [0] + bitstr
+    return bitstr
 
-def leftmost_no_of_bits_to_return_from(x, no_of_bits_to_return):
-    return x >> (bitlen(x) - no_of_bits_to_return)
+def leftmost_no_of_bits_to_return_from(bitstr, no_of_bits_to_return):
+    if (no_of_bits_to_return > len(bitstr)):
+        raise ValueError("Tried to chop negative amount")
+    return bitstr[:no_of_bits_to_return]
 
 def bitlen(x):
     return x.bit_length()
@@ -381,17 +411,24 @@ def calculate_max_outlen(seedlen):
     return Integer(8*floor(seedlen / 8) - (13 + log(8)/log(2)))
 
 def hash_outlen():
-    return bitlen(Hash(b""))
+    return len(Hash(b""))
 
+def num_from_bitstr(bitlist):
+    num = 0
+    for bit in bitlist:
+        num |= bit
+        num <<= 1
+    num >>= 1
+    return num
 
 def main(requested_bitlen, security_strength):
     curve_name = pick_curve(security_strength).name
     print(f"Picking {curve_name}")
 
-    input_randomness = Integer(secrets.randbelow(2^64-1))
+    input_randomness = Integer(secrets.randbelow(2^64-1)).bits()
     output_randomness, delta_time = test_for(input_randomness, requested_bitlen, security_strength)
     print(f"Generation took: {delta_time:.2f} ms")
-    bits = output_randomness.bits()
+    bits = output_randomness
     with open(f"{curve_name}.csv", 'w') as f:
         writer = csv.writer(f)
         writer.writerow(["bit"])
@@ -399,10 +436,10 @@ def main(requested_bitlen, security_strength):
             writer.writerow([bit])
 
 def test_for(input_randomness, requested_amount_of_bits, security_strength):
-    working_state = Dual_EC_DRBG_Instantiate(input_randomness, 0, 0, security_strength)
+    working_state = Dual_EC_DRBG_Instantiate(input_randomness, 0.bits(), 0.bits(), security_strength)
 
     start_time = time.monotonic()
-    status, returned_bits, working_state = Dual_EC_DRBG_Generate(working_state, requested_amount_of_bits, 0)
+    returned_bits, working_state = Dual_EC_DRBG_Generate(working_state, requested_amount_of_bits, 0.bits())
     diff = time.monotonic() - start_time
     return returned_bits, (diff * 1000)
 
