@@ -1,4 +1,4 @@
-import hashlib # SHA-256
+import hashlib # SHA-256, SHA-512
 import time
 import secrets # True random input seed entropy
 import csv # Save the data points
@@ -17,7 +17,7 @@ highest_supported_security_strength = Dual_EC_Security_Strength_256
 
 """Classes"""
 class Curve:
-    def __init__(self, p, n, b):
+    def __init__(self, p, n, b, order):
         """
         An elliptic curve is defined by the following equation:
         y² = x³ + a*x + b (mod p)
@@ -33,10 +33,12 @@ class Curve:
         self.n = n
         self.a = -3 # Note: a is set to be (-3) in the above equation.
         self.b = b
+        self.order = order
 
 def Elliptic_Curve_from(curve):
     FF = GF(curve.p) # construct finite field from prime p
     EC = EllipticCurve([FF(curve.a), FF(curve.b)]) # sage ec
+    EC.set_order(curve.order)
     return (FF, EC)
 
 class Dual_EC_Curve:
@@ -89,7 +91,7 @@ reseeding.
 
 """Functions"""
 def Dual_EC_DRBG_Instantiate(entropy_input, nonce,
-                personalization_string, security_strength):
+                personalization_string, security_strength, curve = None):
     """
     :param entropy_input: The string of bits obtained from the source of entropy input.
     :param nonce: A string of bits as specified in Section 8.6.7.
@@ -112,10 +114,11 @@ def Dual_EC_DRBG_Instantiate(entropy_input, nonce,
     reseed_counter = 0
 
     # 4. Using the security_strength and Table 4 in Section 10.3.1, select the smallest available curve that has a security strength >= security_strength. The values for seedlen, p, a, b, n, P, Q are determined by the curve
-    curve = pick_curve(security_strength)
+    if curve == None:
+        curve = pick_curve(security_strength)
 
     # 5. Return s, seedlen, p, a, b, n, P, Q, and a reseed_counter for the initial_working_state.
-    return WorkingState(s, seedlen, curve, reseed_counter, calculate_max_outlen(seedlen)) #min(hash_outlen(), calculate_max_outlen(seedlen)))
+    return WorkingState(s, seedlen, curve, reseed_counter, calculate_max_outlen(seedlen))
 
 def Hash_df(input_string, no_of_bits_to_return, max_outlen):
     """
@@ -359,7 +362,8 @@ Dual_EC_P256 = Dual_EC_Curve("P-256",
         Curve(
             115792089210356248762697446949407573530086143415290314195533631308867097853951,
             115792089210356248762697446949407573529996955224135760342422259061068512044369,
-            0x5ac635d8_aa3a93e7_b3ebbd55_769886bc_651d06b0_cc53b0f6_3bce3c3e_27d2604b),
+            0x5ac635d8_aa3a93e7_b3ebbd55_769886bc_651d06b0_cc53b0f6_3bce3c3e_27d2604b,
+            0xffffffff00000000ffffffffffffffffbce6faada7179e84f3b9cac2fc632551),
         Point( # Base point for P-256 and also P
             0x6b17d1f2_e12c4247_f8bce6e5_63a440f2_77037d81_2deb33a0_f4a13945_d898c296,
             0x4fe342e2_fe1a7f9b_8ee7eb4a_7c0f9e16_2bce3357_6b315ece_cbb64068_37bf51f5),
@@ -370,7 +374,8 @@ Dual_EC_P384 = Dual_EC_Curve("P-384",
         Curve(
             39402006196394479212279040100143613805079739270465446667948293404245721771496870329047266088258938001861606973112319,
             39402006196394479212279040100143613805079739270465446667946905279627659399113263569398956308152294913554433653942643,
-            0xb3312fa7_e23ee7e4_988e056b_e3f82d19_181d9c6e_fe814112_0314088f_5013875a_c656398d_8a2ed19d_2a85c8ed_d3ec2aef),
+            0xb3312fa7_e23ee7e4_988e056b_e3f82d19_181d9c6e_fe814112_0314088f_5013875a_c656398d_8a2ed19d_2a85c8ed_d3ec2aef,
+            0xffffffffffffffffffffffffffffffffffffffffffffffffc7634d81f4372ddf581a0db248b0a77aecec196accc52973),
         Point(
             0xaa87ca22_be8b0537_8eb1c71e_f320ad74_6e1d3b62_8ba79b98_59f741e0_82542a38_5502f25d_bf55296c_3a545e38_72760ab7,
             0x3617de4a_96262c6f_5d9e98bf_9292dc29_f8f41dbd_289a147c_e9da3113_b5f0b8c0_0a60b1ce_1d7e819d_7a431d7c_90ea0e5f),
@@ -381,7 +386,8 @@ Dual_EC_P521 = Dual_EC_Curve("P-521",
         Curve(
             6864797660130609714981900799081393217269435300143305409394463459185543183397656052122559640661454554977296311391480858037121987999716643812574028291115057151,
             6864797660130609714981900799081393217269435300143305409394463459185543183397655394245057746333217197532963996371363321113864768612440380340372808892707005449,
-            0x051953eb_9618e1c9_a1f929a2_1a0b6854_0eea2da7_25b99b31_5f3b8b48_9918ef10_9e156193_951ec7e9_37b1652c_0bd3bb1b_f073573d_f883d2c3_4f1ef451_fd46b503_f00),
+            0x051953eb_9618e1c9_a1f929a2_1a0b6854_0eea2da7_25b99b31_5f3b8b48_9918ef10_9e156193_951ec7e9_37b1652c_0bd3bb1b_f073573d_f883d2c3_4f1ef451_fd46b503_f00,
+            0x01fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffa51868783bf2f966b7fcc0148f709a5d03bb5c9b8899c47aebb6fb71e91386409),
         Point(
             0xc6858e06_b70404e9_cd9e3ecb_662395b4_429c6481_39053fb5_21f828af_606b4d3d_baa14b5e_77efe759_28fe1dc1_27a2ffa8_de3348b3_c1856a42_9bf97e7e_31c2e5bd_66,
             0x11839296_a789a3bc_0045c8a5_fb42c7d1_bd998f54_449579b4_46817afb_d17273e6_62c97ee7_2995ef42_640c550b_9013fad0_761353c7_086a272c_24088be9_4769fd16_650),
@@ -421,12 +427,13 @@ def num_from_bitstr(bitlist):
     num >>= 1
     return num
 
-def main(requested_bitlen, security_strength):
-    curve_name = pick_curve(security_strength).name
+def generate_for(requested_bitlen, security_strength):
+    curve = pick_curve(security_strength)
+    curve_name = curve.name
     print(f"Picking {curve_name}")
 
     input_randomness = Integer(secrets.randbelow(2^64-1)).bits()
-    output_randomness, delta_time = test_for(input_randomness, requested_bitlen, security_strength)
+    output_randomness, delta_time = test_for(input_randomness, requested_bitlen, security_strength, curve)
     print(f"Generation took: {delta_time:.2f} ms")
     bits = output_randomness
     with open(f"{curve_name}.csv", 'w') as f:
@@ -435,13 +442,59 @@ def main(requested_bitlen, security_strength):
         for bit in bits:
             writer.writerow([bit])
 
-def test_for(input_randomness, requested_amount_of_bits, security_strength):
-    working_state = Dual_EC_DRBG_Instantiate(input_randomness, 0.bits(), 0.bits(), security_strength)
+def backdoor(security_strength):
+    curve = pick_curve(security_strength)
+    curve_name = curve.name
+    print(f"Picking {curve_name}")
+    d, Q = generate_Q(curve.P)
+    print(f"produced backdoor d: {d}, Q: {Q}")
+    curve.Q = Q
+
+    seedlen = pick_seedlen(security_strength)
+    max_outlen = calculate_max_outlen(seedlen)
+    num_of_predictions = 9
+    requested_bitlen = max_outlen * (1+num_of_predictions)
+
+    input_randomness = Integer(secrets.randbelow(2^64-1)).bits()
+    output_randomness, delta_time = test_for(input_randomness, requested_bitlen, security_strength, curve)
+    print(f"Generation took: {delta_time:.2f} ms")
+
+    s = compute_s_from_one_outlen_line_of_bits(output_randomness[:max_outlen])
+    working_state = WorkingState(s, seedlen, curve, 0, max_outlen)
+    for i in range(num_of_predictions):
+        output_randomness = output_randomness[max_outlen:]
+        returned_bits, working_state = Dual_EC_DRBG_Generate(working_state, max_outlen, 0.bits())
+        print(f"predicted: {num_from_bitstr(returned_bits).hex()}, actual: {num_from_bitstr(output_randomness[:max_outlen]).hex()}")
+
+def compute_s_from_one_outlen_line_of_bits(rand_bits):
+    stripped_bits = ...
+    for i in range(2^stripped_bits-1)
+        composite = rand_bits + Integer(i).bits()
+        # TODO
+
+def test_for(input_randomness, requested_amount_of_bits, security_strength, curve):
+    working_state = Dual_EC_DRBG_Instantiate(input_randomness, 0.bits(), 0.bits(), security_strength, curve)
 
     start_time = time.monotonic()
     returned_bits, working_state = Dual_EC_DRBG_Generate(working_state, requested_amount_of_bits, 0.bits())
     diff = time.monotonic() - start_time
     return returned_bits, (diff * 1000)
+
+def generate_Q(P):
+    """ generates d * Q = P
+        and returns d and Q
+    """
+    while True:
+        # pick a random d
+        d = Integer(secrets.randbelow(P.order() - 1)) + 1 # TODO: check the upper bound
+        # compute the inverse of d
+        e = d^-1 % P.order()
+        # compute Q based on P
+        Q = e * P
+        # perform the sanity check
+        if d * Q == P:
+            break
+    return (d, Q)
 
 if __name__ == "__main__":
     if len(sys.argv) != 3:
