@@ -471,9 +471,9 @@ def backdoor(security_strength):
     print("Predicting the next inputs...")
     working_state = WorkingState(s, seedlen, curve, 0, max_outlen)
     returned_bits, working_state = Dual_EC_DRBG_Generate(working_state, max_outlen*num_of_predictions, 0.bits()[::-1])
+    print(f"predicted: {num_from_bitstr(returned_bits).hex()}, actual: {num_from_bitstr(output_randomness).hex()}")
     if returned_bits == output_randomness:
         print("SUCCESS")
-    # print(f"predicted: {num_from_bitstr(returned_bits).hex()}, actual: {num_from_bitstr(output_randomness[:max_outlen]).hex()}")
 
 def compute_s_from_one_outlen_line_of_bits(rand_bits, next_rand_bits, seedlen, max_outlen, d, Q, curve):
     stripped_amount_of_bits = seedlen-max_outlen
