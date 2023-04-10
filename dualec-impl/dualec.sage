@@ -295,7 +295,7 @@ def Dual_EC_DRBG_Generate(working_state: WorkingState, requested_number_of_bits,
     returned_bits = Dual_EC_Truncate(temp, i * working_state.outlen, requested_number_of_bits)
 
     # 14. s = phi(x(s * P)). BACKDOOR: x(d * (s * Q)) * (d * Q) = d * r
-    working_state.s = Dual_EC_phi(Dual_EC_x(Dual_EC_mul(num_from_bitstr(working_state.s), working_state.dual_ec_curve.P)))
+    working_state.s = cast_to_bitlen(Dual_EC_phi(Dual_EC_x(Dual_EC_mul(num_from_bitstr(working_state.s), working_state.dual_ec_curve.P))), working_state.seedlen)
 
     # 15. Return SUCCESS, returned_bits, and s, seedlen, p, a, b, n, P, Q, and a reseed_counter for the new_working_state.
     return returned_bits, working_state
@@ -460,20 +460,20 @@ def backdoor(security_strength):
     seedlen = pick_seedlen(security_strength)
     max_outlen = calculate_max_outlen(seedlen)
     num_of_predictions = 9
-    requested_bitlen = max_outlen * (1+num_of_predictions)
+    requested_bitlen = max_outlen * (2+num_of_predictions)
 
     input_randomness = Integer(secrets.randbelow(2^64-1)).bits()[::-1]
     output_randomness, delta_time = test_for(input_randomness, requested_bitlen, security_strength, curve)
     print(f"Generation took: {delta_time:.2f} ms")
 
     s = compute_s_from_one_outlen_line_of_bits(output_randomness[:max_outlen], output_randomness[max_outlen:2*max_outlen], seedlen, max_outlen, d, Q, curve)
+    output_randomness = output_randomness[2*max_outlen:]
     print("Predicting the next inputs...")
-    print(f"{type(s)}")
     working_state = WorkingState(s, seedlen, curve, 0, max_outlen)
-    for i in range(num_of_predictions):
-        output_randomness = output_randomness[max_outlen:]
-        returned_bits, working_state = Dual_EC_DRBG_Generate(working_state, max_outlen, 0.bits()[::-1])
-        print(f"predicted: {num_from_bitstr(returned_bits).hex()}, actual: {num_from_bitstr(output_randomness[:max_outlen]).hex()}")
+    returned_bits, working_state = Dual_EC_DRBG_Generate(working_state, max_outlen*num_of_predictions, 0.bits()[::-1])
+    if returned_bits == output_randomness:
+        print("SUCCESS")
+    # print(f"predicted: {num_from_bitstr(returned_bits).hex()}, actual: {num_from_bitstr(output_randomness[:max_outlen]).hex()}")
 
 def compute_s_from_one_outlen_line_of_bits(rand_bits, next_rand_bits, seedlen, max_outlen, d, Q, curve):
     stripped_amount_of_bits = seedlen-max_outlen
@@ -483,7 +483,7 @@ def compute_s_from_one_outlen_line_of_bits(rand_bits, next_rand_bits, seedlen, m
     for i in range(2^stripped_amount_of_bits):
         guess_for_stripped_bits_of_r = cast_to_bitlen(Integer(i), stripped_amount_of_bits)
         guess_for_r_x = num_from_bitstr(guess_for_stripped_bits_of_r + rand_bits)
-        if i % 2^9 == 0:
+        if i % 2^8 == 0:
             print(f"guess for stripped_bits = {hex_from_number_padded_to_num_of_bits(num_from_bitstr(guess_for_stripped_bits_of_r), stripped_amount_of_bits)}")
             print(f"guess for r.x = {hex_from_number_padded_to_num_of_bits(guess_for_r_x, seedlen)}")
         guesses_for_R = calculate_Points_from_x(guess_for_r_x, curve)
