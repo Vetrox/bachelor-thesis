@@ -467,11 +467,13 @@ def backdoor(security_strength):
     print(f"Generation took: {delta_time:.2f} ms")
 
     s = compute_s_from_one_outlen_line_of_bits(output_randomness[:max_outlen], output_randomness[max_outlen:2*max_outlen], seedlen, max_outlen, d, Q, curve)
-    #working_state = WorkingState(s, seedlen, curve, 0, max_outlen)
-    #for i in range(num_of_predictions):
-    #    output_randomness = output_randomness[max_outlen:]
-    #    returned_bits, working_state = Dual_EC_DRBG_Generate(working_state, max_outlen, 0.bits()[::-1])
-    #    print(f"predicted: {num_from_bitstr(returned_bits).hex()}, actual: {num_from_bitstr(output_randomness[:max_outlen]).hex()}")
+    print("Predicting the next inputs...")
+    print(f"{type(s)}")
+    working_state = WorkingState(s, seedlen, curve, 0, max_outlen)
+    for i in range(num_of_predictions):
+        output_randomness = output_randomness[max_outlen:]
+        returned_bits, working_state = Dual_EC_DRBG_Generate(working_state, max_outlen, 0.bits()[::-1])
+        print(f"predicted: {num_from_bitstr(returned_bits).hex()}, actual: {num_from_bitstr(output_randomness[:max_outlen]).hex()}")
 
 def compute_s_from_one_outlen_line_of_bits(rand_bits, next_rand_bits, seedlen, max_outlen, d, Q, curve):
     stripped_amount_of_bits = seedlen-max_outlen
@@ -492,7 +494,7 @@ def compute_s_from_one_outlen_line_of_bits(rand_bits, next_rand_bits, seedlen, m
             guess_for_next_rand_bits = cast_to_bitlen(guess_for_next_r, max_outlen)
             if guess_for_next_rand_bits == next_rand_bits:
                 print(f"found the right secret state {guess_for_next_s.hex()}")
-                return guess_for_next_s
+                return guess_for_next_s.bits()[::-1]
     raise ValueError("Didn't find any matching s. This indicates a mathematical problem, since we check every possibility of r")
 
 def calculate_Points_from_x(x, curve):
