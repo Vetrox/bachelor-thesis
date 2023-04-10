@@ -43,6 +43,7 @@ def Elliptic_Curve_from(curve):
 
 class Dual_EC_Curve:
     def __init__(self, name, ec, P, Q):
+        self.ec = ec
         self.name = name
         FF, EC = Elliptic_Curve_from(ec)
         self.FF = FF
@@ -463,33 +464,44 @@ def backdoor(security_strength):
     output_randomness, delta_time = test_for(input_randomness, requested_bitlen, security_strength, curve)
     print(f"Generation took: {delta_time:.2f} ms")
 
-    s = compute_s_from_one_outlen_line_of_bits(output_randomness[:max_outlen], output_randomness[max_outlen:2*max_outlen], seedlen, max_outlen, d, Q)
+    s = compute_s_from_one_outlen_line_of_bits(output_randomness[:max_outlen], output_randomness[max_outlen:2*max_outlen], seedlen, max_outlen, d, Q, curve)
     #working_state = WorkingState(s, seedlen, curve, 0, max_outlen)
     #for i in range(num_of_predictions):
     #    output_randomness = output_randomness[max_outlen:]
     #    returned_bits, working_state = Dual_EC_DRBG_Generate(working_state, max_outlen, 0.bits()[::-1])
     #    print(f"predicted: {num_from_bitstr(returned_bits).hex()}, actual: {num_from_bitstr(output_randomness[:max_outlen]).hex()}")
 
-def compute_s_from_one_outlen_line_of_bits(rand_bits, next_rand_bits, seedlen, max_outlen, d, Q):
+def compute_s_from_one_outlen_line_of_bits(rand_bits, next_rand_bits, seedlen, max_outlen, d, Q, curve):
     stripped_amount_of_bits = seedlen-max_outlen
     print(f"stripped_amount_of_bits = {stripped_amount_of_bits}")
 
     # bruteforce the missing stripped bits
     for i in range(2^stripped_amount_of_bits-1):
         guess_for_stripped_bits_of_r = cast_to_bitlen(Integer(i), stripped_amount_of_bits)
-        guess_for_r = num_from_bitstr(guess_for_stripped_bits_of_r + rand_bits)
+        guess_for_r_x = num_from_bitstr(guess_for_stripped_bits_of_r + rand_bits)
         if i % 1000 == 0:
             print(i)
             print(f"guess for stripped_bits = {hex_from_number_padded_to_num_of_bits(num_from_bitstr(guess_for_stripped_bits_of_r), stripped_amount_of_bits)}")
-            print(f"guess for r = {hex_from_number_padded_to_num_of_bits(guess_for_r, seedlen)}")
-        # it holds that s2 = r * d
-        guess_for_next_s = guess_for_r * d
-        guess_for_next_r = Dual_EC_phi(Dual_EC_x(guess_for_next_s * Q))
-        guess_for_next_rand_bits = cast_to_bitlen(guess_for_next_r, max_outlen)
-        if guess_for_next_rand_bits == next_rand_bits:
-            print("found the right secret state {guess_for_next_s.hex()}")
-            return guess_for_next_s
+            print(f"guess for r.x = {hex_from_number_padded_to_num_of_bits(guess_for_r_x, seedlen)}")
+        guesses_for_R = calculate_Points_from_x(guess_for_r_x, curve)
+        for guess_for_R in guesses_for_R:
+            # it holds that s2 = x(d * R)
+            guess_for_next_s = Dual_EC_phi(Dual_EC_x(d * guess_for_R))
+            guess_for_next_r = Dual_EC_phi(Dual_EC_x(guess_for_next_s * Q))
+            guess_for_next_rand_bits = cast_to_bitlen(guess_for_next_r, max_outlen)
+            if guess_for_next_rand_bits == next_rand_bits:
+                print("found the right secret state {guess_for_next_s.hex()}")
+                return guess_for_next_s
     raise ValueError("Didn't find any matching s. This indicates a mathematical problem, since we check every possibility of r")
+
+def calculate_Points_from_x(x, curve):
+    FF = curve.FF
+    EC = curve.EC
+    x = FF(x)
+    # x³ + a*x + b (mod p)
+    yy = (x^3 + curve.ec.a * x + curve.ec.b) % curve.ec.p
+    y_candidates = yy.sqrt(extend=False, all=True)
+    return [EC(FF(x), FF(y)) for y in y_candidates]
 
 def test_for(input_randomness, requested_amount_of_bits, security_strength, curve):
     working_state = Dual_EC_DRBG_Instantiate(input_randomness, 0.bits()[::-1], 0.bits()[::-1], security_strength, curve)
