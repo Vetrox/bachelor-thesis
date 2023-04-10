@@ -258,7 +258,7 @@ def Dual_EC_DRBG_Generate(working_state: WorkingState, requested_number_of_bits,
     i = 0
 
     while True:
-        print(f"s = {num_from_bitstr(working_state.s).hex()}")
+        print(f"Iteration {i}, s = {num_from_bitstr(working_state.s).hex()}")
         # 5. t = s XOR additional_input.
         t = XOR(num_from_bitstr(working_state.s), num_from_bitstr(additional_input))
 
@@ -271,7 +271,9 @@ def Dual_EC_DRBG_Generate(working_state: WorkingState, requested_number_of_bits,
         # 8. temp = temp || (rightmost outlen bits of r).
         rightmost_outlen_bits_of_r = cast_to_bitlen(r, working_state.outlen)
         stripped_bits = XOR(num_from_bitstr(rightmost_outlen_bits_of_r), r)
-        print(f"r = {r.hex()}, stripped_bits = {stripped_bits.hex()}")
+        hex_outlen_bits_of_r = hex_from_number_padded_to_num_of_bits(num_from_bitstr(rightmost_outlen_bits_of_r), working_state.outlen)
+        hex_stripped_bits = hex_from_number_padded_to_num_of_bits(stripped_bits >> working_state.outlen, working_state.seedlen - working_state.outlen)
+        print(f"r = {hex_outlen_bits_of_r}, stripped_bits = {hex_stripped_bits}")
         temp = ConcatBitStr(temp, rightmost_outlen_bits_of_r)
 
         # 9. additional_input=0
@@ -332,7 +334,7 @@ def bytes_from_bitstr(bitstr):
     return ret
 
 def hex_from_number_padded_to_num_of_bits(num, amount_of_bits):
-    actual_nibbles = ceil(bitlen(num) / 4)
+    actual_nibbles = max(ceil(bitlen(num) / 4), 1)
     amount_of_nibbles = ceil(amount_of_bits / 4)
     if actual_nibbles > amount_of_nibbles:
         raise ValueError("Requested less nibbles than the minimum to represent this number")
@@ -476,11 +478,10 @@ def compute_s_from_one_outlen_line_of_bits(rand_bits, next_rand_bits, seedlen, m
     print(f"stripped_amount_of_bits = {stripped_amount_of_bits}")
 
     # bruteforce the missing stripped bits
-    for i in range(2^stripped_amount_of_bits-1):
+    for i in range(2^stripped_amount_of_bits):
         guess_for_stripped_bits_of_r = cast_to_bitlen(Integer(i), stripped_amount_of_bits)
         guess_for_r_x = num_from_bitstr(guess_for_stripped_bits_of_r + rand_bits)
-        if i % 1000 == 0:
-            print(i)
+        if i % 2^9 == 0:
             print(f"guess for stripped_bits = {hex_from_number_padded_to_num_of_bits(num_from_bitstr(guess_for_stripped_bits_of_r), stripped_amount_of_bits)}")
             print(f"guess for r.x = {hex_from_number_padded_to_num_of_bits(guess_for_r_x, seedlen)}")
         guesses_for_R = calculate_Points_from_x(guess_for_r_x, curve)
@@ -490,7 +491,7 @@ def compute_s_from_one_outlen_line_of_bits(rand_bits, next_rand_bits, seedlen, m
             guess_for_next_r = Dual_EC_phi(Dual_EC_x(guess_for_next_s * Q))
             guess_for_next_rand_bits = cast_to_bitlen(guess_for_next_r, max_outlen)
             if guess_for_next_rand_bits == next_rand_bits:
-                print("found the right secret state {guess_for_next_s.hex()}")
+                print(f"found the right secret state {guess_for_next_s.hex()}")
                 return guess_for_next_s
     raise ValueError("Didn't find any matching s. This indicates a mathematical problem, since we check every possibility of r")
 
