@@ -4,6 +4,8 @@ import secrets # True random input seed entropy
 import csv # Save the data points
 import sys # command line arguments
 
+SHA_256_OUTLEN = 256
+
 """Constants"""
 Dual_EC_Security_Strength_128 = 128
 Dual_EC_Security_Strength_192 = 192
@@ -82,22 +84,21 @@ def Dual_EC_DRBG_Instantiate(entropy_input, nonce,
     seed_material = ConcatBitStr(ConcatBitStr(entropy_input, nonce), personalization_string)
 
     # 2. s = Hash_df(seed_material, seedlen).
-    # Note: Following the spec leaves us in a state where seedlen isn't defined at this point...
     seedlen = pick_seedlen(security_strength)
-    s = Hash_df(seed_material, seedlen, calculate_max_outlen(seedlen))
-    # TODO: Assert bitlen(s) = seedlen
+    s = Hash_df(seed_material, seedlen)
+    assert len(s) == seedlen
 
     # 3. reseed_counter = 0.
     reseed_counter = 0
 
     # 4. Using the security_strength and Table 4 in Section 10.3.1, select the smallest available curve that has a security strength >= security_strength. The values for seedlen, p, a, b, n, P, Q are determined by the curve
-    if curve == None:
+    if curve == None: # BACKDOOR: This is to allow a self-picked Q
         curve = pick_curve(security_strength)
 
     # 5. Return s, seedlen, p, a, b, n, P, Q, and a reseed_counter for the initial_working_state.
     return WorkingState(s, seedlen, curve, reseed_counter, calculate_max_outlen(seedlen))
 
-def Hash_df(input_string, no_of_bits_to_return, max_outlen):
+def Hash_df(input_string, no_of_bits_to_return): #, max_outlen):
     """
     The hash-based derivation function hashes an input
     string and returns the requested number of bits. Let Hash be the hash function used by the DRBG mechanism, and let outlen be its output length.
@@ -116,9 +117,9 @@ integer.
     """
     # Hash gets selected from Table 4 in 10.3.1
     # Note: Since it's allowed for every allowed curve (P-256, P-384, P-521) we use SHA-256.
-
+    outlen = SHA_256_OUTLEN # max_outlen
+    assert no_of_bits_to_return <= 255 * outlen
     # The outlen of SHA-256 is TODO
-    outlen = max_outlen # min(hash_outlen(), max_outlen)
 
     # 1. temp = the Null string
     temp = bits_from_num(0)
@@ -300,9 +301,14 @@ def bitstr_from_bytes(byte_array):
         ret += bits_from_byte(byte)
     return ret
 
+def pad_bitstr_left(bitstr, expected_length):
+    assert type(bitstr) == list
+    remaining = expected_length - len(bitstr)
+    return [0]*remaining + bitstr
+
 def Hash(bitstr):
     assert type(bitstr) == list
-    return bitstr_from_bytes(hashlib.sha256(bytes_from_bitstr(bitstr)).digest())
+    return pad_bitstr_left(bitstr_from_bytes(hashlib.sha256(bytes_from_bitstr(bitstr)).digest()), SHA_256_OUTLEN)
 
 def bytes_from_bitstr(bitstr):
     assert type(bitstr) == list
@@ -472,7 +478,6 @@ def compute_s_from_one_outlen_line_of_bits(rand_bits, next_rand_bits, seedlen, m
         guess_for_r_x = num_from_bitstr(ConcatBitStr(guess_for_stripped_bits_of_r, rand_bits))
         if i % 2^8 == 0:
             print(f"guess for stripped_bits = {hex_from_number_padded_to_num_of_bits(num_from_bitstr(guess_for_stripped_bits_of_r), stripped_amount_of_bits)}")
-            print(f"guess for r.x = {hex_from_number_padded_to_num_of_bits(guess_for_r_x, seedlen)}")
         guesses_for_R = calculate_Points_from_x(guess_for_r_x, curve)
         for guess_for_R in guesses_for_R:
             # it holds that s2 = x(d * R)
