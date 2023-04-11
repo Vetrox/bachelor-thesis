@@ -235,8 +235,9 @@ def Dual_EC_DRBG_Generate(working_state: WorkingState, requested_number_of_bits,
     # 4. i=0
     i = 0
 
+    print(f"Generate(s = {hex_from_number_padded_to_num_of_bits(num_from_bitstr(working_state.s), working_state.seedlen)}, requested_number_of_bits = {requested_number_of_bits})")
     while True:
-        print(f"Iteration {i}, s = {hex_from_number_padded_to_num_of_bits(num_from_bitstr(working_state.s), working_state.seedlen)}")
+        print(f"Iteration {i}")
         # 5. t = s XOR additional_input.
         t = XOR(num_from_bitstr(working_state.s), num_from_bitstr(additional_input))
 
@@ -447,7 +448,8 @@ def attack_backdoor(security_strength):
     curve_name = curve.name
     print(f"Picking {curve_name}")
     d, Q = generate_Q(curve.P)
-    print(f"produced backdoor d: {d}, Q: {Q}")
+    x,y = Q.xy()
+    print(f"produced backdoor d: {d.hex()}, Q: ({x.lift().hex()}, {y.lift().hex()})")
     curve.Q = Q
 
     seedlen = pick_seedlen(security_strength)
@@ -476,16 +478,16 @@ def compute_s_from_one_outlen_line_of_bits(rand_bits, next_rand_bits, seedlen, m
     for i in range(2^stripped_amount_of_bits):
         guess_for_stripped_bits_of_r = cast_to_bitlen(Integer(i), stripped_amount_of_bits)
         guess_for_r_x = num_from_bitstr(ConcatBitStr(guess_for_stripped_bits_of_r, rand_bits))
-        if i % 2^8 == 0:
-            print(f"guess for stripped_bits = {hex_from_number_padded_to_num_of_bits(num_from_bitstr(guess_for_stripped_bits_of_r), stripped_amount_of_bits)}")
+        print(f"\rguess for stripped_bits = {hex_from_number_padded_to_num_of_bits(num_from_bitstr(guess_for_stripped_bits_of_r), stripped_amount_of_bits)}", end="")
         guesses_for_R = calculate_Points_from_x(guess_for_r_x, curve)
+        print(f"\tfound {len(guesses_for_R)} solutions for y", end="")
         for guess_for_R in guesses_for_R:
             # it holds that s2 = x(d * R)
             guess_for_next_s = Dual_EC_phi(Dual_EC_x(Dual_EC_mul(d, guess_for_R)))
             guess_for_next_r = Dual_EC_phi(Dual_EC_x(Dual_EC_mul(guess_for_next_s, Q)))
             guess_for_next_rand_bits = cast_to_bitlen(guess_for_next_r, max_outlen)
             if guess_for_next_rand_bits == next_rand_bits:
-                print(f"found the right secret state {guess_for_next_s.hex()}")
+                print(f"\nfound the right secret state {guess_for_next_s.hex()}")
                 return bits_from_num(guess_for_next_s)
     raise ValueError("Didn't find any matching s. This indicates a mathematical problem, since we check every possibility of r")
 
