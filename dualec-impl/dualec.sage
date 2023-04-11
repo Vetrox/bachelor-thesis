@@ -145,7 +145,7 @@ integer.
     outlen = max_outlen # min(hash_outlen(), max_outlen)
 
     # 1. temp = the Null string
-    temp = 0.bits()[::-1]
+    temp = bits_from_num(0)
 
     # 2. len = ceil(no_of_bits_to_return / outlen)
     len_ = ceil(no_of_bits_to_return / outlen)
@@ -248,11 +248,11 @@ def Dual_EC_DRBG_Generate(working_state: WorkingState, requested_number_of_bits,
     # Note: This isn't implemented yet
 
     # 2. If additional_input_string??? = Null then additional_input = 0 else ...
-    # additional_input = 0.bits()[::-1]
+    # additional_input = bits_from_num(0)
     # Note: we don't perform a check here, because the case Null can' happen
 
     # 3. temp = the Null string
-    temp = 0.bits()[::-1]
+    temp = bits_from_num(0)
 
     # 4. i=0
     i = 0
@@ -278,7 +278,7 @@ def Dual_EC_DRBG_Generate(working_state: WorkingState, requested_number_of_bits,
         temp = ConcatBitStr(temp, rightmost_outlen_bits_of_r)
 
         # 9. additional_input=0
-        additional_input = 0.bits()[::-1]
+        additional_input = bits_from_num(0)
 
         # 10. reseed_counter = reseed_counter + 1.
         working_state.reseed_counter = working_state.reseed_counter + 1
@@ -350,7 +350,7 @@ def num_from_bytes(byte_array):
 def cast_to_bitlen(num, outlen):
     """This also inserts 0s on the left if outlen > bitlen(x)"""
     masked_num = num & (2^outlen - 1)
-    bitstr = masked_num.bits()[::-1]
+    bitstr = bits_from_num(masked_num)
     filler_amount = outlen - len(bitstr)
     if filler_amount > 0:
         for i in range(filler_amount):
@@ -440,7 +440,7 @@ def generate_for(requested_bitlen, security_strength):
     curve_name = curve.name
     print(f"Picking {curve_name}")
 
-    input_randomness = Integer(secrets.randbelow(2^64-1)).bits()[::-1]
+    input_randomness = bits_from_num(Integer(secrets.randbelow(2^64-1)))
     output_randomness, delta_time = test_for(input_randomness, requested_bitlen, security_strength, curve)
     print(f"Generation took: {delta_time:.2f} ms")
     bits = output_randomness
@@ -463,7 +463,7 @@ def backdoor(security_strength):
     num_of_predictions = 9
     requested_bitlen = max_outlen * (2+num_of_predictions)
 
-    input_randomness = Integer(secrets.randbelow(2^64-1)).bits()[::-1]
+    input_randomness = bits_from_num(Integer(secrets.randbelow(2^64-1)))
     output_randomness, delta_time = test_for(input_randomness, requested_bitlen, security_strength, curve)
     print(f"Generation took: {delta_time:.2f} ms")
 
@@ -471,7 +471,7 @@ def backdoor(security_strength):
     output_randomness = output_randomness[2*max_outlen:]
     print("Predicting the next inputs...")
     working_state = WorkingState(s, seedlen, curve, 0, max_outlen)
-    returned_bits, working_state = Dual_EC_DRBG_Generate(working_state, max_outlen*num_of_predictions, 0.bits()[::-1])
+    returned_bits, working_state = Dual_EC_DRBG_Generate(working_state, max_outlen*num_of_predictions, bits_from_num(0))
     print(f"predicted: {num_from_bitstr(returned_bits).hex()}, actual: {num_from_bitstr(output_randomness).hex()}")
     if returned_bits == output_randomness:
         print("SUCCESS")
@@ -483,20 +483,23 @@ def compute_s_from_one_outlen_line_of_bits(rand_bits, next_rand_bits, seedlen, m
     # bruteforce the missing stripped bits
     for i in range(2^stripped_amount_of_bits):
         guess_for_stripped_bits_of_r = cast_to_bitlen(Integer(i), stripped_amount_of_bits)
-        guess_for_r_x = num_from_bitstr(guess_for_stripped_bits_of_r + rand_bits)
+        guess_for_r_x = num_from_bitstr(ConcatBitStr(guess_for_stripped_bits_of_r, rand_bits))
         if i % 2^8 == 0:
             print(f"guess for stripped_bits = {hex_from_number_padded_to_num_of_bits(num_from_bitstr(guess_for_stripped_bits_of_r), stripped_amount_of_bits)}")
             print(f"guess for r.x = {hex_from_number_padded_to_num_of_bits(guess_for_r_x, seedlen)}")
         guesses_for_R = calculate_Points_from_x(guess_for_r_x, curve)
         for guess_for_R in guesses_for_R:
             # it holds that s2 = x(d * R)
-            guess_for_next_s = Dual_EC_phi(Dual_EC_x(d * guess_for_R))
-            guess_for_next_r = Dual_EC_phi(Dual_EC_x(guess_for_next_s * Q))
+            guess_for_next_s = Dual_EC_phi(Dual_EC_x(Dual_EC_mul(d, guess_for_R)))
+            guess_for_next_r = Dual_EC_phi(Dual_EC_x(Dual_EC_mul(guess_for_next_s, Q)))
             guess_for_next_rand_bits = cast_to_bitlen(guess_for_next_r, max_outlen)
             if guess_for_next_rand_bits == next_rand_bits:
                 print(f"found the right secret state {guess_for_next_s.hex()}")
-                return guess_for_next_s.bits()[::-1]
+                return bits_from_num(guess_for_next_s)
     raise ValueError("Didn't find any matching s. This indicates a mathematical problem, since we check every possibility of r")
+
+def bits_from_num(num):
+    return num.bits()[::-1] # ...b3b2b1b0
 
 def calculate_Points_from_x(x, curve):
     FF = curve.FF
@@ -508,17 +511,15 @@ def calculate_Points_from_x(x, curve):
     return [EC(FF(x), FF(y)) for y in y_candidates]
 
 def test_for(input_randomness, requested_amount_of_bits, security_strength, curve):
-    working_state = Dual_EC_DRBG_Instantiate(input_randomness, 0.bits()[::-1], 0.bits()[::-1], security_strength, curve)
+    working_state = Dual_EC_DRBG_Instantiate(input_randomness, bits_from_num(0), bits_from_num(0), security_strength, curve)
 
     start_time = time.monotonic()
-    returned_bits, working_state = Dual_EC_DRBG_Generate(working_state, requested_amount_of_bits, 0.bits()[::-1])
+    returned_bits, working_state = Dual_EC_DRBG_Generate(working_state, requested_amount_of_bits, bits_from_num(0))
     diff = time.monotonic() - start_time
     return returned_bits, (diff * 1000)
 
 def generate_Q(P):
-    """ generates d * Q = P
-        and returns d and Q
-    """
+    """ generates d * Q = P and returns d and Q"""
     while True:
         # pick a random d
         d = Integer(secrets.randbelow(P.order() - 1)) + 1 # TODO: check the upper bound
