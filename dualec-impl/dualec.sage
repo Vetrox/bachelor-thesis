@@ -171,19 +171,15 @@ integer.
     # 6. Return SUCCESS and requested_bits.
     return requested_bits
 
-def ConcatBitStr(bitstr_a,bitstr_b):
+def ConcatBitStr(bitstr_a, bitstr_b):
+    assert type(bitstr_a) == type(bitstr_b) == list
     return bitstr_a + bitstr_b
+
 
 def Dual_EC_DRBG_Reseed(working_state, entropy_input,
                         additional_input):
     raise NotImplementedError("Reseeding isn't implemented yet")
 
-def Dual_EC_pad8(bitstring):
-    """
-    pad8 (bitstring) returns a copy of the bitstring padded on the right with binary
-    0’s, if necessary, to a multiple of 8.
-    """
-    raise NotImplementedError("Not implemented yet")
 def Dual_EC_Truncate(bitstring, in_len, out_len):
     """
     Inputs a bitstring of in_len bits, returning
@@ -191,6 +187,7 @@ def Dual_EC_Truncate(bitstring, in_len, out_len):
     the bitstring is padded on the right with (out_len - in_len) zeroes, and the result
     is returned.
     """
+    assert type(bitstring) == list and type(in_len) == type(out_len) == Integer
     amount_to_add = out_len - in_len
     if amount_to_add > 0:
         bitstring = bitstring + [0]*amount_to_add
@@ -203,6 +200,7 @@ def Dual_EC_x(A):
     coordinate systems; for instance, when efficiency is a primary concern. In this
     case, a point shall be translated back to affine coordinates before x() is applied.
     """
+    assert type(A) == sage.schemes.elliptic_curves.ell_point.EllipticCurvePoint_finite_field
     x,y = A.xy()
     return x
 
@@ -213,11 +211,14 @@ def Dual_EC_phi(x):
     an integer.
     Note: Further details depend on the implementation of the field
     """
+    assert type(x) == sage.rings.finite_rings.integer_mod.IntegerMod_gmp
     return x.lift() # TODO: figure out what to do here
+
 def Dual_EC_mul(scalar, A):
     """
     representing scalar multiplication of a point on the curve
     """
+    assert type(scalar) == Integer and type(A) == sage.schemes.elliptic_curves.ell_point.EllipticCurvePoint_finite_field
     return scalar * A
 
 def Dual_EC_DRBG_Generate(working_state: WorkingState, requested_number_of_bits, additional_input):
@@ -302,9 +303,11 @@ def Dual_EC_DRBG_Generate(working_state: WorkingState, requested_number_of_bits,
     return returned_bits, working_state
 
 def XOR(a, b):
+    assert type(a) == type(b) == Integer
     return a ^^ b
 
 def bits_from_byte(byte):
+    assert type(byte) == int and bitlen(byte) <= 8
     ret = []
     for i in range(8):
         masked = (byte & (i << i)) != 0
@@ -315,15 +318,18 @@ def bits_from_byte(byte):
     return ret
 
 def bitstr_from_bytes(byte_array):
+    assert type(byte_array) == bytes
     ret = []
     for byte in byte_array:
         ret += bits_from_byte(byte)
     return ret
 
 def Hash(bitstr):
+    assert type(bitstr) == list
     return bitstr_from_bytes(hashlib.sha256(bytes_from_bitstr(bitstr)).digest())
 
 def bytes_from_bitstr(bitstr):
+    assert type(bitstr) == list
     ret = []
     while len(bitstr) >= 8:
         byte = bitstr[:8]
@@ -335,6 +341,7 @@ def bytes_from_bitstr(bitstr):
     return ret
 
 def hex_from_number_padded_to_num_of_bits(num, amount_of_bits):
+    assert type(num) == Integer and type(amount_of_bits) == Integer
     actual_nibbles = max(ceil(bitlen(num) / 4), 1)
     amount_of_nibbles = ceil(amount_of_bits / 4)
     if actual_nibbles > amount_of_nibbles:
@@ -344,11 +351,9 @@ def hex_from_number_padded_to_num_of_bits(num, amount_of_bits):
         ret += "0"
     return ret + num.hex()
 
-def num_from_bytes(byte_array):
-    return Integer(byte_array.hex(), 16)
-
 def cast_to_bitlen(num, outlen):
     """This also inserts 0s on the left if outlen > bitlen(x)"""
+    assert type(num) == type(outlen) == Integer
     masked_num = num & (2^outlen - 1)
     bitstr = bits_from_num(masked_num)
     filler_amount = outlen - len(bitstr)
@@ -358,11 +363,13 @@ def cast_to_bitlen(num, outlen):
     return bitstr
 
 def leftmost_no_of_bits_to_return_from(bitstr, no_of_bits_to_return):
+    assert type(bitstr) == list and type(no_of_bits_to_return) == Integer
     if (no_of_bits_to_return > len(bitstr)):
         raise ValueError("Tried to chop negative amount")
     return bitstr[:no_of_bits_to_return]
 
 def bitlen(x):
+    assert type(x) == int or type(x) == Integer
     return x.bit_length()
 
 """Curves"""
