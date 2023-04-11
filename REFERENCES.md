@@ -6,3 +6,6 @@
 
 ## DualEC Specification
 [SP 800-90A](https://csrc.nist.gov/publications/detail/sp/800-90a/archive/2012-01-23)
+
+## Implementation guides
+[CMake](https://github.com/krux02/minimal_cmake_example)
