@@ -1,0 +1,5 @@
+dualec-example
+*.cmake
+Makefile
+CMakeFiles
+CMakeCache.txt
