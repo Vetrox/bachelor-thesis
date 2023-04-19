@@ -41,7 +41,7 @@ target_include_directories(dualec-attack PUBLIC src/main)
 # find_package(Boost 1.36.0 COMPONENTS filesystem system REQUIRED)
 
 target_link_libraries(dualec-attack PUBLIC
-    # ${Boost_LIBRARIES}
+  # ${Boost_LIBRARIES}
   # here you can add any library dependencies
 )
 
