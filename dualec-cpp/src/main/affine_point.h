@@ -10,8 +10,12 @@ public:
         m_x(x),
         m_y(y) {}
 
-    bool identity() {
+    bool identity() const {
         return m_identity;
+    }
+
+    void setIdentity(bool identity) {
+        m_identity = identity;
     }
 
     void setX(Element x) {
@@ -21,11 +25,11 @@ public:
         m_y = y;
     }
 
-    Element x() {
+    Element x() const {
         return m_x;
     }
 
-    Element y() {
+    Element y() const {
         return m_y;
     }
 
@@ -33,7 +37,7 @@ public:
         return (m_identity && other.m_identity) || (!m_identity && !other.m_identity && m_x == other.m_x && m_y == other.m_y);
     }
 
-    std::string to_string() {
+    std::string to_string() const {
         if (m_identity) {
             return "Infinity";
         } else {
