@@ -1,7 +1,7 @@
 #include "dualec.h"
 #include <iostream>
 #include "affine_point.h"
-#include "weierstrass_curve.h"
+#include "elliptic_curve.h"
 
 int main() {
     auto ffield = Zp(123);
