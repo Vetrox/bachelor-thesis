@@ -43,6 +43,7 @@ target_include_directories(dualec-attack PUBLIC src/main)
 target_link_libraries(dualec-attack PUBLIC
   # ${Boost_LIBRARIES}
   # here you can add any library dependencies
+  -lgivaro
 )
 
 ###############################################################################
