@@ -1,4 +1,5 @@
 #include <givaro/modular-integer.h>
 
-typedef Givaro::Modular<Givaro::Integer> Zp;
+typedef Givaro::Integer BigInt;
+typedef Givaro::Modular<BigInt> Zp;
 typedef Zp::Element Element; // an element in Zp
