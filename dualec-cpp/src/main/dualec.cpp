@@ -2,6 +2,7 @@
 #include <iostream>
 #include "affine_point.h"
 #include "elliptic_curve.h"
+#include "bitstr.h"
 
 int main() {
     auto ffield = Zp(123);
@@ -19,6 +20,13 @@ int main() {
     std::cout << std::to_string((point == point2)) << std::endl;
 
     auto p256_p = BigInt("115792089210356248762697446949407573530086143415290314195533631308867097853951");
+    auto bitstr = BitStr(p256_p, 300);
+    std::cout << "Bitstr of p: " << bitstr.as_hex_string() << "\n bin: " << bitstr.as_bin_string() << std::endl;
+    auto bitstr2 = bitstr;
+    auto bitstr3 = bitstr + bitstr2;
+    std::cout << "Bitstr of p2: " << bitstr2.as_hex_string() << "\n bin: " << bitstr2.as_bin_string() << std::endl;
+    std::cout << "Bitstr of p3: " << bitstr3.as_hex_string() << "\n bin: " << bitstr3.as_bin_string() << std::endl;
+
     auto p256_a = BigInt(-3);
     auto p256_b = BigInt("41058363725152142129326129780047268409114441015993725554835256314039467401291");
 

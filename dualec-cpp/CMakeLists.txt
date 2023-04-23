@@ -23,7 +23,7 @@ file(GLOB_RECURSE sources_test src/test/*.cpp)
 add_executable(dualec-attack ${sources})# ${data})
 
 # Just for example add some compiler flags.
-target_compile_options(dualec-attack PUBLIC -std=c++2a -Wall -Wextra)
+target_compile_options(dualec-attack PUBLIC -std=c++2a -Wall -Wextra -ggdb)
 
 # This allows to include files relative to the root of the src directory with a <> pair
 target_include_directories(dualec-attack PUBLIC src/main)
@@ -44,6 +44,7 @@ target_link_libraries(dualec-attack PUBLIC
   # ${Boost_LIBRARIES}
   # here you can add any library dependencies
   -lgivaro
+  -lgmp
 )
 
 ###############################################################################
