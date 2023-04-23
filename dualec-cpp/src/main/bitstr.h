@@ -7,7 +7,8 @@
 #include <sstream>
 #include <iomanip>
 
-template<typename WordT = size_t>
+
+template<typename WordT = uint8_t>
 class BitStr {
     static constexpr auto bits_per_word = sizeof(WordT) * 8;
 public:
@@ -46,15 +47,45 @@ public:
     }
 
     BitStr<WordT> operator+(BitStr<WordT> const& other) const {
-        // TODO: handle bitshifts
-        size_t virtual_other_bytes = (other.bitlength() - other.internal_bitlength()) / bits_per_word;
-        std::cout << "Virtual other bytes " << virtual_other_bytes << std::endl;
-        // allocate enough to hold this->m_data.bitlength() other.bitlength()
+        // allocate enough to hold this->m_data.bitlength() + other.bitlength()
         size_t new_wordt_length = containerlen_for_bitlength<WordT>(internal_bitlength() + other.bitlength());
-        auto* box = new WordT[new_wordt_length];
-        auto end = std::copy(m_data.begin(), m_data.end(), box);
-        std::memset(end, 'A', virtual_other_bytes);
-        // std::copy(other.m_data.begin(), other.m_data.end(), (end + virtual_other_bytes));
+        // std::cout << "new_wordt_length = " << new_wordt_length << std::endl;
+        // std::cout << "Internal + other_bitlen = " << (internal_bitlength() + other.bitlength()) << std::endl;
+        auto* box = (uint8_t*) new WordT[new_wordt_length];
+        // std::cout << "sizeof(WordT) = " << sizeof(WordT) << std::endl;
+        auto* box_end = box + new_wordt_length * sizeof(WordT);
+        // std::cout << "Box_end - box = " << (box_end - box) << std::endl;
+        memset(box, 0, new_wordt_length * sizeof(WordT));
+
+        /*                                |
+         *  |000p|oooo|oooo|00--|----|----|
+         *      ^bitlen1   |  ^internal_bitlen1
+         *                 m_data.begin() |                  box_end
+         *                                ||#zero_wt |              |
+         *                            |000p|oooo|oooo|00--|----|----|
+         *                                ^bitlen2      ^internal_bitlen2
+         *
+         *                    ---|----|---p|oooo|oooo|00--|----|----|
+         *
+         */
+
+        auto* begin_other_internal = box_end - other.m_data.size_bytes();
+        // std::cout << "Begin_other_internal - box = " << ((box_end - other.m_data.size_bytes()) - box) << std::endl;
+        std::copy(other.m_data.begin(), other.m_data.end(), begin_other_internal);
+
+        size_t zero_wordt_amount = (other.bitlength() - other.internal_bitlength()) / bits_per_word;
+        auto* begin_other_zero_words = begin_other_internal - zero_wordt_amount * sizeof(WordT);
+        std::memset(begin_other_zero_words, 0, zero_wordt_amount * sizeof(WordT));
+
+        size_t shift = other.bitlength() % bits_per_word;
+        auto* current_begin = begin_other_zero_words - sizeof(WordT);
+        *current_begin = 0; // set p-bits
+        for (auto it = m_data.rbegin(); it != m_data.rend(); ++it) {
+            // std::cout << "Delta begin = " << (current_begin - box) << std::endl;
+            *current_begin |= (*it << shift);
+            current_begin -= sizeof(WordT);
+            *current_begin |= (*it >> (bits_per_word - shift));
+        }
         std::span<WordT> span((WordT*) box, new_wordt_length);
         return BitStr<WordT>(std::move(span), bitlength() + other.bitlength());
     }
