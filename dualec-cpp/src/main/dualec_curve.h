@@ -1,6 +1,6 @@
 #pragma once
-#include "elliptic_curve.h"
 #include "affine_point.h"
+#include "elliptic_curve.h"
 
 struct DualEcCurve {
     EllipticCurve curve;

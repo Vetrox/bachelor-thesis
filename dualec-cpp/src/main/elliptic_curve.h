@@ -1,6 +1,6 @@
 #pragma once
-#include "forward.h"
 #include "affine_point.h"
+#include "forward.h"
 
 // y^2 = x^3 + a*x + b
 // defined over field Z_p
@@ -13,7 +13,8 @@ public:
         m_field.init(m_b, b);
     }
 
-    void inv(AffinePoint& out, AffinePoint const& in) {
+    void inv(AffinePoint& out, AffinePoint const& in)
+    {
         if (in.identity()) {
             out.setIdentity(true);
             return;
@@ -25,7 +26,8 @@ public:
         out.setX(tmp);
     }
 
-    void _double(AffinePoint& out, AffinePoint const& in) {
+    void _double(AffinePoint& out, AffinePoint const& in)
+    {
         AffinePoint tmp_point;
         inv(tmp_point, in);
         if (in.identity() || tmp_point == in) {
@@ -64,7 +66,8 @@ public:
         out.setY(out_y);
     }
 
-    void add(AffinePoint& out, AffinePoint const& p1, AffinePoint const& p2) {
+    void add(AffinePoint& out, AffinePoint const& p1, AffinePoint const& p2)
+    {
         AffinePoint tmp1, tmp2;
         inv(tmp1, p1);
         inv(tmp2, p2);
@@ -88,7 +91,7 @@ public:
             return _double(out, p1);
 
         out.setIdentity(false);
-	    Element tmp;
+        Element tmp;
         Element num; // y2 - y1
         m_field.sub(num, p2.y(), p1.y());
 
@@ -114,14 +117,15 @@ public:
         out.setY(y3);
     }
 
-    void scalar(AffinePoint& out, AffinePoint const& p, BigInt k) {
+    void scalar(AffinePoint& out, AffinePoint const& p, BigInt k)
+    {
         out.setIdentity(true);
         if (p.identity()) {
             return;
         }
         AffinePoint tmp1, tmp2;
         AffinePoint pp = p;
-        while(k > 0) {
+        while (k > 0) {
             if (k % 2 == 1) {
                 add(tmp1, out, pp);
                 out = tmp1; // out = out + pp
@@ -129,14 +133,16 @@ public:
 
             _double(tmp2, pp);
             pp = tmp2; // pp = 2*pp
-            k >>= 1; // k = k / 2
+            k >>= 1;   // k = k / 2
         }
     }
 
-    std::string to_string() {
-       return "EllipticCurve(Z_" + std::string(m_field.residu())
-           + ", y^2 = x^3 + " + std::string(m_a) + "*x + " + std::string(m_b) + ")";
+    std::string to_string()
+    {
+        return "EllipticCurve(Z_" + std::string(m_field.residu())
+            + ", y^2 = x^3 + " + std::string(m_a) + "*x + " + std::string(m_b) + ")";
     }
+
 private:
     Element m_a;
     Element m_b;

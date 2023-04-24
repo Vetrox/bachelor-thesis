@@ -4,40 +4,53 @@
 
 class AffinePoint {
 public:
-    AffinePoint() : m_identity(true) {}
+    AffinePoint()
+        : m_identity(true)
+    {
+    }
     AffinePoint(Element x, Element y)
-        : m_identity(false),
-        m_x(x),
-        m_y(y) {}
+        : m_identity(false)
+        , m_x(x)
+        , m_y(y)
+    {
+    }
 
-    bool identity() const {
+    bool identity() const
+    {
         return m_identity;
     }
 
-    void setIdentity(bool identity) {
+    void setIdentity(bool identity)
+    {
         m_identity = identity;
     }
 
-    void setX(Element x) {
+    void setX(Element x)
+    {
         m_x = x;
     }
-    void setY(Element y) {
+    void setY(Element y)
+    {
         m_y = y;
     }
 
-    Element x() const {
+    Element x() const
+    {
         return m_x;
     }
 
-    Element y() const {
+    Element y() const
+    {
         return m_y;
     }
 
-    bool operator==(const AffinePoint& other) const {
+    bool operator==(AffinePoint const& other) const
+    {
         return (m_identity && other.m_identity) || (!m_identity && !other.m_identity && m_x == other.m_x && m_y == other.m_y);
     }
 
-    std::string to_string() const {
+    std::string to_string() const
+    {
         if (m_identity) {
             return "Infinity";
         } else {
@@ -46,7 +59,7 @@ public:
     }
 
 private:
-    bool m_identity{ false };
+    bool m_identity { false };
     Element m_x;
     Element m_y;
 };

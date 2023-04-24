@@ -1,10 +1,11 @@
 #include "dualec.h"
-#include <iostream>
 #include "affine_point.h"
-#include "elliptic_curve.h"
 #include "bitstr.h"
+#include "elliptic_curve.h"
+#include <iostream>
 
-int main() {
+int main()
+{
     auto ffield = Zp(123);
     Element element_mod_zp;
     ffield.init(element_mod_zp, 325);
@@ -13,14 +14,14 @@ int main() {
     ffield.mul(product, element_mod_zp, Element(2));
     std::cout << "79 * 2 % 123 = 35, actual: " << product << std::endl;
 
-
     auto point = AffinePoint(99, 59);
     std::cout << point.to_string() << std::endl;
     auto point2 = point;
     std::cout << std::to_string((point == point2)) << std::endl;
 
     auto p256_p = BigInt("115792089210356248762697446949407573530086143415290314195533631308867097853951");
-    auto bitstr = BitStr(p256_p, 300);
+    auto aaa = BigInt("4294967295");
+    auto bitstr = BitStr(aaa, 4 * 8 + 1);
     std::cout << "Bitstr of p: " << bitstr.as_hex_string() << "\n bin: " << bitstr.as_bin_string() << std::endl;
     auto bitstr2 = bitstr;
     auto bitstr3 = bitstr + bitstr2;
