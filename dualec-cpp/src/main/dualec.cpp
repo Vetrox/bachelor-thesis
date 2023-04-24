@@ -3,7 +3,7 @@
 #include "bitstr.h"
 #include "dualec_curve.h"
 #include "elliptic_curve.h"
-#include <SHA256.h>
+#include "hash.h"
 
 #if 0
 size_t pick_seedlen(size_t security_strength) {
@@ -71,11 +71,7 @@ WorkingState Dual_EC_DRBG_Instantiate(BitStr entropy_input, BitStr nonce,
 
 int main()
 {
-    SHA256 sha256;
-    sha256.update("");
-    auto digest = sha256.digest();
-    std::cout << SHA256::toString(digest) << std::endl;
-
+    std::cout << SHA256_Hash(BitStr(BigInt("0"),0)).as_hex_string() << std::endl;
 
     auto ffield = Zp(123);
     Element element_mod_zp;

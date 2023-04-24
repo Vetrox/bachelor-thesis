@@ -13,6 +13,15 @@ class BitStr {
     static constexpr auto bits_per_word = sizeof(WordT) * 8;
 
 public:
+    BitStr(std::span<WordT>&& span, size_t bitlen)
+        : m_data(span)
+        , m_bitlen(bitlen)
+    {
+    }
+    BitStr(BigInt&& i, size_t bitlen)
+    : BitStr(i, bitlen)
+    {
+    }
     BitStr(BigInt& i, size_t bitlen)
         : m_bitlen(bitlen)
     {
@@ -113,6 +122,11 @@ public:
         return m_data.size() * bits_per_word;
     }
 
+    uint8_t* internal_byte_array()
+    {
+        return m_data.data();
+    }
+
     std::string as_bin_string() const
     {
         std::string ret = "";
@@ -130,11 +144,6 @@ public:
     }
 
 private:
-    BitStr(std::span<WordT>&& span, size_t bitlen)
-        : m_data(span)
-        , m_bitlen(bitlen)
-    {
-    }
     std::span<WordT> m_data;
     size_t m_bitlen;
 };
