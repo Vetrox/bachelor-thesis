@@ -3,7 +3,9 @@
 #include "bitstr.h"
 #include "dualec_curve.h"
 #include "elliptic_curve.h"
+#include <SHA256.h>
 
+#if 0
 size_t pick_seedlen(size_t security_strength) {
     if (security_strength <= 128)
         return 256;
@@ -29,6 +31,10 @@ size_t calculate_max_outlen(size_t seedlen) {
     }
 }
 
+BitStr Hash_df(BitStr input_string, size_t no_of_bits_to_return)
+{
+    size_t outlen = ;// TODO
+}
 
 WorkingState Dual_EC_DRBG_Instantiate(BitStr entropy_input, BitStr nonce,
         BitStr personalization_string, size_t security_strength,
@@ -57,6 +63,7 @@ WorkingState Dual_EC_DRBG_Instantiate(BitStr entropy_input, BitStr nonce,
     };
 }
 
+#endif
 
 
 
@@ -64,6 +71,12 @@ WorkingState Dual_EC_DRBG_Instantiate(BitStr entropy_input, BitStr nonce,
 
 int main()
 {
+    SHA256 sha256;
+    sha256.update("");
+    auto digest = sha256.digest();
+    std::cout << SHA256::toString(digest) << std::endl;
+
+
     auto ffield = Zp(123);
     Element element_mod_zp;
     ffield.init(element_mod_zp, 325);
@@ -89,7 +102,7 @@ int main()
     auto p256_a = BigInt(-3);
     auto p256_b = BigInt("41058363725152142129326129780047268409114441015993725554835256314039467401291");
 
-    auto elliptic_curve = EllipticCurve(p256_p, p256_a, p256_b);
+    auto elliptic_curve = EllipticCurve(p256_p,0, p256_a, p256_b);
     std::cout << elliptic_curve.to_string() << std::endl;
 
     AffinePoint tmp;
