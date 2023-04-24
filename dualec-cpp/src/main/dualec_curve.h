@@ -7,6 +7,15 @@ struct DualEcCurve {
     EllipticCurve curve;
     AffinePoint P; // this has to be the base G
     AffinePoint Q;
+
+    std::string to_string() const
+    {
+        return "DualEcCurve(name = " 
+            + name
+            + "curve = " + curve.to_string()
+            + "P = " + P.to_string()
+            + "Q = " + Q.to_string() + ")";
+    }
 };
 
 static const DualEcCurve Dual_EC_P256{

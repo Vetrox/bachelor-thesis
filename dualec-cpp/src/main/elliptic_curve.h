@@ -138,7 +138,7 @@ public:
         }
     }
 
-    std::string to_string()
+    std::string to_string() const
     {
         return "EllipticCurve(Z_" + std::string(m_field.residu())
             + ", y^2 = x^3 + " + std::string(m_a) + "*x + " + std::string(m_b) + ")";

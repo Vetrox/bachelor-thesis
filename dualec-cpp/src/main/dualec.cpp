@@ -4,8 +4,10 @@
 #include "dualec_curve.h"
 #include "elliptic_curve.h"
 #include "hash.h"
+#include <algorithm>
+#include <cmath>
+#include <cstdint>
 
-#if 0
 size_t pick_seedlen(size_t security_strength) {
     if (security_strength <= 128)
         return 256;
@@ -31,14 +33,59 @@ size_t calculate_max_outlen(size_t seedlen) {
     }
 }
 
-BitStr Hash_df(BitStr input_string, size_t no_of_bits_to_return)
+size_t ceildiv(size_t a, size_t b)
 {
-    size_t outlen = ;// TODO
+    return a / b + (a % b > 0 ? 1 : 0);
+}
+BitStr Dual_EC_Truncate(BitStr bitstr, size_t outlen)
+{
+    bitstr.truncate_left(std::min(outlen, bitstr.bitlength()));
+    auto amount_to_add = bitstr.bitlength() - outlen;
+    if (amount_to_add > 0)
+        bitstr = bitstr + BitStr(0, amount_to_add);
+    return bitstr;
+}
+
+DualEcCurve const& pick_curve(size_t security_strength)
+{
+    // TODO: implement for all Curves
+    return Dual_EC_P256;
+}
+
+BitStr Hash_df(BitStr input_string, uint32_t no_of_bits_to_return)
+{
+    size_t outlen = 256; // bits
+    if (no_of_bits_to_return > 255*outlen) {
+        std::cout << "ERROR: Requested too many no_of_bits_to_return" << std::endl;
+        abort();
+    }
+    // 1. temp = the Null string
+    BitStr temp(0,0);
+
+    // 2. len = ceil(no_of_bits_to_return / outlen)
+    auto len = ceildiv(no_of_bits_to_return, outlen);
+
+    // 3. counter = an 8-bit binary value representing the integer "1".
+    uint8_t counter { 1 };
+
+    // 4. For i = 1 to len do
+    for (size_t i = 1; i <= len; i++) {
+        // 4.1 temp = temp || Hash(counter || no_of_bits_to_return || input_string)
+        temp = temp + SHA256_Hash(
+                BitStr(counter, 8) +
+                BitStr(no_of_bits_to_return, 32) +
+                input_string);
+       // 4.2 counter = counter + 1.
+       counter++;
+    }
+    // 5. requested_bits = Leftmost (no_of_bits_to_return) of temp.
+    BitStr requested_bits = Dual_EC_Truncate(std::move(temp), no_of_bits_to_return);
+    return requested_bits;
 }
 
 WorkingState Dual_EC_DRBG_Instantiate(BitStr entropy_input, BitStr nonce,
         BitStr personalization_string, size_t security_strength,
-        DualEcCurve *curve)
+        DualEcCurve const* curve)
 {
     // 1. seed_material = entropy_input || nonce || personalization_string
     auto seed_material = entropy_input + nonce + personalization_string;
@@ -51,27 +98,25 @@ WorkingState Dual_EC_DRBG_Instantiate(BitStr entropy_input, BitStr nonce,
     size_t reseed_counter = 0;
 
     // 4. Using the security_strength and Table 4 in Section 10.3.1, select the smallest available curve that has a security strength >= security_strength. The values for seedlen, p, a, b, n, P, Q are determined by the curve
-    if (curve == nullptr) {
-        curve = pick_curve(security_strength);
-    }
+    if (curve == nullptr)
+        curve = &pick_curve(security_strength);
+
     // 5. Return s, seedlen, p, a, b, n, P, Q, and a reseed_counter for the initial_working_state.
     return WorkingState{.s = std::move(s),
         .seedlen = seedlen,
         .max_outlen = calculate_max_outlen(seedlen),
         .dec_curve = std::move(*curve),
         .reseed_counter = reseed_counter,
+        .outlen = 256
     };
 }
-
-#endif
-
-
-
-
 
 int main()
 {
     std::cout << SHA256_Hash(BitStr(BigInt("0"),0)).as_hex_string() << std::endl;
+
+    auto working_state = Dual_EC_DRBG_Instantiate(BitStr(0, 0), BitStr(0, 0), BitStr(0, 0), 128);
+    std::cout << "Instanciated working state " << working_state.to_string() << std::endl;
 
     auto ffield = Zp(123);
     Element element_mod_zp;

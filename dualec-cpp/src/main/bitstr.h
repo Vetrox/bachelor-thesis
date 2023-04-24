@@ -54,17 +54,42 @@ public:
         other.m_data = std::span<WordT>((WordT*) nullptr, 0);
     }
 
-    ~BitStr()
+    void free_data()
     {
         std::cout << "DESTRUCTION" << std::endl;
         if (m_data.data() != nullptr)
             delete[] m_data.data();
     }
 
+    ~BitStr()
+    {
+        free_data();
+    }
+
     template<typename T>
     static size_t containerlen_for_bitlength(size_t bitlen)
     {
         return bitlen / (sizeof(T) * 8) + ((bitlen % (sizeof(T) * 8) > 0) ? 1 : 0);
+    }
+
+    void truncate_left(size_t new_length)
+    {
+        if (new_length > m_bitlen) {
+            std::cout << "Wrong usage of truncate" << std::endl;
+            abort();
+        }
+        m_bitlen = new_length;
+        BitStr newstr(*this);
+        free_data();
+        *this = std::move(newstr);
+    }
+
+    BitStr& operator=(BitStr&& other)
+    {
+        free_data();
+        m_data = other.m_data;
+        other.m_data = std::span<WordT>((WordT*) nullptr, 0);
+        return *this;
     }
 
     BitStr operator+(BitStr const& other) const
