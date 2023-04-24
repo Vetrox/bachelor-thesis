@@ -1,3 +1,4 @@
 [submodule "dualec-cpp/sha256"]
 	path = dualec-cpp/sha256
 	url = https://github.com/System-Glitch/SHA256.git
+    ignore = dirty
