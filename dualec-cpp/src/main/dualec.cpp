@@ -1,8 +1,66 @@
 #include "dualec.h"
 #include "affine_point.h"
 #include "bitstr.h"
+#include "dualec_curve.h"
 #include "elliptic_curve.h"
-#include <iostream>
+
+size_t pick_seedlen(size_t security_strength) {
+    if (security_strength <= 128)
+        return 256;
+    if (security_strength <= 192)
+        return 384;
+    if (security_strength <= 256)
+        return 521;
+    std::cout << "Invalid security strength requested." << std::endl;
+    abort();
+}
+
+size_t calculate_max_outlen(size_t seedlen) {
+    switch (seedlen) {
+        case 256:
+            return 240;
+        case 384:
+            return 368;
+        case 521:
+            return 504;
+        default:
+            std::cout << "Invalid seedlen provided" << std::endl;
+            abort();
+    }
+}
+
+
+WorkingState Dual_EC_DRBG_Instantiate(BitStr entropy_input, BitStr nonce,
+        BitStr personalization_string, size_t security_strength,
+        DualEcCurve *curve)
+{
+    // 1. seed_material = entropy_input || nonce || personalization_string
+    auto seed_material = entropy_input + nonce + personalization_string;
+    // 2. s = Hash_df(seed_material, seedlen)
+    auto seedlen = pick_seedlen(security_strength);
+    BitStr s = Hash_df(seed_material, seedlen);
+    std::cout << "Length of s: " << s.bitlength() << std::endl;
+
+    // 3. reseed_counter = 0
+    size_t reseed_counter = 0;
+
+    // 4. Using the security_strength and Table 4 in Section 10.3.1, select the smallest available curve that has a security strength >= security_strength. The values for seedlen, p, a, b, n, P, Q are determined by the curve
+    if (curve == nullptr) {
+        curve = pick_curve(security_strength);
+    }
+    // 5. Return s, seedlen, p, a, b, n, P, Q, and a reseed_counter for the initial_working_state.
+    return WorkingState{.s = std::move(s),
+        .seedlen = seedlen,
+        .max_outlen = calculate_max_outlen(seedlen),
+        .dec_curve = std::move(*curve),
+        .reseed_counter = reseed_counter,
+    };
+}
+
+
+
+
+
 
 int main()
 {
