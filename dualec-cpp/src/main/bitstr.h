@@ -2,13 +2,14 @@
 
 #include "forward.h"
 #include <bitset>
+#include <cstdint>
 #include <cstring>
 #include <iomanip>
 #include <span>
 #include <sstream>
 
-template<typename WordT = uint8_t>
 class BitStr {
+    using WordT = uint8_t;
     static constexpr auto bits_per_word = sizeof(WordT) * 8;
 
 public:
@@ -27,7 +28,7 @@ public:
         std::cout << "Data-len = " << word_count << " bitlen = " << bitlen << " word-len = " << amount_of_words_for_bitlen << std::endl;
         m_data = std::span<WordT>(data, word_count);
     }
-    BitStr(BitStr<WordT>& other)
+    BitStr(BitStr& other)
         : m_bitlen(other.m_bitlen)
     {
         size_t amount_of_words = other.m_data.size_bytes() / sizeof(WordT);
@@ -37,11 +38,18 @@ public:
         m_data = std::span<WordT>((WordT*)box, amount_of_words);
         std::cout << "Copied" << std::endl;
     }
+    BitStr(BitStr&& other)
+        : m_bitlen(other.m_bitlen)
+    {
+        m_data = other.m_data;
+        other.m_data = std::span<WordT>((WordT*) nullptr, 0);
+    }
 
     ~BitStr()
     {
         std::cout << "DESTRUCTION" << std::endl;
-        delete[] m_data.data();
+        if (m_data.data() != nullptr)
+            delete[] m_data.data();
     }
 
     template<typename T>
@@ -50,7 +58,7 @@ public:
         return bitlen / (sizeof(T) * 8) + ((bitlen % (sizeof(T) * 8) > 0) ? 1 : 0);
     }
 
-    BitStr<WordT> operator+(BitStr<WordT> const& other) const
+    BitStr operator+(BitStr const& other) const
     {
         // allocate enough to hold this->m_data.bitlength() + other.bitlength()
         size_t new_wordt_length = containerlen_for_bitlength<WordT>(internal_bitlength() + other.bitlength());
@@ -92,7 +100,7 @@ public:
             *current_begin |= (*it >> (bits_per_word - shift));
         }
         std::span<WordT> span((WordT*)box, new_wordt_length);
-        return BitStr<WordT>(std::move(span), bitlength() + other.bitlength());
+        return BitStr(std::move(span), bitlength() + other.bitlength());
     }
 
     size_t bitlength() const
