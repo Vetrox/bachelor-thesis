@@ -5,19 +5,22 @@
 #include <cstdint>
 #include <cstring>
 #include <iomanip>
+#include <iostream>
+#include <iterator>
 #include <span>
 #include <sstream>
+#include <string>
 
 class BitStr {
     using WordT = uint8_t;
     static constexpr auto bits_per_word = sizeof(WordT) * 8;
 
 public:
-    BitStr(std::span<WordT>&& span, size_t bitlen)
-        : m_data(span)
-        , m_bitlen(bitlen)
+    BitStr(std::span<WordT>&& span)
+        : BitStr(std::move(span), span.size() * bits_per_word)
     {
     }
+
     BitStr(BigInt&& i, size_t bitlen)
     : BitStr(i, bitlen)
     {
@@ -34,18 +37,17 @@ public:
             -1 /* 1 = most significant byte first */,
             0 /* makes the first 0 bits of each word 0ed */,
             mpz_ptr);
-        std::cout << "Data-len = " << word_count << " bitlen = " << bitlen << " word-len = " << amount_of_words_for_bitlen << std::endl;
         m_data = std::span<WordT>(data, word_count);
+        std::cout << "BitStr(BigInt&,size_t) constructor: " << debug_description() << std::endl;
     }
     BitStr(BitStr& other)
         : m_bitlen(other.m_bitlen)
     {
         size_t amount_of_words = other.m_data.size_bytes() / sizeof(WordT);
         WordT* box = new WordT[amount_of_words];
-        std::cout << "Copying. Amount of words: " << amount_of_words << std::endl;
         std::copy(other.m_data.begin(), other.m_data.end(), box);
         m_data = std::span<WordT>((WordT*)box, amount_of_words);
-        std::cout << "Copied" << std::endl;
+        std::cout << "BitStr(BitStr&) copy-constructor: " << debug_description() << std::endl;
     }
     BitStr(BitStr&& other)
         : m_bitlen(other.m_bitlen)
@@ -56,9 +58,12 @@ public:
 
     void free_data()
     {
-        std::cout << "DESTRUCTION" << std::endl;
-        if (m_data.data() != nullptr)
+        if (m_data.data() != nullptr) {
+            std::cout << "freeing " << debug_description() << std::endl;
             delete[] m_data.data();
+        } else {
+            std::cout << "ignoring free of " << debug_description() << std::endl;
+        }
     }
 
     ~BitStr()
@@ -78,22 +83,25 @@ public:
             std::cout << "Wrong usage of truncate" << std::endl;
             abort();
         }
+        std::cout << "truncate_left(" << std::to_string(new_length) << ")" << std::endl;
         m_bitlen = new_length;
-        BitStr newstr(*this);
-        free_data();
-        *this = std::move(newstr);
+        // BitStr newstr(*this);
+        // *this = std::move(newstr);
     }
 
     BitStr& operator=(BitStr&& other)
     {
+        std::cout << "BitStr::operator=(this: " << debug_description() << " other: " << other.debug_description() << ")" << std::endl;
         free_data();
         m_data = other.m_data;
+        m_bitlen = other.m_bitlen;
         other.m_data = std::span<WordT>((WordT*) nullptr, 0);
         return *this;
     }
 
     BitStr operator+(BitStr const& other) const
     {
+        std::cout << "BitStr::operator+(this: " << debug_description() << " other: " << other.debug_description() << ")" << std::endl;
         // allocate enough to hold this->m_data.bitlength() + other.bitlength()
         size_t new_wordt_length = containerlen_for_bitlength<WordT>(internal_bitlength() + other.bitlength());
         // std::cout << "new_wordt_length = " << new_wordt_length << std::endl;
@@ -144,12 +152,21 @@ public:
 
     size_t internal_bitlength() const
     {
-        return m_data.size() * bits_per_word;
+        return std::min(m_bitlen, m_data.size() * bits_per_word);
     }
 
     uint8_t* internal_byte_array()
     {
         return m_data.data();
+    }
+
+    std::string debug_description() const
+    {
+        return "BitStr(m_bitlen: "
+            + std::to_string(m_bitlen)
+            + " data[" + std::to_string(m_data.size_bytes()) + "]: "
+                + as_hex_string()
+            + ")";
     }
 
     std::string as_bin_string() const
@@ -169,6 +186,13 @@ public:
     }
 
 private:
+    BitStr(std::span<WordT>&& span, size_t bitlen)
+        : m_data(span)
+        , m_bitlen(bitlen)
+    {
+        std::cout << "BitStr(span&&, size_t) constructor: " << debug_description() << std::endl;
+    }
+
     std::span<WordT> m_data;
     size_t m_bitlen;
 };

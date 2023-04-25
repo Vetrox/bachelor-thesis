@@ -7,6 +7,7 @@
 #include <algorithm>
 #include <cmath>
 #include <cstdint>
+#include <string>
 
 size_t pick_seedlen(size_t security_strength) {
     if (security_strength <= 128)
@@ -37,13 +38,13 @@ size_t ceildiv(size_t a, size_t b)
 {
     return a / b + (a % b > 0 ? 1 : 0);
 }
-BitStr Dual_EC_Truncate(BitStr bitstr, size_t outlen)
+void Dual_EC_Truncate(BitStr& bitstr, size_t outlen)
 {
+    std::cout << "Dual_EC_Truncate(bitstr: " << bitstr.debug_description() << " outlen: " << std::to_string(outlen) << std::endl;
     bitstr.truncate_left(std::min(outlen, bitstr.bitlength()));
     auto amount_to_add = bitstr.bitlength() - outlen;
     if (amount_to_add > 0)
         bitstr = bitstr + BitStr(0, amount_to_add);
-    return bitstr;
 }
 
 DualEcCurve const& pick_curve(size_t security_strength)
@@ -52,7 +53,7 @@ DualEcCurve const& pick_curve(size_t security_strength)
     return Dual_EC_P256;
 }
 
-BitStr Hash_df(BitStr input_string, uint32_t no_of_bits_to_return)
+BitStr Hash_df(BitStr const& input_string, uint32_t no_of_bits_to_return)
 {
     size_t outlen = 256; // bits
     if (no_of_bits_to_return > 255*outlen) {
@@ -79,8 +80,8 @@ BitStr Hash_df(BitStr input_string, uint32_t no_of_bits_to_return)
        counter++;
     }
     // 5. requested_bits = Leftmost (no_of_bits_to_return) of temp.
-    BitStr requested_bits = Dual_EC_Truncate(std::move(temp), no_of_bits_to_return);
-    return requested_bits;
+    Dual_EC_Truncate(temp, no_of_bits_to_return);
+    return temp;
 }
 
 WorkingState Dual_EC_DRBG_Instantiate(BitStr entropy_input, BitStr nonce,
@@ -113,11 +114,9 @@ WorkingState Dual_EC_DRBG_Instantiate(BitStr entropy_input, BitStr nonce,
 
 int main()
 {
-    std::cout << SHA256_Hash(BitStr(BigInt("0"),0)).as_hex_string() << std::endl;
-
     auto working_state = Dual_EC_DRBG_Instantiate(BitStr(0, 0), BitStr(0, 0), BitStr(0, 0), 128);
     std::cout << "Instanciated working state " << working_state.to_string() << std::endl;
-
+#if 0
     auto ffield = Zp(123);
     Element element_mod_zp;
     ffield.init(element_mod_zp, 325);
@@ -155,4 +154,5 @@ int main()
     elliptic_curve.scalar(tmp, G, 3);
 
     std::cout << tmp.to_string() << std::endl;
+#endif
 }
