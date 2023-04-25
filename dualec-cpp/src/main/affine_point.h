@@ -52,9 +52,9 @@ public:
     std::string to_string() const
     {
         if (m_identity) {
-            return "Infinity";
+            return "Point(Infinity)";
         } else {
-            return "(" + std::string(this->m_x) + ", " + std::string(this->m_y) + ")";
+            return "Point(" + bigint_hex(m_x)+ ", " + bigint_hex(m_y) + ")";
         }
     }
 

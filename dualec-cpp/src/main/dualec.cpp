@@ -7,6 +7,7 @@
 #include <algorithm>
 #include <cmath>
 #include <cstdint>
+#include <cstdlib>
 #include <string>
 
 size_t pick_seedlen(size_t security_strength) {
@@ -49,8 +50,14 @@ void Dual_EC_Truncate(BitStr& bitstr, size_t outlen)
 
 DualEcCurve const& pick_curve(size_t security_strength)
 {
-    // TODO: implement for all Curves
-    return Dual_EC_P256;
+    if (security_strength <= 128)
+        return Dual_EC_P256;
+    if (security_strength <= 192)
+        return Dual_EC_P384;
+    if (security_strength <= 256)
+        return Dual_EC_P521;
+    std::cout << "Invalid security strength" << std::endl;
+    abort();
 }
 
 BitStr Hash_df(BitStr const& input_string, uint32_t no_of_bits_to_return)
@@ -114,7 +121,7 @@ WorkingState Dual_EC_DRBG_Instantiate(BitStr entropy_input, BitStr nonce,
 
 int main()
 {
-    auto working_state = Dual_EC_DRBG_Instantiate(BitStr(0, 0), BitStr(0, 0), BitStr(0, 0), 128);
+    auto working_state = Dual_EC_DRBG_Instantiate(BitStr(0, 0), BitStr(0, 0), BitStr(0, 0), 256);
     std::cout << "Instantiated working state " << working_state.to_string() << std::endl;
 #if 0
     auto ffield = Zp(123);
