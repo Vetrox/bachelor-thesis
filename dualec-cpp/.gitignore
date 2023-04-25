@@ -3,3 +3,4 @@ dualec-attack
 Makefile
 CMakeFiles
 CMakeCache.txt
+*.ninja*
