@@ -1,7 +1,7 @@
 #pragma once
+#include "bitstr.h"
 #include "dualec_curve.h"
 #include "forward.h"
-#include "bitstr.h"
 
 struct WorkingState {
     BitStr s;
@@ -23,5 +23,5 @@ struct WorkingState {
 };
 
 WorkingState Dual_EC_DRBG_Instantiate(BitStr entropy_input, BitStr nonce,
-        BitStr personalization_string, size_t security_strength,
-        DualEcCurve const*curve = nullptr);
+    BitStr personalization_string, size_t security_strength,
+    DualEcCurve const* curve = nullptr);

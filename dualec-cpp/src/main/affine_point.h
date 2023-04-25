@@ -54,7 +54,7 @@ public:
         if (m_identity) {
             return "Point(Infinity)";
         } else {
-            return "Point(" + bigint_hex(m_x)+ ", " + bigint_hex(m_y) + ")";
+            return "Point(" + bigint_hex(m_x) + ", " + bigint_hex(m_y) + ")";
         }
     }
 

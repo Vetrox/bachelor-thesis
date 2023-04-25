@@ -12,10 +12,10 @@
 #include <string>
 
 template<typename T>
-    static size_t containerlen_for_bitlength(size_t bitlen)
-    {
-        return bitlen / (sizeof(T) * 8) + ((bitlen % (sizeof(T) * 8) > 0) ? 1 : 0);
-    }
+static size_t containerlen_for_bitlength(size_t bitlen)
+{
+    return bitlen / (sizeof(T) * 8) + ((bitlen % (sizeof(T) * 8) > 0) ? 1 : 0);
+}
 
 class BitStr {
     using WordT = uint8_t;
@@ -27,7 +27,7 @@ public:
     {
     }
     BitStr(BigInt&& i, size_t bitlen)
-    : BitStr(i, bitlen)
+        : BitStr(i, bitlen)
     {
     }
     BitStr(BigInt& i, size_t bitlen);
@@ -36,7 +36,7 @@ public:
         : m_bitlen(other.m_bitlen)
     {
         m_data = other.m_data;
-        other.m_data = std::span<WordT>((WordT*) nullptr, 0);
+        other.m_data = std::span<WordT>((WordT*)nullptr, 0);
     }
 
     ~BitStr()
@@ -66,6 +66,7 @@ public:
     std::string debug_description() const;
     std::string as_bin_string() const;
     std::string as_hex_string() const;
+
 private:
     BitStr(std::span<WordT>&& span, size_t bitlen)
         : m_data(span)
