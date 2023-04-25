@@ -115,7 +115,7 @@ WorkingState Dual_EC_DRBG_Instantiate(BitStr entropy_input, BitStr nonce,
 int main()
 {
     auto working_state = Dual_EC_DRBG_Instantiate(BitStr(0, 0), BitStr(0, 0), BitStr(0, 0), 128);
-    std::cout << "Instanciated working state " << working_state.to_string() << std::endl;
+    std::cout << "Instantiated working state " << working_state.to_string() << std::endl;
 #if 0
     auto ffield = Zp(123);
     Element element_mod_zp;
