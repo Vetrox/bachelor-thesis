@@ -14,11 +14,11 @@ struct WorkingState {
     std::string to_string() const
     {
         return "WorkingState(s = " + s.as_hex_string()
-            + "seedlen = " + std::to_string(seedlen)
-            + "max_outlen = " + std::to_string(max_outlen)
-            + "dec_curve = " + dec_curve.to_string()
-            + "reseed_counter = " + std::to_string(reseed_counter)
-            + "outlen = " + std::to_string(outlen);
+            + " seedlen = " + std::to_string(seedlen)
+            + " max_outlen = " + std::to_string(max_outlen)
+            + " dec_curve = " + dec_curve.to_string()
+            + " reseed_counter = " + std::to_string(reseed_counter)
+            + " outlen = " + std::to_string(outlen);
     }
 };
 

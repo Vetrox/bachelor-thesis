@@ -10,11 +10,11 @@ struct DualEcCurve {
 
     std::string to_string() const
     {
-        return "DualEcCurve(name = " 
+        return "DualEcCurve(name = "
             + name
-            + "curve = " + curve.to_string()
-            + "P = " + P.to_string()
-            + "Q = " + Q.to_string() + ")";
+            + " curve = " + curve.to_string()
+            + " P = " + P.to_string()
+            + " Q = " + Q.to_string() + ")";
     }
 };
 
