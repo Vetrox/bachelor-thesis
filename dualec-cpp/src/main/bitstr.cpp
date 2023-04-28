@@ -1,4 +1,17 @@
 #include "bitstr.h"
+#include "forward.h"
+#include <algorithm>
+#include <cstdint>
+#include <gmp.h>
+#include <ostream>
+
+BigInt BitStr::as_big_int() const
+{
+    mpz_t z;
+    mpz_init(z);
+    mpz_import(z, m_data.size(), 1, sizeof(WordT), -1, 0, m_data.data());
+    return reinterpret_cast<BigInt&>(z);
+}
 
 void BitStr::truncate_left(size_t new_length)
 {

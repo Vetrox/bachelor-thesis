@@ -66,7 +66,7 @@ public:
     std::string debug_description() const;
     std::string as_bin_string() const;
     std::string as_hex_string() const;
-
+    BigInt as_big_int() const;
 private:
     BitStr(std::span<WordT>&& span, size_t bitlen)
         : m_data(span)
