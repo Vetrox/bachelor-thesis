@@ -42,7 +42,29 @@ BigInt BitStr::as_big_int() const
     return reinterpret_cast<BigInt&>(z);
 }
 
-void BitStr::truncate_left(size_t new_length)
+BitStr BitStr::operator^(BitStr const& other) const
+{
+    std::cout << "BitStr::operator^(this: " << debug_description() << " other: " << other.debug_description() << ")" << std::endl;
+    size_t new_bitlen = std::max(bitlength(), other.bitlength());
+    size_t new_wordt_length = containerlen_for_bitlength<WordT>(new_bitlen);
+    auto box = new WordT[new_wordt_length];
+    auto box_end = box + new_wordt_length * sizeof(WordT);
+
+    auto dit1 = m_data.begin(), dit2 = other.m_data.begin();
+    for (auto it = box; it != box_end; ++it) {
+        *it = (WordT)0;
+        if (dit1 != m_data.end()) {
+            *it ^= *dit1;
+            ++dit1;
+        }
+        if (dit2 != other.m_data.end()) {
+            *it ^= *dit2;
+            ++dit2;
+        }
+    }
+    return BitStr(std::span<WordT>((WordT*)box, new_wordt_length), new_bitlen);
+}
+
 BitStr& BitStr::truncate_left(size_t new_length)
 {
     if (new_length > m_bitlen) {
