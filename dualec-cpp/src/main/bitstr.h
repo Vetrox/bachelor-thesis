@@ -77,6 +77,7 @@ public:
     std::string as_bin_string() const;
     std::string as_hex_string() const;
     BigInt as_big_int() const;
+    std::span<uint8_t> to_baked_array() const;
 private:
     BitStr(std::span<WordT>&& span, size_t bitlen)
         : m_data(span)

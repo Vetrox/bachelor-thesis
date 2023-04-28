@@ -2,8 +2,26 @@
 #include "forward.h"
 #include <algorithm>
 #include <cstdint>
+#include <cstring>
 #include <gmp.h>
 #include <ostream>
+
+std::span<uint8_t> BitStr::to_baked_array() const
+{
+    size_t new_uint8_t_length = containerlen_for_bitlength<uint8_t>(bitlength());
+    auto* box = new uint8_t[new_uint8_t_length];
+    auto* start_pos = box + new_uint8_t_length - containerlen_for_bitlength<uint8_t>(internal_bitlength());
+    size_t diff = box - start_pos;
+    if (diff != 0) {
+        std::cout << "Memsetting " << diff << " bytes to 0" << std::endl;
+        std::memset(box, 0, diff);
+    }
+    std::copy(m_data.end() - containerlen_for_bitlength<uint8_t>(internal_bitlength()), m_data.end(), start_pos);
+    auto s = std::span<uint8_t>(box, new_uint8_t_length);
+    std::cout << "to_baked_array(this: " << debug_description() << "): "
+              << "data[" << new_uint8_t_length << "]=" << bytes_as_hex(s) << std::endl;
+    return std::move(s);
+}
 
 BitStr BitStr::truncated_right(size_t new_length) const
 {
