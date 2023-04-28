@@ -18,7 +18,8 @@ struct WorkingState {
             + " max_outlen = " + std::to_string(max_outlen)
             + " dec_curve = " + dec_curve.to_string()
             + " reseed_counter = " + std::to_string(reseed_counter)
-            + " outlen = " + std::to_string(outlen);
+            + " outlen = " + std::to_string(outlen)
+            + ")";
     }
 };
 
