@@ -22,8 +22,16 @@ class BitStr {
     static constexpr auto bits_per_word = sizeof(WordT) * 8;
 
 public:
+    BitStr(BigInt& i)
+        : BitStr(i, i.bitsize())
+    {
+    }
     BitStr(std::span<WordT>&& span)
         : BitStr(std::move(span), span.size() * bits_per_word)
+    {
+    }
+    BitStr(BigInt&& i)
+        : BitStr(std::move(i), i.bitsize())
     {
     }
     BitStr(BigInt&& i, size_t bitlen)
