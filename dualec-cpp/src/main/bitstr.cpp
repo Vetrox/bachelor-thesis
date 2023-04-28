@@ -166,9 +166,12 @@ std::string BitStr::as_bin_string() const
 
 std::string BitStr::debug_description() const
 {
-    return "BitStr(m_bitlen: "
+    auto diff = static_cast<ssize_t>(bitlength()) - static_cast<ssize_t>(m_data.size_bytes() * bits_per_word);
+    return "BitStr(bitlen: "
         + std::to_string(m_bitlen)
-        + " data[" + std::to_string(m_data.size_bytes()) + "]: "
+        + " data[" + std::to_string(m_data.size_bytes()) + " bytes"
+        + (diff != 0 ? (std::to_string(diff) + " bits") : "")
+        + "]: "
         + as_hex_string()
         + ")";
 }
