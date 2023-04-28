@@ -79,14 +79,13 @@ BitStr BitStr::operator+(BitStr const& other) const
 
     /*                                |
      *  |000p|oooo|oooo|00--|----|----|
-     *      ^bitlen1   |  ^internal_bitlen1
-     *                 m_data.begin() |                  box_end
+     *      ^bitlen1    ^internal_bitlen1
+     *                                |                  box_end
      *                                ||#zero_wt |              |
      *                            |000p|oooo|oooo|00--|----|----|
-     *                                ^bitlen2      ^internal_bitlen2
-     *
+     *                                ^bitlen2    ^internal_bitlen2
+     * new:
      *                    ---|----|---p|oooo|oooo|00--|----|----|
-     *
      */
 
     auto* begin_other_internal = box_end - other.m_data.size_bytes();
@@ -147,7 +146,6 @@ void BitStr::free_data()
 BitStr::BitStr(BigInt& i, size_t bitlen)
     : m_bitlen(bitlen)
 {
-    size_t amount_of_words_for_bitlen = containerlen_for_bitlength<WordT>(bitlen);
     auto* mpz_ptr = i.get_mpz();
     size_t word_count = 0;
     auto* data = (WordT*)mpz_export(nullptr, &word_count,
