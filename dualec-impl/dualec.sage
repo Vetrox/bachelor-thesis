@@ -235,9 +235,9 @@ def Dual_EC_DRBG_Generate(working_state: WorkingState, requested_number_of_bits,
     # 4. i=0
     i = 0
 
-    print(f"Generate(s = {hex_from_number_padded_to_num_of_bits(num_from_bitstr(working_state.s), working_state.seedlen)}, requested_number_of_bits = {requested_number_of_bits})")
+    #print(f"Generate(s = {hex_from_number_padded_to_num_of_bits(num_from_bitstr(working_state.s), working_state.seedlen)}, requested_number_of_bits = {requested_number_of_bits})")
     while True:
-        print(f"Iteration {i}")
+        #print(f"Iteration {i}")
         # 5. t = s XOR additional_input.
         t = XOR(num_from_bitstr(working_state.s), num_from_bitstr(additional_input))
 
@@ -252,8 +252,8 @@ def Dual_EC_DRBG_Generate(working_state: WorkingState, requested_number_of_bits,
         stripped_bits = XOR(num_from_bitstr(rightmost_outlen_bits_of_r), r)
         hex_outlen_bits_of_r = hex_from_number_padded_to_num_of_bits(num_from_bitstr(rightmost_outlen_bits_of_r), working_state.outlen)
         hex_stripped_bits = hex_from_number_padded_to_num_of_bits(stripped_bits >> working_state.outlen, working_state.seedlen - working_state.outlen)
-        print(f"s <- {hex_from_number_padded_to_num_of_bits(num_from_bitstr(working_state.s), working_state.seedlen)}")
-        print(f"r <- {hex_outlen_bits_of_r}, stripped_bits = {hex_stripped_bits}")
+        #print(f"s <- {hex_from_number_padded_to_num_of_bits(num_from_bitstr(working_state.s), working_state.seedlen)}")
+        #print(f"r <- {hex_outlen_bits_of_r}, stripped_bits = {hex_stripped_bits}")
         temp = ConcatBitStr(temp, rightmost_outlen_bits_of_r)
 
         # 9. additional_input=0
@@ -276,7 +276,7 @@ def Dual_EC_DRBG_Generate(working_state: WorkingState, requested_number_of_bits,
 
     # 14. s = phi(x(s * P)). BACKDOOR: x(d * (s * Q)) * (d * Q) = d * r
     working_state.s = cast_to_bitlen(Dual_EC_phi(Dual_EC_x(Dual_EC_mul(num_from_bitstr(working_state.s), working_state.dual_ec_curve.P))), working_state.seedlen)
-    print(f"s <- {hex_from_number_padded_to_num_of_bits(num_from_bitstr(working_state.s), working_state.seedlen)}")
+    #print(f"s <- {hex_from_number_padded_to_num_of_bits(num_from_bitstr(working_state.s), working_state.seedlen)}")
     # 15. Return SUCCESS, returned_bits, and s, seedlen, p, a, b, n, P, Q, and a reseed_counter for the new_working_state.
     return returned_bits, working_state
 
@@ -526,6 +526,8 @@ def generate_Q(P):
     return (d, Q)
 
 if __name__ == "__main__":
+    bits, t = test_for([], 2_000_000, 128, Dual_EC_P256)
+    print(t)
 #    if len(sys.argv) != 3:
  #       raise ValueError("Wrong number of command line arguments")
-    attack_backdoor(int(sys.argv[1])) # int(sys.argv[2]))
+   # attack_backdoor(int(sys.argv[1])) # int(sys.argv[2]))
