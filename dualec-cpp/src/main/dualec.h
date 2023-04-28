@@ -26,3 +26,5 @@ struct WorkingState {
 WorkingState Dual_EC_DRBG_Instantiate(BitStr entropy_input, BitStr nonce,
     BitStr personalization_string, size_t security_strength,
     DualEcCurve const* curve = nullptr);
+
+BitStr Dual_EC_DRBG_Generate(WorkingState&, size_t requested_number_of_bits, BitStr additional_input);

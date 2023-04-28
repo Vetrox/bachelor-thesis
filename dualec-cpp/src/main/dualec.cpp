@@ -117,10 +117,85 @@ WorkingState Dual_EC_DRBG_Instantiate(BitStr entropy_input, BitStr nonce,
         .outlen = 256 };
 }
 
+AffinePoint Dual_EC_mul(BigInt scalar, AffinePoint const& point, EllipticCurve const& curve)
+{
+    std::cout << "Dual_EC_mul(scalar: " << scalar << " point: " << point.to_string() << ")" << std::flush;
+    AffinePoint out;
+    curve.scalar(out, point, scalar);
+    std::cout << ": " << out.to_string() << std::endl;
+    return out;
+}
+
+BitStr Dual_EC_Truncate_Right(BitStr const& bitstr, size_t new_length)
+{
+    // adds 0s on the left if new_length > len(bitstr)
+    ssize_t amount_to_add = new_length - bitstr.bitlength();
+    if (amount_to_add >= 0)
+        return BitStr(0, amount_to_add) + bitstr;
+    else
+        return bitstr.truncated_right(new_length);
+}
+
+BitStr Dual_EC_DRBG_Generate(WorkingState& working_state, size_t requested_number_of_bits, BitStr additional_input)
+{
+    // 1. Check whether a reseed is required.
+    // Note: This isn't implemented yet.
+
+    // 2. If additional_input_string = Null then additional_input = 0 else ...
+    // Note:: Implementation omitted additional_input_string.
+
+    // 3. temp = the Null string
+    BitStr temp(0);
+
+    // 4. i = 0
+    size_t i = 0;
+
+    do {
+        // 5. t = s XOR additional_input
+        auto t = working_state.s ^ additional_input;
+
+        // 6. s = phi(x(t * P)). BACKDOOR: x(s * (d * Q)) = x(d * (s * Q))
+        working_state.s = BitStr(Dual_EC_mul(t.as_big_int(), working_state.dec_curve.P, working_state.dec_curve.curve).x(), working_state.seedlen);
+
+        // 7. r = phi(x(s * Q)). BACKDOOR: x(d * (s * Q)) * Q
+        auto r = BitStr(Dual_EC_mul(working_state.s.as_big_int(), working_state.dec_curve.Q, working_state.dec_curve.curve).x());
+
+        // 8. temp = temp || (rightmost outlen bits of r)
+        temp = temp + Dual_EC_Truncate_Right(r, working_state.outlen);
+
+        // 9. additional_input=0
+        additional_input = BitStr(0);
+
+        // 10. reseed_counter = reseed_counter + 1
+        working_state.reseed_counter++;
+
+        // 11. i = i + 1
+        i++;
+
+        // 12. If (len (temp) < requested_number_of_bits), then go to step 5.
+    } while (temp.bitlength() < requested_number_of_bits);
+    // 13. returned_bits = Truncate (temp, i * outlen, requested_number_of_bits).
+    if (temp.bitlength() != i * working_state.outlen) {
+        std::cout << "AssertionError: Temp should be i*outlen" << std::endl;
+        abort();
+    }
+    Dual_EC_Truncate(temp, requested_number_of_bits);
+    auto& returned_bits = temp;
+
+    // 14. s = phi(x(s * P)). BACKDOOR: x(d * (s * Q)) * (d * Q) = d * r
+    working_state.s = Dual_EC_mul(working_state.s.as_big_int(), working_state.dec_curve.P, working_state.dec_curve.curve).x();
+
+    // 15. Return SUCCESS, returned_bits, and s, seedlen, p, a, b, n, P, Q, and a reseed_counter for the new_working_state.
+    return returned_bits;
+}
+
 int main()
 {
-    auto working_state = Dual_EC_DRBG_Instantiate(BitStr(0, 0), BitStr(0, 0), BitStr(0, 0), 256);
+    auto working_state = Dual_EC_DRBG_Instantiate(BitStr(0), BitStr(0), BitStr(0), 128);
     std::cout << "Instantiated working state " << working_state.to_string() << std::endl;
+
+    auto random_bits = Dual_EC_DRBG_Generate(working_state, 10000, BitStr(0)).to_baked_array();
+    std::cout << "Got random bits: " << bytes_as_hex(random_bits) << std::endl;
 #if 0
     auto ffield = Zp(123);
     Element element_mod_zp;
