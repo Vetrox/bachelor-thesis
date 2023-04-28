@@ -5,6 +5,35 @@
 #include <gmp.h>
 #include <ostream>
 
+BitStr BitStr::truncated_right(size_t new_length) const
+{
+    if (new_length > m_bitlen) {
+        std::cout << "Wrong usage of truncate" << std::endl;
+        abort();
+    }
+    /*                            cut
+     *                              |
+     *  |000p|oooo|oooo|00--|----|----|
+     *      ^bitlen     ^internal_bitlen
+     * new:
+     *       |pooo|oooo|000-|----|----|
+     */
+    size_t shift_amount_total = bitlength() - new_length;
+    size_t shift_amount_words = shift_amount_total / bits_per_word;
+    size_t shift_amount = shift_amount_total % bits_per_word;
+    size_t new_wordt_length = containerlen_for_bitlength<WordT>(internal_bitlength()) - shift_amount_words;
+    auto* box = new WordT[new_wordt_length];
+    auto* it = box;
+    for (auto dit = m_data.begin(), prev_dit = dit; dit != m_data.end(); ++it, ++dit) {
+        *it = (WordT) 0;
+        if (dit != m_data.begin())
+            *it |= (*prev_dit) << (bits_per_word-shift_amount);
+        *it |= (*dit) >> shift_amount;
+        prev_dit = dit;
+    }
+    return BitStr(std::span<WordT>(box, new_wordt_length), new_length);
+}
+
 BigInt BitStr::as_big_int() const
 {
     mpz_t z;
@@ -14,6 +43,7 @@ BigInt BitStr::as_big_int() const
 }
 
 void BitStr::truncate_left(size_t new_length)
+BitStr& BitStr::truncate_left(size_t new_length)
 {
     if (new_length > m_bitlen) {
         std::cout << "Wrong usage of truncate" << std::endl;
@@ -21,6 +51,7 @@ void BitStr::truncate_left(size_t new_length)
     }
     std::cout << "truncate_left(" << std::to_string(new_length) << ")" << std::endl;
     m_bitlen = new_length;
+    return *this;
 }
 
 BitStr& BitStr::operator=(BitStr&& other)

@@ -52,7 +52,8 @@ public:
         free_data();
     }
 
-    void truncate_left(size_t new_length);
+    BitStr& truncate_left(size_t new_length);
+    BitStr truncated_right(size_t new_length) const;
     BitStr& operator=(BitStr&& other);
     BitStr operator+(BitStr const& other) const;
 
