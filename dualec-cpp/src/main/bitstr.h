@@ -23,15 +23,16 @@ class BitStr {
 
 public:
     BitStr(BigInt& i)
-        : BitStr(i, i.bitsize())
+        : BitStr(i, i.zero == i ? 0 : i.bitsize())
     {
+        std::cout << "BitStr(BigInt& i:" << i << " ) i.bitsize(): " << i.bitsize() << " debug: " << debug_description() << std::endl;
     }
     BitStr(std::span<WordT>&& span)
         : BitStr(std::move(span), span.size() * bits_per_word)
     {
     }
     BitStr(BigInt&& i)
-        : BitStr(std::move(i), i.bitsize())
+        : BitStr(i)
     {
     }
     BitStr(BigInt&& i, size_t bitlen)
