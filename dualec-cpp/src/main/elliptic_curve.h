@@ -14,7 +14,7 @@ public:
         m_field.init(m_b, b);
     }
 
-    void inv(AffinePoint& out, AffinePoint const& in)
+    void inv(AffinePoint& out, AffinePoint const& in) const
     {
         if (in.identity()) {
             out.setIdentity(true);
@@ -27,7 +27,7 @@ public:
         out.setX(tmp);
     }
 
-    void _double(AffinePoint& out, AffinePoint const& in)
+    void _double(AffinePoint& out, AffinePoint const& in) const
     {
         AffinePoint tmp_point;
         inv(tmp_point, in);
@@ -67,7 +67,7 @@ public:
         out.setY(out_y);
     }
 
-    void add(AffinePoint& out, AffinePoint const& p1, AffinePoint const& p2)
+    void add(AffinePoint& out, AffinePoint const& p1, AffinePoint const& p2) const
     {
         AffinePoint tmp1, tmp2;
         inv(tmp1, p1);
@@ -118,7 +118,7 @@ public:
         out.setY(y3);
     }
 
-    void scalar(AffinePoint& out, AffinePoint const& p, BigInt k)
+    void scalar(AffinePoint& out, AffinePoint const& p, BigInt k) const
     {
         out.setIdentity(true);
         if (p.identity()) {
