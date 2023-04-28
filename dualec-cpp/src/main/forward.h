@@ -3,6 +3,14 @@
 #include <givaro/modular-integer.h>
 #include <span>
 
+#ifdef DEBUG
+#    define DBG std::cout
+#else
+#    define DBG    \
+        if (false) \
+        std::cout
+#endif
+
 typedef Givaro::Integer BigInt;
 typedef Givaro::Modular<BigInt> Zp;
 typedef Zp::Element Element; // an element in Zp

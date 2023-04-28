@@ -5,9 +5,11 @@
 #include "elliptic_curve.h"
 #include "hash.h"
 #include <algorithm>
+#include <chrono>
 #include <cmath>
 #include <cstdint>
 #include <cstdlib>
+#include <ratio>
 #include <string>
 
 size_t pick_seedlen(size_t security_strength)
@@ -18,7 +20,7 @@ size_t pick_seedlen(size_t security_strength)
         return 384;
     if (security_strength <= 256)
         return 521;
-    std::cout << "Invalid security strength requested." << std::endl;
+    DBG << "Invalid security strength requested." << std::endl;
     abort();
 }
 
@@ -32,7 +34,7 @@ size_t calculate_max_outlen(size_t seedlen)
     case 521:
         return 504;
     default:
-        std::cout << "Invalid seedlen provided" << std::endl;
+        DBG << "Invalid seedlen provided" << std::endl;
         abort();
     }
 }
@@ -43,7 +45,7 @@ size_t ceildiv(size_t a, size_t b)
 }
 void Dual_EC_Truncate(BitStr& bitstr, size_t outlen)
 {
-    std::cout << "Dual_EC_Truncate(bitstr: " << bitstr.debug_description() << " outlen: " << std::to_string(outlen) << std::endl;
+    DBG << "Dual_EC_Truncate(bitstr: " << bitstr.debug_description() << " outlen: " << std::to_string(outlen) << std::endl;
     bitstr.truncate_left(std::min(outlen, bitstr.bitlength()));
     auto amount_to_add = bitstr.bitlength() - outlen;
     if (amount_to_add > 0)
@@ -58,7 +60,7 @@ DualEcCurve const& pick_curve(size_t security_strength)
         return Dual_EC_P384;
     if (security_strength <= 256)
         return Dual_EC_P521;
-    std::cout << "Invalid security strength" << std::endl;
+    DBG << "Invalid security strength" << std::endl;
     abort();
 }
 
@@ -66,7 +68,7 @@ BitStr Hash_df(BitStr const& input_string, uint32_t no_of_bits_to_return)
 {
     size_t outlen = 256; // bits
     if (no_of_bits_to_return > 255 * outlen) {
-        std::cout << "ERROR: Requested too many no_of_bits_to_return" << std::endl;
+        DBG << "ERROR: Requested too many no_of_bits_to_return" << std::endl;
         abort();
     }
     // 1. temp = the Null string
@@ -99,7 +101,7 @@ WorkingState Dual_EC_DRBG_Instantiate(BitStr entropy_input, BitStr nonce,
     // 2. s = Hash_df(seed_material, seedlen)
     auto seedlen = pick_seedlen(security_strength);
     BitStr s = Hash_df(seed_material, seedlen);
-    std::cout << "Length of s: " << s.bitlength() << std::endl;
+    DBG << "Length of s: " << s.bitlength() << std::endl;
 
     // 3. reseed_counter = 0
     size_t reseed_counter = 0;
@@ -119,10 +121,8 @@ WorkingState Dual_EC_DRBG_Instantiate(BitStr entropy_input, BitStr nonce,
 
 AffinePoint Dual_EC_mul(BigInt scalar, AffinePoint const& point, EllipticCurve const& curve)
 {
-    std::cout << "Dual_EC_mul(scalar: " << scalar << " point: " << point.to_string() << ")" << std::flush;
     AffinePoint out;
     curve.scalar(out, point, scalar);
-    std::cout << ": " << out.to_string() << std::endl;
     return out;
 }
 
@@ -176,7 +176,7 @@ BitStr Dual_EC_DRBG_Generate(WorkingState& working_state, size_t requested_numbe
     } while (temp.bitlength() < requested_number_of_bits);
     // 13. returned_bits = Truncate (temp, i * outlen, requested_number_of_bits).
     if (temp.bitlength() != i * working_state.outlen) {
-        std::cout << "AssertionError: Temp should be i*outlen" << std::endl;
+        DBG << "AssertionError: Temp should be i*outlen" << std::endl;
         abort();
     }
     Dual_EC_Truncate(temp, requested_number_of_bits);
@@ -192,47 +192,53 @@ BitStr Dual_EC_DRBG_Generate(WorkingState& working_state, size_t requested_numbe
 int main()
 {
     auto working_state = Dual_EC_DRBG_Instantiate(BitStr(0), BitStr(0), BitStr(0), 128);
-    std::cout << "Instantiated working state " << working_state.to_string() << std::endl;
+    DBG << "Instantiated working state " << working_state.to_string() << std::endl;
 
-    auto random_bits = Dual_EC_DRBG_Generate(working_state, 10000, BitStr(0)).to_baked_array();
-    std::cout << "Got random bits: " << bytes_as_hex(random_bits) << std::endl;
+    auto start_time = std::chrono::high_resolution_clock::now();
+    auto random_bits = Dual_EC_DRBG_Generate(working_state, 2'000'000, BitStr(0)).to_baked_array();
+
+    auto end_time = std::chrono::high_resolution_clock::now();
+    double elapsed_time_ms = std::chrono::duration<double, std::milli>(end_time - start_time).count();
+    std::cout << elapsed_time_ms << std::endl;
+
+    DBG << "Got random bits: " << bytes_as_hex(random_bits) << std::endl;
 #if 0
     auto ffield = Zp(123);
     Element element_mod_zp;
     ffield.init(element_mod_zp, 325);
     Element product;
-    std::cout << "325 % 123 = 79, actual: " << element_mod_zp << std::endl;
+    DBG << "325 % 123 = 79, actual: " << element_mod_zp << std::endl;
     ffield.mul(product, element_mod_zp, Element(2));
-    std::cout << "79 * 2 % 123 = 35, actual: " << product << std::endl;
+    DBG << "79 * 2 % 123 = 35, actual: " << product << std::endl;
 
     auto point = AffinePoint(99, 59);
-    std::cout << point.to_string() << std::endl;
+    DBG << point.to_string() << std::endl;
     auto point2 = point;
-    std::cout << std::to_string((point == point2)) << std::endl;
+    DBG << std::to_string((point == point2)) << std::endl;
 
     auto p256_p = BigInt("115792089210356248762697446949407573530086143415290314195533631308867097853951");
     auto aaa = BigInt("4294967295");
     auto bitstr = BitStr(aaa, 4 * 8 + 1);
-    std::cout << "Bitstr of p: " << bitstr.as_hex_string() << "\n bin: " << bitstr.as_bin_string() << std::endl;
+    DBG << "Bitstr of p: " << bitstr.as_hex_string() << "\n bin: " << bitstr.as_bin_string() << std::endl;
     auto bitstr2 = bitstr;
     auto bitstr3 = bitstr + bitstr2;
-    std::cout << "Bitstr of p2: " << bitstr2.as_hex_string() << "\n bin: " << bitstr2.as_bin_string() << std::endl;
-    std::cout << "Bitstr of p3: " << bitstr3.as_hex_string() << "\n bin: " << bitstr3.as_bin_string() << std::endl;
+    DBG << "Bitstr of p2: " << bitstr2.as_hex_string() << "\n bin: " << bitstr2.as_bin_string() << std::endl;
+    DBG << "Bitstr of p3: " << bitstr3.as_hex_string() << "\n bin: " << bitstr3.as_bin_string() << std::endl;
 
     auto p256_a = BigInt(-3);
     auto p256_b = BigInt("41058363725152142129326129780047268409114441015993725554835256314039467401291");
 
     auto elliptic_curve = EllipticCurve(p256_p,0, p256_a, p256_b);
-    std::cout << elliptic_curve.to_string() << std::endl;
+    DBG << elliptic_curve.to_string() << std::endl;
 
     AffinePoint tmp;
     elliptic_curve._double(tmp, point);
 
-    std::cout << tmp.to_string() << std::endl;
+    DBG << tmp.to_string() << std::endl;
 
     AffinePoint G(BigInt("48439561293906451759052585252797914202762949526041747995844080717082404635286"), BigInt("36134250956749795798585127919587881956611106672985015071877198253568414405109"));
     elliptic_curve.scalar(tmp, G, 3);
 
-    std::cout << tmp.to_string() << std::endl;
+    DBG << tmp.to_string() << std::endl;
 #endif
 }

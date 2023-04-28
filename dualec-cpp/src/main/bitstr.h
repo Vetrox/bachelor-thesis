@@ -25,7 +25,6 @@ public:
     BitStr(BigInt& i)
         : BitStr(i, i.zero == i ? 0 : i.bitsize())
     {
-        std::cout << "BitStr(BigInt& i:" << i << " ) i.bitsize(): " << i.bitsize() << " debug: " << debug_description() << std::endl;
     }
     BitStr(std::span<WordT>&& span)
         : BitStr(std::move(span), span.size() * bits_per_word)
@@ -79,12 +78,12 @@ public:
     std::string as_hex_string() const;
     BigInt as_big_int() const;
     std::span<uint8_t> to_baked_array() const;
+
 private:
     BitStr(std::span<WordT>&& span, size_t bitlen)
         : m_data(span)
         , m_bitlen(bitlen)
     {
-        std::cout << "BitStr(span&&, size_t) constructor: " << debug_description() << std::endl;
     }
 
     void free_data();
