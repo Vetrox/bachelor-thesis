@@ -25,9 +25,9 @@ BitStr BitStr::truncated_right(size_t new_length) const
     auto* box = new WordT[new_wordt_length];
     auto* it = box;
     for (auto dit = m_data.begin(), prev_dit = dit; dit != m_data.end(); ++it, ++dit) {
-        *it = (WordT) 0;
+        *it = (WordT)0;
         if (dit != m_data.begin())
-            *it |= (*prev_dit) << (bits_per_word-shift_amount);
+            *it |= (*prev_dit) << (bits_per_word - shift_amount);
         *it |= (*dit) >> shift_amount;
         prev_dit = dit;
     }
