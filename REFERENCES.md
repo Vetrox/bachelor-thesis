@@ -9,3 +9,4 @@
 
 ## Implementation guides
 [CMake](https://github.com/krux02/minimal_cmake_example)
+[Efficient ECDSA](https://csrc.nist.gov/csrc/media/events/workshop-on-elliptic-curve-cryptography-standards/documents/papers/session6-adalier-mehmet.pdf)
