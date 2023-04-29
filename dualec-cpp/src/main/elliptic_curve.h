@@ -29,15 +29,13 @@ public:
 
     void _double(AffinePoint& out, AffinePoint const& in) const
     {
-        AffinePoint tmp_point;
-        inv(tmp_point, in);
-        if (in.identity() || tmp_point == in) {
+        if (in.identity()) {
             out.setIdentity(true);
             return;
         }
         out.setIdentity(false);
         Element tmp_element;
-        Element _3x_sq; // 3 * x^2
+        Element _3x_sq;                      // 3 * x^2
         m_field.mul(_3x_sq, in.x(), in.x()); // x^2
         m_field.init(tmp_element, 3);
         m_field.mulin(_3x_sq, tmp_element);
@@ -61,7 +59,7 @@ public:
 
         Element out_y;
         m_field.sub(tmp_element, in.x(), out_x); // x - out_x
-        m_field.mulin(tmp_element, slope); // l * (x - out_x)
+        m_field.mulin(tmp_element, slope);       // l * (x - out_x)
         m_field.sub(out_y, tmp_element, in.y()); // l * (x - out_x) - y
 
         out.setX(out_x);
@@ -70,11 +68,7 @@ public:
 
     void add(AffinePoint& out, AffinePoint const& p1, AffinePoint const& p2) const
     {
-        AffinePoint tmp1, tmp2;
-        inv(tmp1, p1);
-        inv(tmp2, p2);
-
-        if ((p1.identity() && p2.identity()) || (tmp1 == p2) || (tmp2 == p1)) {
+        if (p1.identity() && p2.identity()) {
             out.setIdentity(true);
             return;
         }
@@ -87,6 +81,16 @@ public:
         if (p2.identity()) {
             out = p1;
             return;
+        }
+
+        {
+            AffinePoint tmp1;
+            inv(tmp1, p1);
+
+            if (tmp1 == p2) {
+                out.setIdentity(true);
+                return;
+            }
         }
 
         if (p1 == p2)
@@ -113,9 +117,10 @@ public:
         Element sub_x1_out_x; // x1 - out_x
         m_field.sub(sub_x1_out_x, p1.x(), out_x);
 
-        Element out_y; // out_y = l * (x1 - out_x) - y1
+        Element out_y;                         // out_y = l * (x1 - out_x) - y1
         m_field.mul(tmp, slope, sub_x1_out_x); // l * (x1 - out_x)
         m_field.sub(out_y, tmp, p1.y());
+
         out.setX(out_x);
         out.setY(out_y);
     }
@@ -147,7 +152,6 @@ public:
     }
 
 private:
-
     Element m_a;
     Element m_b;
     Zp m_field;
