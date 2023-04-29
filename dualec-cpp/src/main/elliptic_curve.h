@@ -132,16 +132,16 @@ public:
             return;
         }
         AffinePoint tmp1, tmp2;
-        AffinePoint pp = p;
+        AffinePoint _2p = p;
         while (k > 0) {
-            if (k % 2 == 1) {
-                add(tmp1, out, pp);
+            if (k.operator&(static_cast<size_t>(0b1)) == 1) {
+                add(tmp1, out, _2p);
                 out = tmp1; // out = out + pp
             }
 
-            _double(tmp2, pp);
-            pp = tmp2; // pp = 2*pp
-            k >>= 1;   // k = k / 2
+            _double(tmp2, _2p);
+            _2p = tmp2; // pp = 2*pp
+            k >>= 1;    // k = k / 2
         }
     }
 
