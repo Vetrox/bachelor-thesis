@@ -24,7 +24,7 @@ public:
         out.setX(in.x());
         Element tmp;
         m_field.sub(tmp, m_field.zero, in.y());
-        out.setX(tmp);
+        out.setY(tmp);
     }
 
     void _double(AffinePoint& out, AffinePoint const& in) const
