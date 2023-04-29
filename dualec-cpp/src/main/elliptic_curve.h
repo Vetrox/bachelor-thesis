@@ -9,7 +9,7 @@ public:
     EllipticCurve(BigInt prime, BigInt n, BigInt a, BigInt b)
         : m_field(prime)
     {
-        (void)n; // the order of the elliptic curve group
+        (void)n; // the order of the elliptic curve group, e.g. the base Point G
         m_field.init(m_a, a);
         m_field.init(m_b, b);
     }
