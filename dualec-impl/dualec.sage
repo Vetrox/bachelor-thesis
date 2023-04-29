@@ -526,7 +526,7 @@ def generate_Q(P):
     return (d, Q)
 
 if __name__ == "__main__":
-    bits, t = test_for([], 2_000_000, 128, Dual_EC_P256)
+    bits, t = test_for([], 100_000, 128, Dual_EC_P256)
     print(t)
 #    if len(sys.argv) != 3:
  #       raise ValueError("Wrong number of command line arguments")

@@ -195,7 +195,7 @@ int main()
     DBG << "Instantiated working state " << working_state.to_string() << std::endl;
 
     auto start_time = std::chrono::high_resolution_clock::now();
-    auto random_bits = Dual_EC_DRBG_Generate(working_state, 2'000'000, BitStr(0)).to_baked_array();
+    auto random_bits = Dual_EC_DRBG_Generate(working_state, 100'000, BitStr(0)).to_baked_array();
 
     auto end_time = std::chrono::high_resolution_clock::now();
     double elapsed_time_ms = std::chrono::duration<double, std::milli>(end_time - start_time).count();

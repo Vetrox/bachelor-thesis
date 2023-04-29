@@ -22,7 +22,7 @@ file(GLOB_RECURSE sources      src/main/*.cpp src/main/*.h)
 add_executable(dualec-attack ${sources})# ${data})
 
 # Just for example add some compiler flags.
-target_compile_options(dualec-attack PUBLIC -std=c++2a -O2 -Wall -Wextra -fdiagnostics-color=always) #-DDEBUG -ggdb
+target_compile_options(dualec-attack PUBLIC -std=c++2a -O2 -Wall -g -Wextra -fdiagnostics-color=always) #-DDEBUG -ggdb
 
 # This allows to include files relative to the root of the src directory with a <> pair
 target_include_directories(dualec-attack PUBLIC src/main)
