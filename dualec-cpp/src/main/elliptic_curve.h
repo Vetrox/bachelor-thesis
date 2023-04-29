@@ -37,31 +37,32 @@ public:
         }
         out.setIdentity(false);
         Element tmp_element;
-        Element xs;
-        m_field.mul(xs, in.x(), in.x()); // x^2
+        Element _3x_sq; // 3 * x^2
+        m_field.mul(_3x_sq, in.x(), in.x()); // x^2
         m_field.init(tmp_element, 3);
-        m_field.mulin(xs, tmp_element);
+        m_field.mulin(_3x_sq, tmp_element);
 
-        Element ty; // y*2
+        Element _2y; // 2 * y
         m_field.init(tmp_element, 2);
-        m_field.mul(ty, tmp_element, in.y());
+        m_field.mul(_2y, tmp_element, in.y());
 
-        Element slope; // m
-        m_field.add(tmp_element, xs, m_a);
-        m_field.div(slope, tmp_element, ty);
+        Element slope; // l = (3 * x^2 + a) / (2 * y)
+        m_field.add(tmp_element, _3x_sq, m_a);
+        m_field.div(slope, tmp_element, _2y);
 
-        Element slope2; // m^2
-        m_field.mul(slope2, slope, slope);
+        Element slope_sq; // l^2
+        m_field.mul(slope_sq, slope, slope);
 
-        Element xpx; // 2*x
-        m_field.add(xpx, in.x(), in.x());
+        Element _2x; // x+x
+        m_field.add(_2x, in.x(), in.x());
 
-        Element out_x;
-        m_field.sub(out_x, slope2, xpx);
+        Element out_x; // l^2 - x - x
+        m_field.sub(out_x, slope_sq, _2x);
 
         Element out_y;
-        m_field.sub(tmp_element, in.x(), out_x);
-        m_field.sub(out_y, m_field.mulin(tmp_element, slope), in.y());
+        m_field.sub(tmp_element, in.x(), out_x); // x - out_x
+        m_field.mulin(tmp_element, slope); // l * (x - out_x)
+        m_field.sub(out_y, tmp_element, in.y()); // l * (x - out_x) - y
 
         out.setX(out_x);
         out.setY(out_y);
@@ -99,23 +100,24 @@ public:
         Element den; // x2 - x1
         m_field.sub(den, p2.x(), p1.x());
 
-        Element slope; // m
+        Element slope; // l = (y2-y1) / (x2-x1)
         m_field.div(slope, num, den);
 
-        Element slope2; // m^2
-        m_field.mul(slope2, slope, slope);
+        Element slope_sq; // l^2
+        m_field.mul(slope_sq, slope, slope);
 
-        Element x3; // x_3
-        m_field.sub(x3, slope2, m_field.add(tmp, p2.x(), p1.x()));
+        Element out_x; // out_x = l^2 - (x1 + x2)
+        m_field.add(tmp, p1.x(), p2.x());
+        m_field.sub(out_x, slope_sq, tmp);
 
-        Element diffx3; // x_1 - x_3
-        m_field.sub(diffx3, p1.x(), x3);
+        Element sub_x1_out_x; // x1 - out_x
+        m_field.sub(sub_x1_out_x, p1.x(), out_x);
 
-        Element y3; // y_3
-        m_field.mul(tmp, slope, diffx3);
-        m_field.sub(y3, tmp, p1.y());
-        out.setX(x3);
-        out.setY(y3);
+        Element out_y; // out_y = l * (x1 - out_x) - y1
+        m_field.mul(tmp, slope, sub_x1_out_x); // l * (x1 - out_x)
+        m_field.sub(out_y, tmp, p1.y());
+        out.setX(out_x);
+        out.setY(out_y);
     }
 
     void scalar(AffinePoint& out, AffinePoint const& p, BigInt k) const
@@ -145,6 +147,7 @@ public:
     }
 
 private:
+
     Element m_a;
     Element m_b;
     Zp m_field;
