@@ -55,10 +55,10 @@ size_t ceildiv(size_t a, size_t b)
 void Dual_EC_Truncate(BitStr& bitstr, size_t outlen)
 {
     DBG << "Dual_EC_Truncate(bitstr: " << bitstr.debug_description() << " outlen: " << std::to_string(outlen) << std::endl;
-    bitstr.truncate_left(std::min(outlen, bitstr.bitlength()));
+    bitstr = bitstr.truncated_left(std::min(outlen, bitstr.bitlength()));
     auto amount_to_add = bitstr.bitlength() - outlen;
     if (amount_to_add > 0)
-        bitstr = bitstr + BitStr(0, amount_to_add);
+        bitstr = bitstr + BitStr(BigInt(0), amount_to_add);
 }
 
 DualEcCurve const& pick_curve(size_t security_strength)
@@ -81,7 +81,7 @@ BitStr Hash_df(BitStr const& input_string, uint32_t no_of_bits_to_return)
         abort();
     }
     // 1. temp = the Null string
-    BitStr temp(0, 0);
+    BitStr temp(BigInt(0), 0);
 
     // 2. len = ceil(no_of_bits_to_return / outlen)
     auto len = ceildiv(no_of_bits_to_return, hash_outlen);
@@ -118,7 +118,8 @@ WorkingState Dual_EC_DRBG_Instantiate(BitStr entropy_input, BitStr nonce,
     // 4. Using the security_strength and Table 4 in Section 10.3.1, select the smallest available curve that has a security strength >= security_strength. The values for seedlen, p, a, b, n, P, Q are determined by the curve
     if (curve == nullptr)
         curve = &pick_curve(security_strength);
-
+    else
+        DBG << "Instantiate: Using custom curve" << std::endl;
     // 5. Return s, seedlen, p, a, b, n, P, Q, and a reseed_counter for the initial_working_state.
     return WorkingState { .s = std::move(s),
         .seedlen = seedlen,
@@ -139,7 +140,7 @@ BitStr Dual_EC_Truncate_Right(BitStr const& bitstr, size_t new_length)
     // adds 0s on the left if new_length > len(bitstr)
     ssize_t amount_to_add = new_length - bitstr.bitlength();
     if (amount_to_add >= 0)
-        return BitStr(0, amount_to_add) + bitstr;
+        return BitStr(BigInt(0), amount_to_add) + bitstr;
     else
         return bitstr.truncated_right(new_length);
 }
@@ -164,10 +165,12 @@ BitStr Dual_EC_DRBG_Generate(WorkingState& working_state, size_t requested_numbe
 
         // 6. s = phi(x(t * P)). BACKDOOR: x(s * (d * Q)) = x(d * (s * Q))
         working_state.s = BitStr(Dual_EC_mul(t.as_big_int(), working_state.dec_curve.P, working_state.dec_curve.curve).x(), working_state.seedlen);
+        std::cout << "i: " << i << " s: " << working_state.s.as_hex_string() << std::endl;
 
         // 7. r = phi(x(s * Q)). BACKDOOR: x(d * (s * Q)) * Q
         auto r = BitStr(Dual_EC_mul(working_state.s.as_big_int(), working_state.dec_curve.Q, working_state.dec_curve.curve).x());
 
+        std::cout << "i: " << i << " r: " << r.as_hex_string() << std::endl;
         // 8. temp = temp || (rightmost outlen bits of r)
         temp = temp + Dual_EC_Truncate_Right(r, working_state.outlen);
 
@@ -182,6 +185,7 @@ BitStr Dual_EC_DRBG_Generate(WorkingState& working_state, size_t requested_numbe
 
         // 12. If (len (temp) < requested_number_of_bits), then go to step 5.
     } while (temp.bitlength() < requested_number_of_bits);
+
     // 13. returned_bits = Truncate (temp, i * outlen, requested_number_of_bits).
     if (temp.bitlength() != i * working_state.outlen) {
         std::cout << "AssertionError: Temp should be i*outlen" << std::endl;
@@ -192,6 +196,7 @@ BitStr Dual_EC_DRBG_Generate(WorkingState& working_state, size_t requested_numbe
 
     // 14. s = phi(x(s * P)). BACKDOOR: x(d * (s * Q)) * (d * Q) = d * r
     working_state.s = BitStr(Dual_EC_mul(working_state.s.as_big_int(), working_state.dec_curve.P, working_state.dec_curve.curve).x(), working_state.seedlen);
+    std::cout << " s: " << working_state.s.as_hex_string() << std::endl;
 
     // 15. Return SUCCESS, returned_bits, and s, seedlen, p, a, b, n, P, Q, and a reseed_counter for the new_working_state.
     return returned_bits;
@@ -229,6 +234,7 @@ void generate_dQ(AffinePoint const& P, BigInt const& order_of_p, EllipticCurve c
 [[nodiscard]] BitStr simulate_client_generation(DualEcCurve const& curve, size_t no_of_bits_to_return, size_t security_strength)
 {
     auto random_input_entropy = random_bigint(BigInt(1) << 123);
+    DBG << "Random input entropy: " << bigint_hex(random_input_entropy) << std::endl;
     auto working_state = Dual_EC_DRBG_Instantiate(BitStr(random_input_entropy), BitStr(0), BitStr(0), security_strength, &curve);
     auto random_bits = Dual_EC_DRBG_Generate(working_state, no_of_bits_to_return, BitStr(0));
     return random_bits;
@@ -245,7 +251,6 @@ BitStr predict_next_rand_bits(AffinePoint const& point, BitStr& out_guess_for_ne
 static std::queue<std::shared_future<BitStr>> workers;
 void push_worker(std::function<BitStr()> func)
 {
-    std::cout << workers.size() << std::endl;
     workers.push(std::async(std::launch::async, func));
 }
 
@@ -257,8 +262,11 @@ BitStr brute_force_next_s(BitStr const& bits, size_t security_strength, BigInt d
 
     auto outlen_bits = bits.truncated_right(outlen);
     auto next_rand_bits = BitStr(bits);
-    next_rand_bits.truncate_left(outlen);                    // TODO: off-by-one
+    next_rand_bits = next_rand_bits.truncated_left(bits.bitlength() - outlen); // TODO: off-by-one
+    std::cout << "intermediate " << next_rand_bits.as_hex_string() << std::endl;
     next_rand_bits = next_rand_bits.truncated_right(outlen); // TODO: off-by-one
+
+    std::cout << "Using " << outlen_bits.as_hex_string() << " to predict " << next_rand_bits.as_hex_string() << std::endl;
 
     std::cout << "Pushing workers..." << std::endl;
     auto max_bound = BigInt(1) << stripped_amount_of_bits;
@@ -314,9 +322,11 @@ void simulate_backdoor(size_t security_strength)
     BigInt d;
     generate_dQ(bad_curve.P, bad_curve.order_of_p, bad_curve.curve, d, bad_curve.Q);
     std::cout << "Produced backdoor d: " << bigint_hex(d) << " " << bad_curve.to_string() << std::endl;
+
     auto outlen = calculate_max_outlen(pick_seedlen(security_strength));
-    auto random_bits = simulate_client_generation(bad_curve, outlen, security_strength);
+    auto random_bits = simulate_client_generation(bad_curve, outlen * 3, security_strength);
     std::cout << "Got random bits: " << bytes_as_hex(random_bits.to_baked_array()) << std::endl;
+
     auto working_state = brute_force_working_state(random_bits, security_strength, d, bad_curve);
     std::cout << "Brute-forced working-state: " << working_state.to_string() << std::endl;
 }
@@ -324,56 +334,4 @@ void simulate_backdoor(size_t security_strength)
 int main()
 {
     simulate_backdoor(128);
-#if 0
-    Zp f(152);
-    BigInt d(45);
-    f.invin(d);
-    std::cout << d << std::endl;
-    DBG << "Instantiated working state " << working_state.to_string() << std::endl;
-
-    auto start_time = std::chrono::high_resolution_clock::now();
-    auto random_bits = Dual_EC_DRBG_Generate(working_state, 100'000, BitStr(0)).to_baked_array();
-
-    auto end_time = std::chrono::high_resolution_clock::now();
-    double elapsed_time_ms = std::chrono::duration<double, std::milli>(end_time - start_time).count();
-    std::cout << elapsed_time_ms << std::endl;
-
-    auto ffield = Zp(123);
-    Element element_mod_zp;
-    ffield.init(element_mod_zp, 325);
-    Element product;
-    DBG << "325 % 123 = 79, actual: " << element_mod_zp << std::endl;
-    ffield.mul(product, element_mod_zp, Element(2));
-    DBG << "79 * 2 % 123 = 35, actual: " << product << std::endl;
-
-    auto point = AffinePoint(99, 59);
-    DBG << point.to_string() << std::endl;
-    auto point2 = point;
-    DBG << std::to_string((point == point2)) << std::endl;
-
-    auto p256_p = BigInt("115792089210356248762697446949407573530086143415290314195533631308867097853951");
-    auto aaa = BigInt("4294967295");
-    auto bitstr = BitStr(aaa, 4 * 8 + 1);
-    DBG << "Bitstr of p: " << bitstr.as_hex_string() << "\n bin: " << bitstr.as_bin_string() << std::endl;
-    auto bitstr2 = bitstr;
-    auto bitstr3 = bitstr + bitstr2;
-    DBG << "Bitstr of p2: " << bitstr2.as_hex_string() << "\n bin: " << bitstr2.as_bin_string() << std::endl;
-    DBG << "Bitstr of p3: " << bitstr3.as_hex_string() << "\n bin: " << bitstr3.as_bin_string() << std::endl;
-
-    auto p256_a = BigInt(-3);
-    auto p256_b = BigInt("41058363725152142129326129780047268409114441015993725554835256314039467401291");
-
-    auto elliptic_curve = EllipticCurve(p256_p,0, p256_a, p256_b);
-    DBG << elliptic_curve.to_string() << std::endl;
-
-    AffinePoint tmp;
-    elliptic_curve._double(tmp, point);
-
-    DBG << tmp.to_string() << std::endl;
-
-    AffinePoint G(BigInt("48439561293906451759052585252797914202762949526041747995844080717082404635286"), BigInt("36134250956749795798585127919587881956611106672985015071877198253568414405109"));
-    elliptic_curve.scalar(tmp, G, 3);
-
-    DBG << tmp.to_string() << std::endl;
-#endif
 }
