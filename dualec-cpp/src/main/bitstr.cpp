@@ -4,26 +4,25 @@
 #include <cstdint>
 #include <cstring>
 #include <gmp.h>
+#include <memory>
 #include <ostream>
 
-std::span<uint8_t> BitStr::to_baked_array() const
+[[nodiscard]] std::span<BitStr::B> BitStr::to_baked_array() const
 {
-    size_t new_uint8_t_length = containerlen_for_bitlength<uint8_t>(bitlength());
-    auto* box = new uint8_t[new_uint8_t_length];
-    auto* start_pos = box + new_uint8_t_length - containerlen_for_bitlength<uint8_t>(internal_bitlength());
+    size_t new_byte_len = containerlen_for_bitlength<B>(bitlength());
+    auto* box = new uint8_t[new_byte_len];
+    auto* start_pos = box + new_byte_len - containerlen_for_bitlength<B>(internal_bitlength());
     size_t diff = box - start_pos;
-    if (diff != 0) {
-        DBG << "Memsetting " << diff << " bytes to 0" << std::endl;
+    if (diff != 0)
         std::memset(box, 0, diff);
-    }
-    std::copy(m_data.end() - containerlen_for_bitlength<uint8_t>(internal_bitlength()), m_data.end(), start_pos);
-    auto s = std::span<uint8_t>(box, new_uint8_t_length);
+    std::copy(data_end() - containerlen_for_bitlength<B>(internal_bitlength()), data_end(), start_pos);
+    auto s = std::span<uint8_t>(box, new_byte_len);
     DBG << "to_baked_array(this: " << debug_description() << "): "
-        << "data[" << new_uint8_t_length << "]=" << bytes_as_hex(s) << std::endl;
+        << "data[" << new_byte_len << "]=" << bytes_as_hex(s) << std::endl;
     return s;
 }
 
-BitStr BitStr::truncated_right(size_t new_length) const
+[[nodiscard]] BitStr BitStr::truncated_right(size_t new_length) const
 {
     if (new_length > m_bitlen) {
         std::cout << "Wrong usage of truncate" << std::endl;
@@ -39,82 +38,92 @@ BitStr BitStr::truncated_right(size_t new_length) const
     size_t shift_amount_total = bitlength() - new_length;
     size_t shift_amount_words = shift_amount_total / bits_per_word;
     size_t shift_amount = shift_amount_total % bits_per_word;
-    size_t new_wordt_length = containerlen_for_bitlength<WordT>(internal_bitlength()) - shift_amount_words;
-    auto* box = new WordT[new_wordt_length];
+    size_t new_wordt_length = containerlen_for_bitlength<B>(internal_bitlength()) - shift_amount_words;
+    auto* box = new B[new_wordt_length];
     auto* it = box;
-    for (auto dit = m_data.begin(), prev_dit = dit; dit != m_data.end(); ++it, ++dit) {
-        *it = (WordT)0;
-        if (dit != m_data.begin())
+    for (auto dit = m_data_begin.get(), prev_dit = dit; dit != data_end(); ++it, ++dit) {
+        *it = static_cast<B>(0);
+        if (dit != m_data_begin.get())
             *it |= (*prev_dit) << (bits_per_word - shift_amount);
         *it |= (*dit) >> shift_amount;
         prev_dit = dit;
     }
-    return BitStr(std::span<WordT>(box, new_wordt_length), new_length);
+    return BitStr(std::unique_ptr<B>(box), new_wordt_length, new_length);
 }
 
-BigInt BitStr::as_big_int() const
+[[nodiscard]] BigInt BitStr::as_big_int() const
 {
     mpz_t z;
     mpz_init(z);
-    mpz_import(z, m_data.size(), 1, sizeof(WordT), -1, 0, m_data.data());
+    mpz_import(z, m_data_len, 1, sizeof(B), -1, 0, m_data_begin.get());
     return reinterpret_cast<BigInt&>(z);
 }
 
-BitStr BitStr::operator^(BitStr const& other) const
+[[nodiscard]] BitStr BitStr::operator^(BitStr const& other) const
 {
     DBG << "BitStr::operator^(this: " << debug_description() << " other: " << other.debug_description() << ")" << std::endl;
     size_t new_bitlen = std::max(bitlength(), other.bitlength());
-    size_t new_wordt_length = containerlen_for_bitlength<WordT>(new_bitlen);
-    auto box = new WordT[new_wordt_length];
-    auto box_end = box + new_wordt_length * sizeof(WordT);
+    size_t new_wordt_length = containerlen_for_bitlength<B>(new_bitlen);
+    auto box = new B[new_wordt_length];
+    auto box_end = box + new_wordt_length;
 
-    auto dit1 = m_data.begin(), dit2 = other.m_data.begin();
+    auto dit1 = m_data_begin.get(), dit2 = other.m_data_begin.get();
     for (auto it = box; it != box_end; ++it) {
-        *it = (WordT)0;
-        if (dit1 != m_data.end()) {
+        *it = static_cast<B>(0);
+        if (dit1 != data_end()) {
             *it ^= *dit1;
             ++dit1;
         }
-        if (dit2 != other.m_data.end()) {
+        if (dit2 != other.data_end()) {
             *it ^= *dit2;
             ++dit2;
         }
     }
-    return BitStr(std::span<WordT>((WordT*)box, new_wordt_length), new_bitlen);
+    return BitStr(std::unique_ptr<B>(box), new_wordt_length, new_bitlen);
 }
 
-BitStr& BitStr::truncate_left(size_t new_length)
+[[nodiscard]] BitStr BitStr::truncated_left(size_t new_length) const
 {
+    DBG << "truncated_left(" << std::to_string(new_length) << ")" << std::endl;
     if (new_length > m_bitlen) {
         std::cout << "Wrong usage of truncate" << std::endl;
         abort();
     }
-    DBG << "truncate_left(" << std::to_string(new_length) << ")" << std::endl;
-    m_bitlen = new_length;
-    return *this;
+
+    size_t new_data_len = containerlen_for_bitlength<B>(new_length);
+    size_t bits_in_msb = new_length % bits_per_word;
+    auto* box = new B[new_data_len];
+    auto* trim_begin = data_end() - new_data_len;
+    std::memset(box, 0, new_data_len);
+    std::copy(trim_begin, data_end(), box);
+    // zero out the trimmed bits in msb
+    *box &= (0xff >> bits_in_msb);
+    return BitStr(std::unique_ptr<B>(box), new_data_len, new_length);
+}
+
+void BitStr::invalidate()
+{
+    m_data_begin.reset();
+    m_bitlen = 0;
+    m_data_len = 0;
 }
 
 BitStr& BitStr::operator=(BitStr&& other)
 {
-    free_data();
-    m_data = other.m_data;
+    m_data_begin = std::move(other.m_data_begin);
+    m_data_len = other.m_data_len;
     m_bitlen = other.m_bitlen;
-    other.m_data = std::span<WordT>((WordT*)nullptr, 0);
+    other.invalidate();
     return *this;
 }
 
-BitStr BitStr::operator+(BitStr const& other) const
+[[nodiscard]] BitStr BitStr::operator+(BitStr const& other) const
 {
     DBG << "BitStr::operator+(this: " << debug_description() << " other: " << other.debug_description() << ")" << std::endl;
-    // allocate enough to hold this->m_data.bitlength() + other.bitlength()
-    size_t new_wordt_length = containerlen_for_bitlength<WordT>(internal_bitlength() + other.bitlength());
-    // DBG << "new_wordt_length = " << new_wordt_length << std::endl;
-    // DBG << "Internal + other_bitlen = " << (internal_bitlength() + other.bitlength()) << std::endl;
-    auto* box = (uint8_t*)new WordT[new_wordt_length];
-    // DBG << "sizeof(WordT) = " << sizeof(WordT) << std::endl;
-    auto* box_end = box + new_wordt_length * sizeof(WordT);
-    // DBG << "Box_end - box = " << (box_end - box) << std::endl;
-    memset(box, 0, new_wordt_length * sizeof(WordT));
+    size_t new_data_len = containerlen_for_bitlength<B>(internal_bitlength() + other.bitlength());
+    auto* box = new B[new_data_len];
+    auto* box_end = box + new_data_len;
+    memset(box, 0, new_data_len);
 
     /*                                |
      *  |000p|oooo|oooo|00--|----|----|
@@ -126,86 +135,76 @@ BitStr BitStr::operator+(BitStr const& other) const
      * new:
      *                    ---|----|---p|oooo|oooo|00--|----|----|
      */
+    auto* box_rhs_internal_begin = box_end - other.m_data_len;
+    std::copy(other.m_data_begin.get(), other.data_end(), box_rhs_internal_begin);
 
-    auto* begin_other_internal = box_end - other.m_data.size_bytes();
-    // DBG << "Begin_other_internal - box = " << ((box_end - other.m_data.size_bytes()) - box) << std::endl;
-    std::copy(other.m_data.begin(), other.m_data.end(), begin_other_internal);
+    size_t no_zero_byte_plus1 = containerlen_for_bitlength<B>(other.bitlength() - other.internal_bitlength());
+    auto* begin_other_zero_words = box_rhs_internal_begin - no_zero_byte_plus1;
+    std::memset(begin_other_zero_words, 0, no_zero_byte_plus1);
 
-    size_t zero_wordt_amount = (other.bitlength() - other.internal_bitlength()) / bits_per_word;
-    auto* begin_other_zero_words = begin_other_internal - zero_wordt_amount * sizeof(WordT);
-    std::memset(begin_other_zero_words, 0, zero_wordt_amount * sizeof(WordT));
-
-    size_t shift = other.bitlength() % bits_per_word;
-    auto* current_begin = begin_other_zero_words - sizeof(WordT);
-    *current_begin = 0; // set p-bits
-    for (auto it = m_data.rbegin(); it != m_data.rend(); ++it) {
-        // DBG << "Delta begin = " << (current_begin - box) << std::endl;
-        *current_begin |= (*it << shift);
-        current_begin -= sizeof(WordT);
-        *current_begin |= (*it >> (bits_per_word - shift));
+    size_t rhs_bits = other.bitlength() % bits_per_word;
+    auto* out_it = box;
+    for (auto it = m_data_begin.get(); it != data_end(); ++it) {
+        *out_it |= (*it >> (bits_per_word - rhs_bits));
+        ++out_it;
+        *out_it |= (*it << rhs_bits);
     }
-    std::span<WordT> span((WordT*)box, new_wordt_length);
-    return BitStr(std::move(span), bitlength() + other.bitlength());
+    return BitStr(std::unique_ptr<B>(box), new_data_len, bitlength() + other.bitlength());
 }
 
-std::string BitStr::as_hex_string() const
+[[nodiscard]] std::string BitStr::as_hex_string() const
 {
     std::stringstream ss;
-    for (auto const& word : m_data)
-        ss << std::hex << std::setw(sizeof(WordT) * 2) << std::setfill('0') << +word;
+    for (auto* it = m_data_begin.get(); it != data_end(); ++it)
+        ss << std::hex << std::setw(2) << std::setfill('0') << +(*it);
     return ss.str();
 }
-std::string BitStr::as_bin_string() const
+
+[[nodiscard]] std::string BitStr::as_bin_string() const
 {
     std::string ret = "";
-    for (auto const& word : m_data)
-        ret += std::bitset<bits_per_word>(word).to_string();
+    for (auto* it = m_data_begin.get(); it != data_end(); ++it)
+        ret += std::bitset<bits_per_word>(*it).to_string();
     return ret;
 }
 
-std::string BitStr::debug_description() const
+[[nodiscard]] std::string BitStr::debug_description() const
 {
-    auto diff = static_cast<ssize_t>(bitlength()) - static_cast<ssize_t>(m_data.size_bytes() * bits_per_word);
+    auto diff = static_cast<ssize_t>(bitlength()) - static_cast<ssize_t>(m_data_len * bits_per_word);
     return "BitStr(bitlen: "
         + std::to_string(m_bitlen)
-        + " data[" + std::to_string(m_data.size_bytes()) + " bytes"
+        + " data[" + std::to_string(m_data_len) + " bytes"
         + (diff != 0 ? ((diff > 0 ? "+" : "") + std::to_string(diff) + " bits") : "")
         + "]: "
         + as_hex_string()
         + ")";
 }
 
-void BitStr::free_data()
-{
-    if (m_data.data() != nullptr) {
-        DBG << "~" << debug_description() << std::endl;
-        delete[] m_data.data();
-    } else {
-        DBG << "~null" << debug_description() << std::endl;
-    }
-}
-
 BitStr::BitStr(BigInt const& i, size_t bitlen)
     : m_bitlen(bitlen)
 {
-    auto* mpz_ptr = i.get_mpz();
     size_t word_count = 0;
-    auto* data = (WordT*)mpz_export(nullptr, &word_count,
+    auto* data = static_cast<B*>(mpz_export(nullptr, &word_count,
         1 /* most significant word first */,
-        sizeof(WordT),
-        -1 /* 1 = most significant byte first */,
+        sizeof(B),
+        -1 /* least significant byte first */,
         0 /* makes the first 0 bits of each word 0ed */,
-        mpz_ptr);
-    m_data = std::span<WordT>(data, word_count);
+        i.get_mpz_const()));
+    m_data_begin = std::unique_ptr<B>(data);
+    m_data_len = word_count;
     DBG << "BitStr(BigInt&,size_t) constructor: " << debug_description() << std::endl;
 }
 
-BitStr::BitStr(BitStr const& other)
-    : m_bitlen(other.m_bitlen)
+[[nodiscard]] BitStr::B* BitStr::data_end() const
 {
-    size_t amount_of_words = other.m_data.size_bytes() / sizeof(WordT);
-    WordT* box = new WordT[amount_of_words];
-    std::copy(other.m_data.begin(), other.m_data.end(), box);
-    m_data = std::span<WordT>((WordT*)box, amount_of_words);
+    return m_data_begin.get() + m_data_len;
+}
+
+BitStr::BitStr(BitStr const& other)
+    : m_data_len(other.m_data_len)
+    , m_bitlen(other.m_bitlen)
+{
+    m_data_begin = std::unique_ptr<B>(new B[m_data_len]);
+    std::copy(other.m_data_begin.get(), other.data_end(), m_data_begin.get());
     DBG << "BitStr(BitStr&) copy-constructor: " << debug_description() << std::endl;
 }
