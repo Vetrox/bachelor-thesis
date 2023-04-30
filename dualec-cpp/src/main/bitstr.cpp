@@ -48,7 +48,7 @@
         *it |= (*dit) >> shift_amount;
         prev_dit = dit;
     }
-    return BitStr(std::unique_ptr<B>(box), new_wordt_length, new_length);
+    return BitStr(std::unique_ptr<B[]>(box), new_wordt_length, new_length);
 }
 
 [[nodiscard]] BigInt BitStr::as_big_int() const
@@ -79,7 +79,7 @@
             ++dit2;
         }
     }
-    return BitStr(std::unique_ptr<B>(box), new_wordt_length, new_bitlen);
+    return BitStr(std::unique_ptr<B[]>(box), new_wordt_length, new_bitlen);
 }
 
 [[nodiscard]] BitStr BitStr::truncated_left(size_t new_length) const
@@ -98,7 +98,7 @@
     std::copy(trim_begin, data_end(), box);
     // zero out the trimmed bits in msb
     *box &= (0xff >> bits_in_msb);
-    return BitStr(std::unique_ptr<B>(box), new_data_len, new_length);
+    return BitStr(std::unique_ptr<B[]>(box), new_data_len, new_length);
 }
 
 void BitStr::invalidate()
@@ -111,6 +111,7 @@ void BitStr::invalidate()
 BitStr& BitStr::operator=(BitStr&& other)
 {
     m_data_begin = std::move(other.m_data_begin);
+    std::cout << "OPERATOR= " << m_data_begin.get() << std::endl;
     m_data_len = other.m_data_len;
     m_bitlen = other.m_bitlen;
     other.invalidate();
@@ -135,21 +136,29 @@ BitStr& BitStr::operator=(BitStr&& other)
      * new:
      *                    ---|----|---p|oooo|oooo|00--|----|----|
      */
-    auto* box_rhs_internal_begin = box_end - other.m_data_len;
-    std::copy(other.m_data_begin.get(), other.data_end(), box_rhs_internal_begin);
+    auto* box_rhs_internal_begin = box_end;
+    if (other.m_data_begin.get() != nullptr) {
+        box_rhs_internal_begin -= other.m_data_len;
+        std::copy(other.m_data_begin.get(), other.data_end(), box_rhs_internal_begin);
+    }
 
     size_t no_zero_byte_plus1 = containerlen_for_bitlength<B>(other.bitlength() - other.internal_bitlength());
-    auto* begin_other_zero_words = box_rhs_internal_begin - no_zero_byte_plus1;
-    std::memset(begin_other_zero_words, 0, no_zero_byte_plus1);
-
-    size_t rhs_bits = other.bitlength() % bits_per_word;
-    auto* out_it = box;
-    for (auto it = m_data_begin.get(); it != data_end(); ++it) {
-        *out_it |= (*it >> (bits_per_word - rhs_bits));
-        ++out_it;
-        *out_it |= (*it << rhs_bits);
+    if (no_zero_byte_plus1 == 0) {
+        auto* begin_other_zero_words = box_rhs_internal_begin - no_zero_byte_plus1;
+        std::memset(begin_other_zero_words, 0, no_zero_byte_plus1);
     }
-    return BitStr(std::unique_ptr<B>(box), new_data_len, bitlength() + other.bitlength());
+
+    if (m_data_begin.get() != nullptr) {
+        size_t rhs_bits = other.bitlength() % bits_per_word;
+        auto* out_it = box;
+        for (auto it = m_data_begin.get(); it != data_end(); ++it) {
+            *out_it |= (*it >> (bits_per_word - rhs_bits));
+            ++out_it;
+            if (out_it != box_end)
+                *out_it |= (*it << rhs_bits);
+        }
+    }
+    return BitStr(std::unique_ptr<B[]>(box), new_data_len, bitlength() + other.bitlength());
 }
 
 [[nodiscard]] std::string BitStr::as_hex_string() const
@@ -183,15 +192,18 @@ BitStr& BitStr::operator=(BitStr&& other)
 BitStr::BitStr(BigInt const& i, size_t bitlen)
     : m_bitlen(bitlen)
 {
-    size_t word_count = 0;
-    auto* data = static_cast<B*>(mpz_export(nullptr, &word_count,
-        1 /* most significant word first */,
-        sizeof(B),
-        -1 /* least significant byte first */,
-        0 /* makes the first 0 bits of each word 0ed */,
-        i.get_mpz_const()));
-    m_data_begin = std::unique_ptr<B>(data);
-    m_data_len = word_count;
+    auto container_len = containerlen_for_bitlength<B>(i.bitsize());
+    if (container_len > 0) {
+        auto* data = new B[container_len];
+        (void)static_cast<B*>(mpz_export(data, nullptr,
+            1 /* most significant word first */,
+            sizeof(B),
+            -1 /* least significant byte first */,
+            0 /* makes the first 0 bits of each word 0ed */,
+            i.get_mpz_const()));
+        m_data_begin = std::unique_ptr<B[]>(data);
+        m_data_len = container_len;
+    }
     DBG << "BitStr(BigInt&,size_t) constructor: " << debug_description() << std::endl;
 }
 
@@ -204,7 +216,9 @@ BitStr::BitStr(BitStr const& other)
     : m_data_len(other.m_data_len)
     , m_bitlen(other.m_bitlen)
 {
-    m_data_begin = std::unique_ptr<B>(new B[m_data_len]);
-    std::copy(other.m_data_begin.get(), other.data_end(), m_data_begin.get());
+    if (other.internal_bitlength() > 0 && other.m_data_begin.get() != nullptr) {
+        m_data_begin = std::unique_ptr<B[]>(new B[m_data_len]);
+        std::copy(other.m_data_begin.get(), other.data_end(), m_data_begin.get());
+    }
     DBG << "BitStr(BitStr&) copy-constructor: " << debug_description() << std::endl;
 }

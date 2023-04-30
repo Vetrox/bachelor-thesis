@@ -27,7 +27,7 @@ public:
         : BitStr(i, i.zero == i ? 0 : i.bitsize())
     {
     }
-    BitStr(std::unique_ptr<B>&& data_begin, size_t data_len)
+    BitStr(std::unique_ptr<B[]>&& data_begin, size_t data_len)
         : BitStr(std::move(data_begin), data_len, data_len * bits_per_word)
     {
     }
@@ -47,6 +47,11 @@ public:
         , m_bitlen(other.m_bitlen)
     {
         other.m_data_begin.reset();
+    }
+
+    ~BitStr()
+    {
+        DBG << "~" << debug_description() << std::endl;
     }
 
     [[nodiscard]] BitStr truncated_left(size_t new_length) const;
@@ -72,7 +77,7 @@ public:
     [[nodiscard]] std::span<uint8_t> to_baked_array() const;
 
 private:
-    BitStr(std::unique_ptr<B>&& data_begin, size_t data_len, size_t bitlen)
+    BitStr(std::unique_ptr<B[]>&& data_begin, size_t data_len, size_t bitlen)
         : m_data_begin(std::move(data_begin))
         , m_data_len(data_len)
         , m_bitlen(bitlen)
@@ -82,7 +87,7 @@ private:
     void invalidate();
     [[nodiscard]] B* data_end() const;
 
-    std::unique_ptr<B> m_data_begin;
+    std::unique_ptr<B[]> m_data_begin;
     size_t m_data_len { 0 };
     size_t m_bitlen { 0 };
 };

@@ -1,4 +1,4 @@
 #pragma once
 #include "bitstr.h"
 
-BitStr SHA256_Hash(BitStr input);
+BitStr SHA256_Hash(BitStr const& input);

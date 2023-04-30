@@ -92,7 +92,8 @@ BitStr Hash_df(BitStr const& input_string, uint32_t no_of_bits_to_return)
     // 4. For i = 1 to len do
     for (size_t i = 1; i <= len; i++) {
         // 4.1 temp = temp || Hash(counter || no_of_bits_to_return || input_string)
-        temp = temp + SHA256_Hash(BitStr(counter, 8) + BitStr(no_of_bits_to_return, 32) + input_string);
+        BitStr hash_value = SHA256_Hash(BitStr(BigInt(counter), 8) + BitStr(BigInt(no_of_bits_to_return), 32) + input_string);
+        temp = temp + hash_value;
         // 4.2 counter = counter + 1.
         counter++;
     }
@@ -333,5 +334,8 @@ void simulate_backdoor(size_t security_strength)
 
 int main()
 {
+    auto a = new uint8_t[1];
+    delete[] a;
+
     simulate_backdoor(128);
 }
