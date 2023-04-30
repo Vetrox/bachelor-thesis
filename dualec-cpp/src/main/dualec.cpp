@@ -3,12 +3,17 @@
 #include "bitstr.h"
 #include "dualec_curve.h"
 #include "elliptic_curve.h"
+#include "forward.h"
 #include "hash.h"
 #include <algorithm>
 #include <chrono>
 #include <cmath>
 #include <cstdint>
 #include <cstdlib>
+#include <givaro/random-integer.h>
+#include <gmp++/gmp++_int.h>
+#include <limits>
+#include <random>
 #include <ratio>
 #include <string>
 
@@ -189,9 +194,57 @@ BitStr Dual_EC_DRBG_Generate(WorkingState& working_state, size_t requested_numbe
     return returned_bits;
 }
 
+BigInt random_bigint(BigInt end_exclusive)
+{
+    auto generator = Givaro::RandomIntegerIterator<>(Zp(end_exclusive));
+    return generator.randomInteger();
+}
+
+void generate_dQ(AffinePoint const& P, BigInt order_of_p, EllipticCurve const& curve, BigInt& out_d, AffinePoint& out_Q)
+{
+    Zp order_field(order_of_p);
+    Givaro::RandomIntegerIterator<> random_integer_iterator(order_field);
+    while (true) {
+        // pick random d
+        out_d = random_integer_iterator.randomInteger();
+        if (Givaro::isZero(out_d))
+            continue;
+        // compute the inverse of d
+        BigInt e;
+        order_field.inv(e, out_d);
+        // compute Q based on P
+        curve.scalar(out_Q, P, e);
+
+        // perform sanity check
+        AffinePoint P2;
+        curve.scalar(P2, out_Q, out_d);
+        if (P2 == P)
+            return;
+    }
+}
+
+void simulate_backdoor(size_t security_strength)
+{
+
+    auto bad_curve = pick_curve(security_strength);
+    BigInt d;
+    generate_dQ(bad_curve.P, bad_curve.order_of_p, bad_curve.curve, d, bad_curve.Q);
+    std::cout << "Produced backdoor d: " << bigint_hex(d) << " " << bad_curve.to_string() << std::endl;
+    auto random_input_entropy = random_bigint(BigInt(1) << 123);
+
+    auto working_state = Dual_EC_DRBG_Instantiate(BitStr(random_input_entropy), BitStr(0), BitStr(0), security_strength, &bad_curve);
+    auto random_bits = Dual_EC_DRBG_Generate(working_state, calculate_max_outlen(pick_seedlen(security_strength)) * 3, BitStr(0));
+    std::cout << "Got random bits: " << bytes_as_hex(random_bits.to_baked_array()) << std::endl;
+}
+
 int main()
 {
-    auto working_state = Dual_EC_DRBG_Instantiate(BitStr(0), BitStr(0), BitStr(0), 128);
+    simulate_backdoor(128);
+#if 0
+    Zp f(152);
+    BigInt d(45);
+    f.invin(d);
+    std::cout << d << std::endl;
     DBG << "Instantiated working state " << working_state.to_string() << std::endl;
 
     auto start_time = std::chrono::high_resolution_clock::now();
@@ -201,8 +254,6 @@ int main()
     double elapsed_time_ms = std::chrono::duration<double, std::milli>(end_time - start_time).count();
     std::cout << elapsed_time_ms << std::endl;
 
-    DBG << "Got random bits: " << bytes_as_hex(random_bits) << std::endl;
-#if 0
     auto ffield = Zp(123);
     Element element_mod_zp;
     ffield.init(element_mod_zp, 325);

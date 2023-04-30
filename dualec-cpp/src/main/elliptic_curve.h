@@ -6,10 +6,10 @@
 // defined over field Z_p
 class EllipticCurve {
 public:
-    EllipticCurve(BigInt prime, BigInt n, BigInt a, BigInt b)
+    EllipticCurve(std::string name, BigInt prime, BigInt a, BigInt b)
         : m_field(prime)
+        , m_name(name)
     {
-        (void)n; // the order of the elliptic curve group, e.g. the base Point G
         m_field.init(m_a, a);
         m_field.init(m_b, b);
     }
@@ -155,4 +155,5 @@ private:
     Element m_a;
     Element m_b;
     Zp m_field;
+    std::string m_name;
 };
