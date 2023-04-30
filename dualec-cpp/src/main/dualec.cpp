@@ -10,12 +10,16 @@
 #include <cmath>
 #include <cstdint>
 #include <cstdlib>
+#include <future>
 #include <givaro/random-integer.h>
 #include <gmp++/gmp++_int.h>
 #include <limits>
+#include <queue>
 #include <random>
 #include <ratio>
 #include <string>
+#include <thread>
+#include <unistd.h>
 
 size_t pick_seedlen(size_t security_strength)
 {
@@ -238,6 +242,13 @@ BitStr predict_next_rand_bits(AffinePoint const& point, BitStr& out_guess_for_ne
     return BitStr(guess_for_next_r, outlen);
 }
 
+static std::queue<std::shared_future<BitStr>> workers;
+void push_worker(std::function<BitStr()> func)
+{
+    std::cout << workers.size() << std::endl;
+    workers.push(std::async(std::launch::async, func));
+}
+
 BitStr brute_force_next_s(BitStr const& bits, size_t security_strength, BigInt d, DualEcCurve const& dec_curve)
 {
     auto seedlen = pick_seedlen(security_strength);
@@ -249,21 +260,36 @@ BitStr brute_force_next_s(BitStr const& bits, size_t security_strength, BigInt d
     next_rand_bits.truncate_left(outlen);                    // TODO: off-by-one
     next_rand_bits = next_rand_bits.truncated_right(outlen); // TODO: off-by-one
 
-    for (BigInt i(0); i < (BigInt(1) << stripped_amount_of_bits); i = i + 1) {
-        BitStr guess_for_stripped_bits_of_r(i, stripped_amount_of_bits);
-        auto guess_for_r_x = (guess_for_stripped_bits_of_r + outlen_bits).as_big_int();
-        std::cout << (guess_for_stripped_bits_of_r + outlen_bits).as_hex_string() << std::endl;
-        AffinePoint guess_R1, guess_R2;
-        dec_curve.curve.lift_x(guess_R1, guess_R2, guess_for_r_x);
-        if (!guess_R1.identity()) {
-            BitStr guess_for_next_s(0);
-            auto guess_next_rand_bits = predict_next_rand_bits(guess_R1, guess_for_next_s, d, dec_curve, seedlen, outlen);
-            if (guess_next_rand_bits.as_big_int() == next_rand_bits.as_big_int())
-                return guess_for_next_s;
-            guess_next_rand_bits = predict_next_rand_bits(guess_R2, guess_for_next_s, d, dec_curve, seedlen, outlen);
-            if (guess_next_rand_bits.as_big_int() == next_rand_bits.as_big_int())
-                return guess_for_next_s;
-        }
+    std::cout << "Pushing workers..." << std::endl;
+    auto max_bound = BigInt(1) << stripped_amount_of_bits;
+    auto per_thread = max_bound / BigInt(std::thread::hardware_concurrency() * 5);
+    for (BigInt thread_start(0), thread_end(per_thread); thread_end < max_bound; thread_end = thread_end + per_thread, thread_start + per_thread) {
+        auto lambda = [&dec_curve, &next_rand_bits, seedlen, outlen, d, thread_start, thread_end, stripped_amount_of_bits, outlen_bits]() {
+            for (BigInt i(thread_start); i < thread_end; i = i + 1) {
+                BitStr guess_for_stripped_bits_of_r(i, stripped_amount_of_bits);
+                auto guess_for_r_x = (guess_for_stripped_bits_of_r + outlen_bits).as_big_int();
+                AffinePoint guess_R1, guess_R2;
+                dec_curve.curve.lift_x(guess_R1, guess_R2, guess_for_r_x);
+                BitStr guess_for_next_s(0);
+                if (!guess_R1.identity()) {
+                    auto guess_next_rand_bits = predict_next_rand_bits(guess_R1, guess_for_next_s, d, dec_curve, seedlen, outlen);
+                    if (guess_next_rand_bits.as_big_int() == next_rand_bits.as_big_int())
+                        return guess_for_next_s;
+                    guess_next_rand_bits = predict_next_rand_bits(guess_R2, guess_for_next_s, d, dec_curve, seedlen, outlen);
+                    if (guess_next_rand_bits.as_big_int() == next_rand_bits.as_big_int())
+                        return guess_for_next_s;
+                }
+            }
+            return BitStr(0);
+        };
+        push_worker(lambda);
+    }
+    std::cout << "Finished pushing workers..." << std::endl;
+    while (!workers.empty()) {
+        auto ret = workers.front().get();
+        if (ret.bitlength() > 0)
+            return ret;
+        workers.pop();
     }
     std::cout << "Unexpected end of brute-force" << std::endl;
     abort();
