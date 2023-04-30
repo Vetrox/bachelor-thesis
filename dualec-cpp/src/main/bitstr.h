@@ -22,7 +22,7 @@ class BitStr {
     static constexpr auto bits_per_word = sizeof(WordT) * 8;
 
 public:
-    BitStr(BigInt& i)
+    BitStr(BigInt const& i)
         : BitStr(i, i.zero == i ? 0 : i.bitsize())
     {
     }
@@ -38,8 +38,8 @@ public:
         : BitStr(i, bitlen)
     {
     }
-    BitStr(BigInt& i, size_t bitlen);
-    BitStr(BitStr& other);
+    BitStr(BigInt const& i, size_t bitlen);
+    BitStr(BitStr const& other);
     BitStr(BitStr&& other)
         : m_bitlen(other.m_bitlen)
     {

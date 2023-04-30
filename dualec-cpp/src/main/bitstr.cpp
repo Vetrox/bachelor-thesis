@@ -185,7 +185,7 @@ void BitStr::free_data()
     }
 }
 
-BitStr::BitStr(BigInt& i, size_t bitlen)
+BitStr::BitStr(BigInt const& i, size_t bitlen)
     : m_bitlen(bitlen)
 {
     auto* mpz_ptr = i.get_mpz();
@@ -200,7 +200,7 @@ BitStr::BitStr(BigInt& i, size_t bitlen)
     DBG << "BitStr(BigInt&,size_t) constructor: " << debug_description() << std::endl;
 }
 
-BitStr::BitStr(BitStr& other)
+BitStr::BitStr(BitStr const& other)
     : m_bitlen(other.m_bitlen)
 {
     size_t amount_of_words = other.m_data.size_bytes() / sizeof(WordT);
