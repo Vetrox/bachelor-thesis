@@ -200,7 +200,7 @@ BigInt random_bigint(BigInt end_exclusive)
     return generator.randomInteger();
 }
 
-void generate_dQ(AffinePoint const& P, BigInt order_of_p, EllipticCurve const& curve, BigInt& out_d, AffinePoint& out_Q)
+void generate_dQ(AffinePoint const& P, BigInt const& order_of_p, EllipticCurve const& curve, BigInt& out_d, AffinePoint& out_Q)
 {
     Zp order_field(order_of_p);
     Givaro::RandomIntegerIterator<> random_integer_iterator(order_field);
@@ -223,6 +223,14 @@ void generate_dQ(AffinePoint const& P, BigInt order_of_p, EllipticCurve const& c
     }
 }
 
+[[nodiscard]] BitStr simulate_client_generation(DualEcCurve const& curve, size_t no_of_bits_to_return, size_t security_strength)
+{
+    auto random_input_entropy = random_bigint(BigInt(1) << 123);
+    auto working_state = Dual_EC_DRBG_Instantiate(BitStr(random_input_entropy), BitStr(0), BitStr(0), security_strength, &curve);
+    auto random_bits = Dual_EC_DRBG_Generate(working_state, no_of_bits_to_return, BitStr(0));
+    return random_bits;
+}
+
 void simulate_backdoor(size_t security_strength)
 {
 
@@ -230,10 +238,7 @@ void simulate_backdoor(size_t security_strength)
     BigInt d;
     generate_dQ(bad_curve.P, bad_curve.order_of_p, bad_curve.curve, d, bad_curve.Q);
     std::cout << "Produced backdoor d: " << bigint_hex(d) << " " << bad_curve.to_string() << std::endl;
-    auto random_input_entropy = random_bigint(BigInt(1) << 123);
-
-    auto working_state = Dual_EC_DRBG_Instantiate(BitStr(random_input_entropy), BitStr(0), BitStr(0), security_strength, &bad_curve);
-    auto random_bits = Dual_EC_DRBG_Generate(working_state, calculate_max_outlen(pick_seedlen(security_strength)) * 3, BitStr(0));
+    auto random_bits = simulate_client_generation(bad_curve, calculate_max_outlen(pick_seedlen(security_strength)), security_strength);
     std::cout << "Got random bits: " << bytes_as_hex(random_bits.to_baked_array()) << std::endl;
 }
 
