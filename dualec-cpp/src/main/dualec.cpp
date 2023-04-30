@@ -71,8 +71,8 @@ DualEcCurve const& pick_curve(size_t security_strength)
 
 BitStr Hash_df(BitStr const& input_string, uint32_t no_of_bits_to_return)
 {
-    size_t outlen = 256; // bits
-    if (no_of_bits_to_return > 255 * outlen) {
+    size_t hash_outlen = 256; // bits
+    if (no_of_bits_to_return > 255 * hash_outlen) {
         DBG << "ERROR: Requested too many no_of_bits_to_return" << std::endl;
         abort();
     }
@@ -80,7 +80,7 @@ BitStr Hash_df(BitStr const& input_string, uint32_t no_of_bits_to_return)
     BitStr temp(0, 0);
 
     // 2. len = ceil(no_of_bits_to_return / outlen)
-    auto len = ceildiv(no_of_bits_to_return, outlen);
+    auto len = ceildiv(no_of_bits_to_return, hash_outlen);
 
     // 3. counter = an 8-bit binary value representing the integer "1".
     uint8_t counter { 1 };
@@ -118,10 +118,9 @@ WorkingState Dual_EC_DRBG_Instantiate(BitStr entropy_input, BitStr nonce,
     // 5. Return s, seedlen, p, a, b, n, P, Q, and a reseed_counter for the initial_working_state.
     return WorkingState { .s = std::move(s),
         .seedlen = seedlen,
-        .max_outlen = calculate_max_outlen(seedlen),
         .dec_curve = std::move(*curve),
         .reseed_counter = reseed_counter,
-        .outlen = 256 };
+        .outlen = calculate_max_outlen(seedlen) };
 }
 
 AffinePoint Dual_EC_mul(BigInt scalar, AffinePoint const& point, EllipticCurve const& curve)
@@ -188,7 +187,7 @@ BitStr Dual_EC_DRBG_Generate(WorkingState& working_state, size_t requested_numbe
     auto& returned_bits = temp;
 
     // 14. s = phi(x(s * P)). BACKDOOR: x(d * (s * Q)) * (d * Q) = d * r
-    working_state.s = Dual_EC_mul(working_state.s.as_big_int(), working_state.dec_curve.P, working_state.dec_curve.curve).x();
+    working_state.s = BitStr(Dual_EC_mul(working_state.s.as_big_int(), working_state.dec_curve.P, working_state.dec_curve.curve).x(), working_state.seedlen);
 
     // 15. Return SUCCESS, returned_bits, and s, seedlen, p, a, b, n, P, Q, and a reseed_counter for the new_working_state.
     return returned_bits;
@@ -231,6 +230,57 @@ void generate_dQ(AffinePoint const& P, BigInt const& order_of_p, EllipticCurve c
     return random_bits;
 }
 
+BitStr predict_next_rand_bits(AffinePoint const& point, BitStr& out_guess_for_next_s, BigInt const& d, DualEcCurve const& dec_curve, size_t seedlen, size_t outlen)
+{
+    //  it holds that s2 = x(d * R)
+    out_guess_for_next_s = BitStr(Dual_EC_mul(d, point, dec_curve.curve).x(), seedlen);
+    auto guess_for_next_r = Dual_EC_mul(out_guess_for_next_s.as_big_int(), dec_curve.Q, dec_curve.curve).x();
+    return BitStr(guess_for_next_r, outlen);
+}
+
+BitStr brute_force_next_s(BitStr const& bits, size_t security_strength, BigInt d, DualEcCurve const& dec_curve)
+{
+    auto seedlen = pick_seedlen(security_strength);
+    auto outlen = calculate_max_outlen(seedlen);
+    auto stripped_amount_of_bits = seedlen - outlen;
+
+    auto outlen_bits = bits.truncated_right(outlen);
+    auto next_rand_bits = BitStr(bits);
+    next_rand_bits.truncate_left(outlen);                    // TODO: off-by-one
+    next_rand_bits = next_rand_bits.truncated_right(outlen); // TODO: off-by-one
+
+    for (BigInt i(0); i < (BigInt(1) << stripped_amount_of_bits); i = i + 1) {
+        BitStr guess_for_stripped_bits_of_r(i, stripped_amount_of_bits);
+        auto guess_for_r_x = (guess_for_stripped_bits_of_r + outlen_bits).as_big_int();
+        std::cout << (guess_for_stripped_bits_of_r + outlen_bits).as_hex_string() << std::endl;
+        AffinePoint guess_R1, guess_R2;
+        dec_curve.curve.lift_x(guess_R1, guess_R2, guess_for_r_x);
+        if (!guess_R1.identity()) {
+            BitStr guess_for_next_s(0);
+            auto guess_next_rand_bits = predict_next_rand_bits(guess_R1, guess_for_next_s, d, dec_curve, seedlen, outlen);
+            if (guess_next_rand_bits.as_big_int() == next_rand_bits.as_big_int())
+                return guess_for_next_s;
+            guess_next_rand_bits = predict_next_rand_bits(guess_R2, guess_for_next_s, d, dec_curve, seedlen, outlen);
+            if (guess_next_rand_bits.as_big_int() == next_rand_bits.as_big_int())
+                return guess_for_next_s;
+        }
+    }
+    std::cout << "Unexpected end of brute-force" << std::endl;
+    abort();
+}
+
+WorkingState brute_force_working_state(BitStr const& bits, size_t security_strength, BigInt d, DualEcCurve const& dec_curve)
+{
+    BitStr s = brute_force_next_s(bits, security_strength, d, dec_curve);
+    return {
+        .s = s,
+        .seedlen = pick_seedlen(security_strength),
+        .dec_curve = dec_curve,
+        .reseed_counter = 0,
+        .outlen = calculate_max_outlen(pick_seedlen(security_strength)),
+    };
+}
+
 void simulate_backdoor(size_t security_strength)
 {
 
@@ -238,8 +288,11 @@ void simulate_backdoor(size_t security_strength)
     BigInt d;
     generate_dQ(bad_curve.P, bad_curve.order_of_p, bad_curve.curve, d, bad_curve.Q);
     std::cout << "Produced backdoor d: " << bigint_hex(d) << " " << bad_curve.to_string() << std::endl;
-    auto random_bits = simulate_client_generation(bad_curve, calculate_max_outlen(pick_seedlen(security_strength)), security_strength);
+    auto outlen = calculate_max_outlen(pick_seedlen(security_strength));
+    auto random_bits = simulate_client_generation(bad_curve, outlen, security_strength);
     std::cout << "Got random bits: " << bytes_as_hex(random_bits.to_baked_array()) << std::endl;
+    auto working_state = brute_force_working_state(random_bits, security_strength, d, bad_curve);
+    std::cout << "Brute-forced working-state: " << working_state.to_string() << std::endl;
 }
 
 int main()
