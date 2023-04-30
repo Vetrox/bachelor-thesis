@@ -184,7 +184,7 @@ BitStr Dual_EC_DRBG_Generate(WorkingState& working_state, size_t requested_numbe
     } while (temp.bitlength() < requested_number_of_bits);
     // 13. returned_bits = Truncate (temp, i * outlen, requested_number_of_bits).
     if (temp.bitlength() != i * working_state.outlen) {
-        DBG << "AssertionError: Temp should be i*outlen" << std::endl;
+        std::cout << "AssertionError: Temp should be i*outlen" << std::endl;
         abort();
     }
     Dual_EC_Truncate(temp, requested_number_of_bits);

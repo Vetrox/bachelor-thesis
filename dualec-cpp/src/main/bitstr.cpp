@@ -26,7 +26,7 @@ std::span<uint8_t> BitStr::to_baked_array() const
 BitStr BitStr::truncated_right(size_t new_length) const
 {
     if (new_length > m_bitlen) {
-        DBG << "Wrong usage of truncate" << std::endl;
+        std::cout << "Wrong usage of truncate" << std::endl;
         abort();
     }
     /*                            cut
@@ -86,7 +86,7 @@ BitStr BitStr::operator^(BitStr const& other) const
 BitStr& BitStr::truncate_left(size_t new_length)
 {
     if (new_length > m_bitlen) {
-        DBG << "Wrong usage of truncate" << std::endl;
+        std::cout << "Wrong usage of truncate" << std::endl;
         abort();
     }
     DBG << "truncate_left(" << std::to_string(new_length) << ")" << std::endl;
