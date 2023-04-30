@@ -1,6 +1,9 @@
 #pragma once
 #include "affine_point.h"
 #include "forward.h"
+#include "givaro/givintsqrootmod.h"
+#include <gmp++/gmp++_int.h>
+#include <ostream>
 
 // y^2 = x^3 + a*x + b
 // defined over field Z_p
@@ -145,6 +148,28 @@ public:
         }
     }
 
+    void lift_x(AffinePoint& r1, AffinePoint& r2, BigInt inp_x) const
+    {
+        BigInt x;
+        m_field.init(x, inp_x);
+        // x^3 + a*x + b (mod p)
+        BigInt xxx = x;
+        m_field.mulin(xxx, x);
+        m_field.mulin(xxx, x);
+        BigInt ax;
+        m_field.mul(ax, m_a, x);
+
+        m_field.addin(xxx, ax);
+        m_field.addin(xxx, m_b);
+        if (!Givaro::isOne(Givaro::legendre(xxx, m_field.residu()))) {
+            r1 = r2 = AffinePoint();
+            return;
+        }
+        BigInt y1, y2;
+        sqrt(y1, y2, xxx);
+        r1 = AffinePoint(x, y1);
+        r2 = AffinePoint(x, y2);
+    }
     std::string to_string() const
     {
         return "EllipticCurve(Z_" + bigint_hex(m_field.residu())
@@ -152,6 +177,13 @@ public:
     }
 
 private:
+    void sqrt(BigInt& s1, BigInt& s2, BigInt const& z) const
+    {
+        // ASSUMES Givaro::legendre(z, m_field.residu()) == 1
+        auto abx = Givaro::IntSqrtModDom<>();
+        abx.sqrootmod(s1, z, m_field.residu());
+        m_field.sub(s2, m_field.zero, s1);
+    }
     Element m_a;
     Element m_b;
     Zp m_field;
