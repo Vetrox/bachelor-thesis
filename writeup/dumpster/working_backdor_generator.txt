@@ -1,0 +1,17 @@
+Produced backdoor d: 0x3799a488 DualEcCurve( curve: EllipticCurve(Z_0xffffffff00000001000000000000000000000000ffffffffffffffffffffffff, y^2 = x^3 + 0xffffffff00000001000000000000000000000000fffffffffffffffffffffffc*x + 0x5ac635d8aa3a93e7b3ebbd55769886bc651d06b0cc53b0f63bce3c3e27d2604b) P: Point(0x6b17d1f2e12c4247f8bce6e563a440f277037d812deb33a0f4a13945d898c296, 0x4fe342e2fe1a7f9b8ee7eb4a7c0f9e162bce33576b315ececbb6406837bf51f5) Q: Point(0x9eea2c36af842c377193855e1cff37a05cd64e666849db619e87b52affbf81ed, 0xbb697da857c05f3ba6e18184243efefc849762fdb419ba58c4a4001e47d546d0))
+Got random bits: 4cea33a45e7af8a82ec3041269ae2957025bf1df206f2865f0efd2ecd1a1b8fd00e7ed4547b622de286dfcd3c026d19af9b601abc489271dfb4284db3270d06c1fdaf2ad895a8b2ec76d94471ec5a35e21fdbbadb0c95b0e597c
+❯ sage
+┌────────────────────────────────────────────────────────────────────┐
+│ SageMath version 9.8, Release Date: 2023-02-11                     │
+│ Using Python 3.10.10. Type "help()" for help.                      │
+└────────────────────────────────────────────────────────────────────┘
+sage: FF = GF(0xffffffff00000001000000000000000000000000ffffffffffffffffffffffff)
+sage: EC = EllipticCurve([FF(0xffffffff00000001000000000000000000000000fffffffffffffffffffffffc), FF(0x5ac635d8aa3a93e7b3ebbd55769886bc651d06b0cc53b0f63bce3c3e2
+....: 7d2604b)])
+sage: P = EC(0x6b17d1f2e12c4247f8bce6e563a440f277037d812deb33a0f4a13945d898c296, 0x4fe342e2fe1a7f9b8ee7eb4a7c0f9e162bce33576b315ececbb6406837bf51f5)
+sage: Q = EC(0x9eea2c36af842c377193855e1cff37a05cd64e666849db619e87b52affbf81ed, 0xbb697da857c05f3ba6e18184243efefc849762fdb419ba58c4a4001e47d546d0)
+sage: (P * 0x3799a488) == Q
+False
+sage: (Q * 0x3799a488) == P
+True
+
