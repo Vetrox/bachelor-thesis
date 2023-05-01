@@ -337,8 +337,5 @@ void simulate_backdoor(size_t security_strength)
 
 int main()
 {
-    auto a = new uint8_t[1];
-    delete[] a;
-
     simulate_backdoor(128);
 }
