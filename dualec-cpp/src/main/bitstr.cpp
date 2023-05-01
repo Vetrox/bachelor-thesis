@@ -174,7 +174,7 @@ BitStr& BitStr::operator=(BitStr&& other)
 [[nodiscard]] std::string BitStr::as_hex_string() const
 {
     std::stringstream ss;
-    if (m_data_begin.get() == nullptr)
+    if (m_data_begin.get() == nullptr || m_data_len == 0 || m_bitlen == 0)
         ss << "<nullptr>";
     else
         for (auto* it = m_data_begin.get(); it != data_end(); ++it)
@@ -185,7 +185,7 @@ BitStr& BitStr::operator=(BitStr&& other)
 [[nodiscard]] std::string BitStr::as_bin_string() const
 {
     std::string ret = "";
-    if (m_data_begin.get() == nullptr)
+    if (m_data_begin.get() == nullptr || m_data_len == 0 || m_bitlen == 0)
         ret += "<nullptr>";
     else
         for (auto* it = m_data_begin.get(); it != data_end(); ++it)
