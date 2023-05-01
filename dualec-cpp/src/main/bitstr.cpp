@@ -208,17 +208,19 @@ BitStr& BitStr::operator=(BitStr&& other)
 BitStr::BitStr(BigInt const& i, size_t bitlen)
     : m_bitlen(bitlen)
 {
-    auto container_len = containerlen_for_bitlength<B>(i.bitsize());
-    if (container_len > 0) {
-        auto* data = new B[container_len];
-        (void)static_cast<B*>(mpz_export(data, nullptr,
-            1 /* most significant word first */,
-            sizeof(B),
-            -1 /* least significant byte first */,
-            0 /* makes the first 0 bits of each word 0ed */,
-            i.get_mpz_const()));
-        m_data_begin = std::unique_ptr<B[]>(data);
-        m_data_len = container_len;
+    if (bitlen > 0) {
+        auto container_len = containerlen_for_bitlength<B>(i.bitsize());
+        if (container_len > 0) {
+            auto* data = new B[container_len];
+            (void)static_cast<B*>(mpz_export(data, nullptr,
+                1 /* most significant word first */,
+                sizeof(B),
+                -1 /* least significant byte first */,
+                0 /* makes the first 0 bits of each word 0ed */,
+                i.get_mpz_const()));
+            m_data_begin = std::unique_ptr<B[]>(data);
+            m_data_len = container_len;
+        }
     }
     DBG << "BitStr(BigInt&,size_t) constructor: " << debug_description() << std::endl;
 }
