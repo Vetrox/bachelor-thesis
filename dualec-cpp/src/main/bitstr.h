@@ -46,7 +46,7 @@ public:
         , m_data_len(other.m_data_len)
         , m_bitlen(other.m_bitlen)
     {
-        other.m_data_begin.reset();
+        other.invalidate();
     }
 
     ~BitStr()

@@ -24,7 +24,8 @@
 
 [[nodiscard]] BitStr BitStr::truncated_right(size_t new_length) const
 {
-    if (new_length > m_bitlen) {
+    DBG << "BitStr::truncated_right(this: " << debug_description() << " new_length: " << new_length << std::endl;
+    if (new_length > bitlength()) {
         std::cout << "Wrong usage of truncate" << std::endl;
         abort();
     }
@@ -35,24 +36,28 @@
      * new:
      *       |pooo|oooo|000-|----|----|
      */
-    size_t shift_amount_total = bitlength() - new_length;
-    size_t shift_amount_words = shift_amount_total / bits_per_word;
-    size_t shift_amount = shift_amount_total % bits_per_word;
-    size_t new_wordt_length = containerlen_for_bitlength<B>(internal_bitlength()) - shift_amount_words;
-    auto* box = new B[new_wordt_length];
-    auto* it = box;
-    for (auto dit = m_data_begin.get(), prev_dit = dit; dit != data_end(); ++it, ++dit) {
+    size_t bitshift_total = bitlength() - new_length;
+    if (internal_bitlength() <= bitshift_total)
+        return BitStr(std::unique_ptr<B[]>(), 0, new_length);
+    size_t new_internal_bitlen = internal_bitlength() - bitshift_total;
+    size_t new_byte_len = containerlen_for_bitlength<B>(new_internal_bitlen);
+    size_t bitshift_inner = bitshift_total % bits_per_word;
+    auto* box = new B[new_byte_len];
+    auto* box_end = box + new_byte_len;
+    for (decltype(auto) it = box, dit = m_data_begin.get(), prev_dit = dit; it != box_end; ++it, ++dit) {
         *it = static_cast<B>(0);
         if (dit != m_data_begin.get())
-            *it |= (*prev_dit) << (bits_per_word - shift_amount);
-        *it |= (*dit) >> shift_amount;
+            *it |= (*prev_dit) << (bits_per_word - bitshift_inner);
+        *it |= (*dit) >> bitshift_inner;
         prev_dit = dit;
     }
-    return BitStr(std::unique_ptr<B[]>(box), new_wordt_length, new_length);
+    return BitStr(std::unique_ptr<B[]>(box), new_byte_len, new_length);
 }
 
 [[nodiscard]] BigInt BitStr::as_big_int() const
 {
+    if (m_data_begin.get() == nullptr)
+        return BigInt(0);
     mpz_t z;
     mpz_init(z);
     mpz_import(z, m_data_len, 1, sizeof(B), -1, 0, m_data_begin.get());
@@ -70,11 +75,11 @@
     auto dit1 = m_data_begin.get(), dit2 = other.m_data_begin.get();
     for (auto it = box; it != box_end; ++it) {
         *it = static_cast<B>(0);
-        if (dit1 != data_end()) {
+        if (dit1 && dit1 != data_end()) {
             *it ^= *dit1;
             ++dit1;
         }
-        if (dit2 != other.data_end()) {
+        if (dit2 && dit2 != other.data_end()) {
             *it ^= *dit2;
             ++dit2;
         }
@@ -111,7 +116,6 @@ void BitStr::invalidate()
 BitStr& BitStr::operator=(BitStr&& other)
 {
     m_data_begin = std::move(other.m_data_begin);
-    std::cout << "OPERATOR= " << m_data_begin.get() << std::endl;
     m_data_len = other.m_data_len;
     m_bitlen = other.m_bitlen;
     other.invalidate();
@@ -164,16 +168,22 @@ BitStr& BitStr::operator=(BitStr&& other)
 [[nodiscard]] std::string BitStr::as_hex_string() const
 {
     std::stringstream ss;
-    for (auto* it = m_data_begin.get(); it != data_end(); ++it)
-        ss << std::hex << std::setw(2) << std::setfill('0') << +(*it);
+    if (m_data_begin.get() == nullptr)
+        ss << "<nullptr>";
+    else
+        for (auto* it = m_data_begin.get(); it != data_end(); ++it)
+            ss << std::hex << std::setw(2) << std::setfill('0') << +(*it);
     return ss.str();
 }
 
 [[nodiscard]] std::string BitStr::as_bin_string() const
 {
     std::string ret = "";
-    for (auto* it = m_data_begin.get(); it != data_end(); ++it)
-        ret += std::bitset<bits_per_word>(*it).to_string();
+    if (m_data_begin.get() == nullptr)
+        ret += "<nullptr>";
+    else
+        for (auto* it = m_data_begin.get(); it != data_end(); ++it)
+            ret += std::bitset<bits_per_word>(*it).to_string();
     return ret;
 }
 
