@@ -21,8 +21,8 @@
 #include <thread>
 #include <unistd.h>
 
-static constexpr auto max_threads = 1;
-static auto const no_of_threads = BigInt(std::min(max_threads, (int)std::thread::hardware_concurrency() * 5));
+static constexpr uint32_t max_threads = 1;
+static auto const no_of_threads = BigInt(std::min(max_threads, std::thread::hardware_concurrency() * 5));
 
 size_t pick_seedlen(size_t security_strength)
 {

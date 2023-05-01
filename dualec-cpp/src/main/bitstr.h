@@ -46,6 +46,7 @@ public:
         , m_data_len(other.m_data_len)
         , m_bitlen(other.m_bitlen)
     {
+        DBG << "BitStr(BitStr&&): " << debug_description() << std::endl;
         other.invalidate();
     }
 
@@ -82,6 +83,7 @@ private:
         , m_data_len(data_len)
         , m_bitlen(bitlen)
     {
+        DBG << "BitStr(unique_ptr&, size_t, size_t): " << debug_description() << ")" << std::endl;
     }
 
     void invalidate();

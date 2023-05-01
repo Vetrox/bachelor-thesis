@@ -115,6 +115,7 @@ void BitStr::invalidate()
 
 BitStr& BitStr::operator=(BitStr&& other)
 {
+    DBG << "BitStr::operator=(this: " << debug_description() << " other: " << other.debug_description() << ")" << std::endl;
     m_data_begin = std::move(other.m_data_begin);
     m_data_len = other.m_data_len;
     m_bitlen = other.m_bitlen;
