@@ -106,7 +106,8 @@
     std::memset(box, 0, new_data_len);
     std::copy(trim_begin, data_end(), box);
     // zero out the trimmed bits in msb
-    *box &= (0xff >> bits_in_msb);
+    if (bits_in_msb > 0)
+        *box &= 0xff >> (bits_per_word - bits_in_msb);
     return BitStr(std::unique_ptr<B[]>(box), new_data_len, new_length);
 }
 
