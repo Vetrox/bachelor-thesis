@@ -21,6 +21,9 @@
 #include <thread>
 #include <unistd.h>
 
+static constexpr auto max_threads = 1;
+static auto const no_of_threads = BigInt(std::min(max_threads, (int)std::thread::hardware_concurrency() * 5));
+
 size_t pick_seedlen(size_t security_strength)
 {
     if (security_strength <= 128)
@@ -269,10 +272,10 @@ BitStr brute_force_next_s(BitStr const& bits, size_t security_strength, BigInt d
 
     std::cout << "Using " << outlen_bits.as_hex_string() << " to predict " << next_rand_bits.as_hex_string() << std::endl;
 
-    std::cout << "Pushing workers..." << std::endl;
     auto max_bound = BigInt(1) << stripped_amount_of_bits;
-    auto per_thread = max_bound / BigInt(std::thread::hardware_concurrency() * 5);
-    for (BigInt thread_start(0), thread_end(per_thread); thread_end < max_bound; thread_end = thread_end + per_thread, thread_start + per_thread) {
+    auto per_thread = max_bound / no_of_threads;
+    std::cout << "Pushing " << no_of_threads << " workers..." << std::endl;
+    for (BigInt thread_start(0), thread_end(per_thread); thread_end <= max_bound; thread_end += per_thread, thread_start += per_thread) {
         auto lambda = [&dec_curve, &next_rand_bits, seedlen, outlen, d, thread_start, thread_end, stripped_amount_of_bits, outlen_bits]() {
             for (BigInt i(thread_start); i < thread_end; i = i + 1) {
                 BitStr guess_for_stripped_bits_of_r(i, stripped_amount_of_bits);
