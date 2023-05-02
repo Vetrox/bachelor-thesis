@@ -1,6 +1,7 @@
 #include "bitstr.h"
 #include "forward.h"
 #include <algorithm>
+#include <bitset>
 #include <cstdint>
 #include <cstring>
 #include <gmp.h>
@@ -172,21 +173,56 @@ BitStr& BitStr::operator=(BitStr&& other)
 {
     std::stringstream ss;
     if (m_data_begin.get() == nullptr || m_data_len == 0 || m_bitlen == 0)
-        ss << "<nullptr>";
+        ss << "<null>";
     else
         for (auto* it = m_data_begin.get(); it != data_end(); ++it)
             ss << std::hex << std::setw(2) << std::setfill('0') << +(*it);
     return ss.str();
 }
 
+std::string bin_from_bitset_of_size(size_t used_bits, uint8_t value)
+{
+    switch (used_bits) {
+    case 0:
+        return "";
+    case 1:
+        return (value & 0b1) ? "1" : "0";
+    case 2:
+        return std::bitset<2>(value & 0b11).to_string();
+    case 3:
+        return std::bitset<3>(value & 0b111).to_string();
+    case 4:
+        return std::bitset<4>(value & 0b1111).to_string();
+    case 5:
+        return std::bitset<5>(value & 0b1111'1).to_string();
+    case 6:
+        return std::bitset<6>(value & 0b1111'11).to_string();
+    case 7:
+        return std::bitset<7>(value & 0b1111'111).to_string();
+    case 8:
+        return std::bitset<8>(value & 0b1111'1111).to_string();
+    default:
+        return "WRONG USAGE!";
+    }
+}
+
 [[nodiscard]] std::string BitStr::as_bin_string() const
 {
     std::string ret = "";
     if (m_data_begin.get() == nullptr || m_data_len == 0 || m_bitlen == 0)
-        ret += "<nullptr>";
-    else
-        for (auto* it = m_data_begin.get(); it != data_end(); ++it)
-            ret += std::bitset<bits_per_word>(*it).to_string();
+        ret += "<null>";
+    else {
+        ret += "0b";
+        size_t add_bits = bitlength() - internal_bitlength();
+        for (size_t i = 0; i < add_bits; ++i)
+            ret += "0";
+        for (auto* it = m_data_begin.get(); it != data_end(); ++it) {
+            size_t used_bits = bits_per_word;
+            if (it == m_data_begin.get() && m_bitlen % bits_per_word != 0 && add_bits == 0)
+                used_bits = m_bitlen % bits_per_word;
+            ret += bin_from_bitset_of_size(used_bits, *it);
+        }
+    }
     return ret;
 }
 
