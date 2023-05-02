@@ -22,6 +22,7 @@
 #include <unistd.h>
 
 static constexpr uint32_t max_threads = 1;
+static constexpr auto determined = true;
 static auto const no_of_threads = BigInt(std::min(max_threads, std::thread::hardware_concurrency() * 5));
 
 size_t pick_seedlen(size_t security_strength)
@@ -238,6 +239,8 @@ void generate_dQ(AffinePoint const& P, BigInt const& order_of_p, EllipticCurve c
 [[nodiscard]] BitStr simulate_client_generation(DualEcCurve const& curve, size_t no_of_bits_to_return, size_t security_strength)
 {
     auto random_input_entropy = random_bigint(BigInt(1) << 123);
+    if (determined)
+        random_input_entropy = 0;
     DBG << "Random input entropy: " << bigint_hex(random_input_entropy) << std::endl;
     auto working_state = Dual_EC_DRBG_Instantiate(BitStr(random_input_entropy), BitStr(0), BitStr(0), security_strength, &curve);
     auto random_bits = Dual_EC_DRBG_Generate(working_state, no_of_bits_to_return, BitStr(0));
@@ -324,7 +327,8 @@ void simulate_backdoor(size_t security_strength)
 
     auto bad_curve = pick_curve(security_strength);
     BigInt d;
-    generate_dQ(bad_curve.P, bad_curve.order_of_p, bad_curve.curve, d, bad_curve.Q);
+    if (!determined)
+        generate_dQ(bad_curve.P, bad_curve.order_of_p, bad_curve.curve, d, bad_curve.Q);
     std::cout << "Produced backdoor d: " << bigint_hex(d) << " " << bad_curve.to_string() << std::endl;
 
     auto outlen = calculate_max_outlen(pick_seedlen(security_strength));
