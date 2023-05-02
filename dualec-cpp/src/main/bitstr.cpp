@@ -45,16 +45,14 @@
     size_t bitshift_inner = bitshift_total % bits_per_word;
     auto* box = new B[new_byte_len];
     auto* box_end = box + new_byte_len;
-    size_t p_bitshift = internal_bitlength() % bits_per_word;
-    auto dit = m_data_begin.get(), prev_dit = dit;
-    if (bitshift_inner >= p_bitshift) // no bit remains in the most-significant-byte.
-        ++dit;
-    for (auto it = box; it != box_end; ++it, ++dit) {
+
+    auto dit = m_data_begin.get();
+    for (auto it = box; it != box_end; ++dit) {
         *it = static_cast<B>(0);
-        if (dit != m_data_begin.get())
-            *it |= (*prev_dit) << (bits_per_word - bitshift_inner);
         *it |= (*dit) >> bitshift_inner;
-        prev_dit = dit;
+        ++it;
+        if (it != box && bitshift_inner != 0 && it != box_end)
+            *it |= (*dit) << (bits_per_word - bitshift_inner);
     }
     return BitStr(std::unique_ptr<B[]>(box), new_byte_len, new_length);
 }
