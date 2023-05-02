@@ -98,6 +98,8 @@
         std::cout << "Wrong usage of truncate" << std::endl;
         abort();
     }
+    if (new_length == 0 || m_bitlen == 0 || m_data_len == 0 || m_data_begin.get() == nullptr)
+        return BitStr(std::unique_ptr<B[]>(), 0, 0);
 
     size_t new_data_len = containerlen_for_bitlength<B>(new_length);
     size_t bits_in_msb = new_length % bits_per_word;
