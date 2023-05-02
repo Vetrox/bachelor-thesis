@@ -287,7 +287,8 @@ BitStr brute_force_next_s(BitStr const& bits, size_t security_strength, BigInt d
         auto lambda = [&dec_curve, &next_rand_bits, seedlen, outlen, d, thread_start, thread_end, stripped_amount_of_bits, outlen_bits]() {
             for (BigInt i(thread_start); i < thread_end; i = i + 1) {
                 BitStr guess_for_stripped_bits_of_r(i, stripped_amount_of_bits);
-                auto guess_for_r_x = (guess_for_stripped_bits_of_r + outlen_bits).as_big_int();
+                auto guess_r_bitstr = guess_for_stripped_bits_of_r + outlen_bits;
+                auto guess_for_r_x = guess_r_bitstr.as_big_int();
                 AffinePoint guess_R1, guess_R2;
                 dec_curve.curve.lift_x(guess_R1, guess_R2, guess_for_r_x);
                 BitStr guess_for_next_s(0);
@@ -331,9 +332,8 @@ void simulate_backdoor(size_t security_strength)
 {
 
     auto bad_curve = pick_curve(security_strength);
-    BigInt d;
-    if (!determined)
-        generate_dQ(bad_curve.P, bad_curve.order_of_p, bad_curve.curve, d, bad_curve.Q);
+    BigInt d(-1);
+    generate_dQ(bad_curve.P, bad_curve.order_of_p, bad_curve.curve, d, bad_curve.Q);
     std::cout << "Produced backdoor d: " << bigint_hex(d) << " " << bad_curve.to_string() << std::endl;
 
     auto outlen = calculate_max_outlen(pick_seedlen(security_strength));
