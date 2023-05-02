@@ -154,20 +154,15 @@ BitStr& BitStr::operator=(BitStr&& other)
         std::copy(other.m_data_begin.get(), other.data_end(), box_rhs_internal_begin);
     }
 
-    size_t no_zero_byte_plus1 = containerlen_for_bitlength<B>(other.bitlength() - other.internal_bitlength());
-    if (no_zero_byte_plus1 == 0) {
-        auto* begin_other_zero_words = box_rhs_internal_begin - no_zero_byte_plus1;
-        std::memset(begin_other_zero_words, 0, no_zero_byte_plus1);
-    }
-
-    if (m_data_begin.get() != nullptr) {
+    if (m_data_begin.get() != nullptr && m_data_len > 0 && m_bitlen > 0) {
         size_t rhs_bits = other.bitlength() % bits_per_word;
+        size_t right_shift = (bits_per_word - rhs_bits) % bits_per_word;
         auto* out_it = box;
         for (auto it = m_data_begin.get(); it != data_end(); ++it) {
-            *out_it |= (*it >> (bits_per_word - rhs_bits));
+            *out_it |= (*it) >> right_shift;
             ++out_it;
-            if (out_it != box_end)
-                *out_it |= (*it << rhs_bits);
+            if (out_it < box_end)
+                *out_it |= (*it) << rhs_bits;
         }
     }
     return BitStr(std::unique_ptr<B[]>(box), new_data_len, bitlength() + other.bitlength());
