@@ -288,7 +288,7 @@ def bits_from_byte(byte):
     assert type(byte) == int and bitlen(byte) <= 8
     ret = []
     for i in range(8):
-        masked = (byte & (i << i)) != 0
+        masked = (byte & (0b1 << (7-i))) != 0
         if masked == True:
             ret.append(1)
         else:
