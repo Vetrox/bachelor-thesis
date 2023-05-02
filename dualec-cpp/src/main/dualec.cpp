@@ -18,12 +18,15 @@
 #include <random>
 #include <ratio>
 #include <string>
+#include <sys/types.h>
 #include <thread>
 #include <unistd.h>
 
-static constexpr uint32_t max_threads = 1;
+static constexpr uint32_t max_threads = 15;
 static constexpr auto determined = true;
 static auto const no_of_threads = BigInt(std::min(max_threads, std::thread::hardware_concurrency() * 5));
+static BigInt stripped_bit_marker = -1;
+static std::stop_source stop_source;
 
 size_t pick_seedlen(size_t security_strength)
 {
@@ -113,6 +116,8 @@ WorkingState Dual_EC_DRBG_Instantiate(BitStr entropy_input, BitStr nonce,
 {
     // 1. seed_material = entropy_input || nonce || personalization_string
     auto seed_material = entropy_input + nonce + personalization_string;
+    DBG << "seed_material: " << seed_material.debug_description() << std::endl;
+
     // 2. s = Hash_df(seed_material, seedlen)
     auto seedlen = pick_seedlen(security_strength);
     BitStr s = Hash_df(seed_material, seedlen);
@@ -182,7 +187,10 @@ BitStr Dual_EC_DRBG_Generate(WorkingState& working_state, size_t requested_numbe
         auto amount_of_stripped_bits = (int)r.bitlength() - (int)working_state.outlen;
         std::cout << "Amount-of-stripped-bits: " << amount_of_stripped_bits << std::endl;
         auto stripped_bits = r.truncated_leftmost(amount_of_stripped_bits);
+        if (i == 0)
+            stripped_bit_marker = stripped_bits.as_big_int();
         std::cout << "i: " << i << " r: " << stripped_r.as_hex_string() << " stripped_bits: " << stripped_bits.as_hex_string() << std::endl;
+        std::cout << "  R: " << Dual_EC_mul(working_state.s.as_big_int(), working_state.dec_curve.Q, working_state.dec_curve.curve).to_string() << std::endl;
         temp = temp + stripped_r;
 
         // 9. additional_input=0
@@ -249,14 +257,20 @@ void generate_dQ(AffinePoint const& P, BigInt const& order_of_p, EllipticCurve c
         random_input_entropy = 0;
     DBG << "Random input entropy: " << bigint_hex(random_input_entropy) << std::endl;
     auto working_state = Dual_EC_DRBG_Instantiate(BitStr(random_input_entropy), BitStr(0), BitStr(0), security_strength, &curve);
+    std::cout << "WorkingState: " << working_state.to_string() << std::endl;
+
     auto random_bits = Dual_EC_DRBG_Generate(working_state, no_of_bits_to_return, BitStr(0));
     return random_bits;
 }
 
-BitStr predict_next_rand_bits(AffinePoint const& point, BitStr& out_guess_for_next_s, BigInt const& d, DualEcCurve const& dec_curve, size_t seedlen, size_t outlen)
+BitStr predict_next_rand_bits(AffinePoint const& point, BitStr& out_guess_for_next_s, BigInt const& d, DualEcCurve const& dec_curve, size_t seedlen, size_t outlen, bool log = false)
 {
+    if (log)
+        std::cout << "predict_next_rand_bits(point: " << point.to_string() << " out_guess_for_next_s: " << out_guess_for_next_s.debug_description() << " d: " << bigint_hex(d) << " seedlen: " << seedlen << ")";
     //  it holds that s2 = x(d * R)
     out_guess_for_next_s = BitStr(Dual_EC_mul(d, point, dec_curve.curve).x(), seedlen);
+    if (log)
+        std::cout << " out_guess_for_next_s = " << out_guess_for_next_s.debug_description() << std::endl;
     auto guess_for_next_r = Dual_EC_mul(out_guess_for_next_s.as_big_int(), dec_curve.Q, dec_curve.curve).x();
     return BitStr(guess_for_next_r, outlen);
 }
@@ -286,19 +300,37 @@ BitStr brute_force_next_s(BitStr const& bits, size_t security_strength, BigInt d
     for (BigInt thread_start(0), thread_end(per_thread); thread_end <= max_bound; thread_end += per_thread, thread_start += per_thread) {
         auto lambda = [&dec_curve, &next_rand_bits, seedlen, outlen, d, thread_start, thread_end, stripped_amount_of_bits, outlen_bits]() {
             for (BigInt i(thread_start); i < thread_end; i = i + 1) {
+                if (stop_source.get_token().stop_requested())
+                    break;
                 BitStr guess_for_stripped_bits_of_r(i, stripped_amount_of_bits);
                 auto guess_r_bitstr = guess_for_stripped_bits_of_r + outlen_bits;
+                if (i == stripped_bit_marker)
+                    std::cout << "\rGuess for r: " << guess_r_bitstr.as_hex_string();
+                if (i == stripped_bit_marker)
+                    std::cout << "\n THIS IS IT" << std::endl;
                 auto guess_for_r_x = guess_r_bitstr.as_big_int();
                 AffinePoint guess_R1, guess_R2;
                 dec_curve.curve.lift_x(guess_R1, guess_R2, guess_for_r_x);
                 BitStr guess_for_next_s(0);
                 if (!guess_R1.identity()) {
-                    auto guess_next_rand_bits = predict_next_rand_bits(guess_R1, guess_for_next_s, d, dec_curve, seedlen, outlen);
-                    if (guess_next_rand_bits.as_big_int() == next_rand_bits.as_big_int())
+                    if (i == stripped_bit_marker)
+                        std::cout << " " << guess_R1.to_string() << " " << guess_R2.to_string() << std::endl;
+                    auto guess_next_rand_bits = predict_next_rand_bits(guess_R1, guess_for_next_s, d, dec_curve, seedlen, outlen, i == stripped_bit_marker);
+                    if (i == stripped_bit_marker)
+                        std::cout << "guess_for_next_s: " << guess_for_next_s.debug_description() << std::endl;
+                    if (guess_next_rand_bits.as_big_int() == next_rand_bits.as_big_int()) {
+                        std::cout << "FOUND THE SOLUTION." << std::endl;
+                        stop_source.request_stop();
                         return guess_for_next_s;
-                    guess_next_rand_bits = predict_next_rand_bits(guess_R2, guess_for_next_s, d, dec_curve, seedlen, outlen);
-                    if (guess_next_rand_bits.as_big_int() == next_rand_bits.as_big_int())
+                    }
+                    guess_next_rand_bits = predict_next_rand_bits(guess_R2, guess_for_next_s, d, dec_curve, seedlen, outlen, i == stripped_bit_marker);
+                    if (i == stripped_bit_marker)
+                        std::cout << "guess_for_next_s: " << guess_for_next_s.debug_description() << std::endl;
+                    if (guess_next_rand_bits.as_big_int() == next_rand_bits.as_big_int()) {
+                        std::cout << "FOUND THE SOLUTION." << std::endl;
+                        stop_source.request_stop();
                         return guess_for_next_s;
+                    }
                 }
             }
             return BitStr(0);
@@ -341,7 +373,7 @@ void simulate_backdoor(size_t security_strength)
     std::cout << "Got random bits: " << bytes_as_hex(random_bits.to_baked_array()) << std::endl;
 
     auto working_state = brute_force_working_state(random_bits, security_strength, d, bad_curve);
-    std::cout << "Brute-forced working-state: " << working_state.to_string() << std::endl;
+    std::cout << "SUCCESS!!! Brute-forced working-state: " << working_state.to_string() << std::endl;
 }
 
 int main()
