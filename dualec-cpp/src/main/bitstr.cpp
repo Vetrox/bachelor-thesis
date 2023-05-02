@@ -206,7 +206,6 @@ BitStr& BitStr::operator=(BitStr&& other)
 }
 
 BitStr::BitStr(BigInt const& i, size_t bitlen)
-    : m_bitlen(bitlen)
 {
     if (bitlen > 0) {
         auto container_len = containerlen_for_bitlength<B>(i.bitsize());
@@ -218,10 +217,15 @@ BitStr::BitStr(BigInt const& i, size_t bitlen)
                 -1 /* least significant byte first */,
                 0 /* makes the first 0 bits of each word 0ed */,
                 i.get_mpz_const()));
+            m_bitlen = i.bitsize();
             m_data_begin = std::unique_ptr<B[]>(data);
             m_data_len = container_len;
         }
     }
+    if (m_bitlen <= bitlen)
+        m_bitlen = bitlen;
+    else
+        *this = truncated_left(bitlen);
     DBG << "BitStr(BigInt&,size_t) constructor: " << debug_description() << std::endl;
 }
 
