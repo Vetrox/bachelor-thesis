@@ -58,8 +58,9 @@ size_t ceildiv(size_t a, size_t b)
 }
 void Dual_EC_Truncate(BitStr& bitstr, size_t outlen)
 {
+    /* string consisting of the leftmost outlen bits from bitstr */
     DBG << "Dual_EC_Truncate(bitstr: " << bitstr.debug_description() << " outlen: " << std::to_string(outlen) << std::endl;
-    bitstr = bitstr.truncated_left(std::min(outlen, bitstr.bitlength()));
+    bitstr = bitstr.truncated_leftmost(std::min(outlen, bitstr.bitlength()));
     auto amount_to_add = bitstr.bitlength() - outlen;
     if (amount_to_add > 0)
         bitstr = bitstr + BitStr(BigInt(0), amount_to_add);
