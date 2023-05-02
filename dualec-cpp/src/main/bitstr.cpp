@@ -23,9 +23,9 @@
     return s;
 }
 
-[[nodiscard]] BitStr BitStr::truncated_right(size_t new_length) const
+[[nodiscard]] BitStr BitStr::truncated_leftmost(size_t new_length) const
 {
-    DBG << "BitStr::truncated_right(this: " << debug_description() << " new_length: " << new_length << std::endl;
+    DBG << "BitStr::truncated_leftmost(this: " << debug_description() << " new_length: " << new_length << std::endl;
     if (new_length > bitlength()) {
         std::cout << "Wrong usage of truncate" << std::endl;
         abort();
@@ -92,9 +92,9 @@
     return BitStr(std::unique_ptr<B[]>(box), new_wordt_length, new_bitlen);
 }
 
-[[nodiscard]] BitStr BitStr::truncated_left(size_t new_length) const
+[[nodiscard]] BitStr BitStr::truncated_rightmost(size_t new_length) const
 {
-    DBG << "truncated_left(" << std::to_string(new_length) << ")" << std::endl;
+    DBG << "truncated_rightmost(" << std::to_string(new_length) << ")" << std::endl;
     if (new_length > m_bitlen) {
         std::cout << "Wrong usage of truncate" << std::endl;
         abort();
@@ -258,7 +258,7 @@ BitStr::BitStr(BigInt const& i, size_t bitlen)
     if (m_bitlen <= bitlen)
         m_bitlen = bitlen;
     else
-        *this = truncated_left(bitlen);
+        *this = truncated_rightmost(bitlen);
     DBG << "BitStr(BigInt&,size_t) constructor: " << debug_description() << std::endl;
 }
 

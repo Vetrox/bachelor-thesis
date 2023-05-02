@@ -146,8 +146,9 @@ BitStr Dual_EC_Truncate_Right(BitStr const& bitstr, size_t new_length)
     ssize_t amount_to_add = new_length - bitstr.bitlength();
     if (amount_to_add >= 0)
         return BitStr(BigInt(0), amount_to_add) + bitstr;
-    else
-        return bitstr.truncated_right(new_length);
+    else {
+        return bitstr.truncated_leftmost(new_length);
+    }
 }
 
 BitStr Dual_EC_DRBG_Generate(WorkingState& working_state, size_t requested_number_of_bits, BitStr additional_input)
@@ -175,9 +176,13 @@ BitStr Dual_EC_DRBG_Generate(WorkingState& working_state, size_t requested_numbe
         // 7. r = phi(x(s * Q)). BACKDOOR: x(d * (s * Q)) * Q
         auto r = BitStr(Dual_EC_mul(working_state.s.as_big_int(), working_state.dec_curve.Q, working_state.dec_curve.curve).x());
 
-        std::cout << "i: " << i << " r: " << r.as_hex_string() << std::endl;
         // 8. temp = temp || (rightmost outlen bits of r)
-        temp = temp + Dual_EC_Truncate_Right(r, working_state.outlen);
+        auto stripped_r = r.truncated_rightmost(working_state.outlen);
+        auto amount_of_stripped_bits = (int)r.bitlength() - (int)working_state.outlen;
+        std::cout << "Amount-of-stripped-bits: " << amount_of_stripped_bits << std::endl;
+        auto stripped_bits = r.truncated_leftmost(amount_of_stripped_bits);
+        std::cout << "i: " << i << " r: " << stripped_r.as_hex_string() << " stripped_bits: " << stripped_bits.as_hex_string() << std::endl;
+        temp = temp + stripped_r;
 
         // 9. additional_input=0
         additional_input = BitStr(0);
@@ -267,11 +272,10 @@ BitStr brute_force_next_s(BitStr const& bits, size_t security_strength, BigInt d
     auto outlen = calculate_max_outlen(seedlen);
     auto stripped_amount_of_bits = seedlen - outlen;
 
-    auto outlen_bits = bits.truncated_right(outlen);
+    auto outlen_bits = bits.truncated_leftmost(outlen);
     auto next_rand_bits = BitStr(bits);
-    next_rand_bits = next_rand_bits.truncated_left(bits.bitlength() - outlen); // TODO: off-by-one
-    std::cout << "intermediate " << next_rand_bits.as_hex_string() << std::endl;
-    next_rand_bits = next_rand_bits.truncated_right(outlen); // TODO: off-by-one
+    next_rand_bits = next_rand_bits.truncated_rightmost(bits.bitlength() - outlen);
+    next_rand_bits = next_rand_bits.truncated_leftmost(outlen);
 
     std::cout << "Using " << outlen_bits.as_hex_string() << " to predict " << next_rand_bits.as_hex_string() << std::endl;
 

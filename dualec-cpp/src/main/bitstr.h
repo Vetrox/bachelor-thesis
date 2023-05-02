@@ -55,8 +55,8 @@ public:
         DBG << "~" << debug_description() << std::endl;
     }
 
-    [[nodiscard]] BitStr truncated_left(size_t new_length) const;
-    [[nodiscard]] BitStr truncated_right(size_t new_length) const;
+    [[nodiscard]] BitStr truncated_rightmost(size_t new_length) const;
+    [[nodiscard]] BitStr truncated_leftmost(size_t new_length) const;
     BitStr& operator=(BitStr&& other);
     [[nodiscard]] BitStr operator+(BitStr const& other) const;
     [[nodiscard]] BitStr operator^(BitStr const& other) const;
