@@ -162,7 +162,7 @@ BitStr& BitStr::operator=(BitStr&& other)
         for (auto it = m_data_begin.get(); it != data_end(); ++it) {
             *out_it |= (*it) >> right_shift;
             ++out_it;
-            if (out_it < box_end)
+            if (out_it < box_end && rhs_bits != 0)
                 *out_it |= (*it) << rhs_bits;
         }
     }
