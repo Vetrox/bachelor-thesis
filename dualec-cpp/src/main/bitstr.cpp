@@ -60,13 +60,10 @@
 
 [[nodiscard]] BigInt BitStr::as_big_int() const
 {
-    if (m_data_begin.get() == nullptr)
+    if (m_data_len == 0 || m_bitlen == 0 || m_data_begin.get() == nullptr)
         return BigInt(0);
-    mpz_t z;
-    mpz_init(z);
-    mpz_import(z, m_data_len, 1, sizeof(B), -1, 0, m_data_begin.get());
-    auto i = BigInt(mpz_class(z));
-    mpz_clear(z);
+    auto i = BigInt(0);
+    mpz_import(i.get_mpz(), m_data_len, 1, sizeof(B), -1, 0, m_data_begin.get());
     return i;
 }
 
