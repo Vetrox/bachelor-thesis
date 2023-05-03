@@ -4,11 +4,13 @@
 std::string bigint_hex(BigInt const& i)
 {
     char* hex_str;
-    gmp_asprintf(&hex_str, "%#Zx", i.get_mpz_const());
-    return hex_str;
+    decltype(auto) aa = gmp_asprintf(&hex_str, "%#Zx", i.get_mpz_const());
+    std::string ret(hex_str);
+    free(hex_str);
+    return ret;
 }
 
-std::string bytes_as_hex(std::span<uint8_t> const& bytes)
+std::string bytes_as_hex(MArray<uint8_t> const& bytes)
 {
     std::stringstream ss;
     for (auto const& word : bytes)

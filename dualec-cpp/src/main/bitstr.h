@@ -75,7 +75,7 @@ public:
     [[nodiscard]] std::string as_bin_string() const;
     [[nodiscard]] std::string as_hex_string() const;
     [[nodiscard]] BigInt as_big_int() const;
-    [[nodiscard]] std::span<uint8_t> to_baked_array() const;
+    [[nodiscard]] MArray<uint8_t> to_baked_array() const;
 
 private:
     BitStr(std::unique_ptr<B[]>&& data_begin, size_t data_len, size_t bitlen)

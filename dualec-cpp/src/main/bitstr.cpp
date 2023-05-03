@@ -9,7 +9,7 @@
 #include <memory>
 #include <ostream>
 
-[[nodiscard]] std::span<BitStr::B> BitStr::to_baked_array() const
+[[nodiscard]] MArray<BitStr::B> BitStr::to_baked_array() const
 {
     size_t new_byte_len = containerlen_for_bitlength<B>(bitlength());
     auto* box = new uint8_t[new_byte_len];
@@ -18,7 +18,7 @@
     if (diff != 0)
         std::memset(box, 0, diff);
     std::copy(data_end() - containerlen_for_bitlength<B>(internal_bitlength()), data_end(), start_pos);
-    auto s = std::span<uint8_t>(box, new_byte_len);
+    MArray<uint8_t> s = std::span<uint8_t>(box, new_byte_len);
     DBG << "to_baked_array(this: " << debug_description() << "): "
         << "data[" << new_byte_len << "]=" << bytes_as_hex(s) << std::endl;
     return s;
