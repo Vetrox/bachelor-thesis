@@ -233,7 +233,10 @@ void generate_dQ(AffinePoint const& P, BigInt const& order_of_p, EllipticCurve c
     Givaro::RandomIntegerIterator<> random_integer_iterator(order_field);
     while (true) {
         // pick random d
-        out_d = random_integer_iterator.randomInteger();
+        if (determined)
+            out_d = BigInt(0x197febe5);
+        else
+            out_d = random_integer_iterator.randomInteger();
         if (Givaro::isZero(out_d))
             continue;
         // compute the inverse of d
