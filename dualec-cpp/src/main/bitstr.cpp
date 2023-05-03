@@ -5,6 +5,7 @@
 #include <cstdint>
 #include <cstring>
 #include <gmp.h>
+#include <gmpxx.h>
 #include <memory>
 #include <ostream>
 
@@ -64,7 +65,9 @@
     mpz_t z;
     mpz_init(z);
     mpz_import(z, m_data_len, 1, sizeof(B), -1, 0, m_data_begin.get());
-    return reinterpret_cast<BigInt&>(z);
+    auto i = BigInt(mpz_class(z));
+    mpz_clear(z);
+    return i;
 }
 
 [[nodiscard]] BitStr BitStr::operator^(BitStr const& other) const
