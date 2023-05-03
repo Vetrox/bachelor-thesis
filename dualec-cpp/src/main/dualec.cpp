@@ -343,8 +343,11 @@ BitStr brute_force_next_s(BitStr const& bits, size_t security_strength, BigInt d
     std::cout << "Finished pushing workers..." << std::endl;
     while (!workers.empty()) {
         auto ret = workers.front().get();
-        if (ret.bitlength() > 0)
+        if (ret.bitlength() > 0) {
+            while (!workers.empty())
+                workers.pop();
             return ret;
+        }
         workers.pop();
     }
     std::cout << "Unexpected end of brute-force" << std::endl;
