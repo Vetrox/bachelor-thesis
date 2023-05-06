@@ -65,8 +65,10 @@ void Dual_EC_Truncate(BitStr& bitstr, size_t outlen)
     DBG << "Dual_EC_Truncate(bitstr: " << bitstr.debug_description() << " outlen: " << std::to_string(outlen) << std::endl;
     bitstr = bitstr.truncated_leftmost(std::min(outlen, bitstr.bitlength()));
     auto amount_to_add = bitstr.bitlength() - outlen;
-    if (amount_to_add > 0)
+    if (amount_to_add > 0) {
+        std::cout << "ERROR: The caller should guarantee that this case isn't hit. Adding " << amount_to_add << " 0-bits" << std::endl;
         bitstr = bitstr + BitStr(BigInt(0), amount_to_add);
+    }
 }
 
 DualEcCurve const& pick_curve(size_t security_strength)
