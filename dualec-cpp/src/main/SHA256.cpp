@@ -161,7 +161,7 @@ std::string SHA256::toString(uint8_t const* digest)
     s << std::setfill('0') << std::hex;
 
     for (uint8_t i = 0; i < 32; i++) {
-        s << std::setw(2) << (unsigned int)digest[i];
+        s << std::setw(2) << static_cast<unsigned int>(digest[i]);
     }
 
     return s.str();
