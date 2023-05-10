@@ -23,15 +23,14 @@ add_executable(dualec-attack ${sources})# ${data})
 
 # Just for example add some compiler flags.
 target_compile_options(dualec-attack PUBLIC -std=c++2a -O0 -Wall -Wextra -fdiagnostics-color=always
-    -ggdb
-    -DDEBUG
-    -fsanitize=address,undefined,leak
+    #-ggdb
+    #-DDEBUG
+    #-fsanitize=address,undefined,leak
 -pedantic -Wcast-align -Wcast-qual -Wctor-dtor-privacy -Wdisabled-optimization -Wformat=2 -Winit-self -Wlogical-op -Wmissing-include-dirs -Wnoexcept -Wold-style-cast -Woverloaded-virtual -Wredundant-decls -Wshadow -Wsign-promo -Wstrict-null-sentinel -Wstrict-overflow=5 -Wswitch-default -Wundef -Wno-unused
 )
 
 target_link_options(dualec-attack PUBLIC
-    -fsanitize=address,undefined,leak
-
+    #-fsanitize=address,undefined,leak
 )
 
 # This allows to include files relative to the root of the src directory with a <> pair
@@ -49,15 +48,15 @@ target_include_directories(dualec-attack PUBLIC src/main)
 # that we need to link into the program.
 # find_package(Boost 1.36.0 COMPONENTS filesystem system REQUIRED)
 
-add_subdirectory(./sha256)
-link_directories(./sha256)
+# add_subdirectory(./sha256)
+# link_directories(./sha256)
 
 target_link_libraries(dualec-attack PUBLIC
   # ${Boost_LIBRARIES}
   # here you can add any library dependencies
   -lgivaro
   -lgmp
-  sha256
+  # sha256
 )
 
 ###############################################################################

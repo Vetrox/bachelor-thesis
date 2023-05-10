@@ -1,5 +1,5 @@
 #include "hash.h"
-#include "../../sha256/include/SHA256.h"
+#include "SHA256.h"
 
 static SHA256 sha256;
 BitStr SHA256_Hash(BitStr const& input)
