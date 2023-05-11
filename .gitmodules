@@ -1,0 +1,4 @@
+[submodule "dualec-cpp/mbedtls"]
+	path = dualec-cpp/mbedtls
+	url = https://github.com/Mbed-TLS/mbedtls.git
+    ignore = dirty
