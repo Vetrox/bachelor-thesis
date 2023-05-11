@@ -14,6 +14,7 @@
 #include <givaro/random-integer.h>
 #include <gmp++/gmp++_int.h>
 #include <limits>
+#include <mbedtls/psa_util.h>
 #include <queue>
 #include <random>
 #include <ratio>
@@ -374,7 +375,56 @@ void simulate_backdoor(size_t security_strength)
     std::cout << "SUCCESS!!!\nBrute-forced working-state: " << working_state.to_string() << std::endl;
 }
 
+void test_mbedtls()
+{
+    psa_status_t status;
+    psa_algorithm_t alg = PSA_ALG_SHA_256;
+    psa_hash_operation_t operation = PSA_HASH_OPERATION_INIT;
+    unsigned char input[] = { 'a', 'b', 'c' };
+    unsigned char expected_hash[] = {
+        0xba, 0x78, 0x16, 0xbf, 0x8f, 0x01, 0xcf, 0xea, 0x41, 0x41, 0x40, 0xde,
+        0x5d, 0xae, 0x22, 0x23, 0xb0, 0x03, 0x61, 0xa3, 0x96, 0x17, 0x7a, 0x9c,
+        0xb4, 0x10, 0xff, 0x61, 0xf2, 0x00, 0x15, 0xad
+    };
+    size_t expected_hash_len = PSA_HASH_LENGTH(alg);
+
+    printf("Verify a hash...\t");
+    fflush(stdout);
+
+    /* Initialize PSA Crypto */
+    status = psa_crypto_init();
+    if (status != PSA_SUCCESS) {
+        printf("Failed to initialize PSA Crypto\n");
+        return;
+    }
+
+    /* Verify message hash */
+    status = psa_hash_setup(&operation, alg);
+    if (status != PSA_SUCCESS) {
+        printf("Failed to begin hash operation\n");
+        return;
+    }
+    status = psa_hash_update(&operation, input, sizeof(input));
+    if (status != PSA_SUCCESS) {
+        printf("Failed to update hash operation\n");
+        return;
+    }
+    status = psa_hash_verify(&operation, expected_hash, expected_hash_len);
+    if (status != PSA_SUCCESS) {
+        printf("Failed to verify hash\n");
+        return;
+    }
+
+    printf("Verified a hash\n");
+
+    /* Clean up hash operation context */
+    psa_hash_abort(&operation);
+
+    mbedtls_psa_crypto_free();
+}
+
 int main()
 {
-    simulate_backdoor(128);
+    //    simulate_backdoor(128);
+    test_mbedtls();
 }
