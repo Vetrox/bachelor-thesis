@@ -217,6 +217,7 @@ BitStr Dual_EC_DRBG_Generate(WorkingState& working_state, size_t requested_numbe
     auto& returned_bits = temp;
 
     // 14. s = phi(x(s * P)). BACKDOOR: x(d * (s * Q)) * (d * Q) = d * r
+    // NOTE: This step doesn't exist in SP-800-90 (2006)
     working_state.s = BitStr(Dual_EC_mul(working_state.s.as_big_int(), working_state.dec_curve.P, working_state.dec_curve.curve).x(), working_state.seedlen);
     std::cout << " s: " << working_state.s.as_hex_string() << std::endl;
 
