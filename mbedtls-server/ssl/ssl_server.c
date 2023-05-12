@@ -43,7 +43,7 @@ int main(void)
     unsigned char buf[1024];
     const char *pers = "ssl_server";
 
-    mbedtls_entropy_context entropy;
+    mbedtls_entropy_context entropy; // use MBEDTLS_ALLOW_PRIVATE_ACCESS to access and possibly modify the content to our will
     mbedtls_ctr_drbg_context ctr_drbg;
     mbedtls_ssl_context ssl;
     mbedtls_ssl_config conf;
