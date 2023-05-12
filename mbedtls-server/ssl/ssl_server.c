@@ -1,4 +1,5 @@
 #include "mbedtls/build_info.h"
+#include "mbedtls/pk.h"
 #include "mbedtls/platform.h"
 
 #include <stdlib.h>
@@ -11,6 +12,7 @@
 #include "mbedtls/net_sockets.h"
 #include "mbedtls/error.h"
 #include "mbedtls/debug.h"
+#include "mbedtls/x509_crt.h"
 // #include "test/certs.h"
 
 #if defined(MBEDTLS_SSL_CACHE_C)
@@ -93,28 +95,20 @@ int main(void)
      * Instead, you may want to use mbedtls_x509_crt_parse_file() to read the
      * server and CA certificates, as well as mbedtls_pk_parse_keyfile().
      */
-    /*ret = mbedtls_x509_crt_parse(&srvcert, (const unsigned char *) mbedtls_test_srv_crt,
-                                 mbedtls_test_srv_crt_len);
+    ret = mbedtls_x509_crt_parse_file(&srvcert, "server-cert.pem");
+    // ret = mbedtls_x509_crt_parse(&srvcert, (const unsigned char *) mbedtls_test_srv_crt, mbedtls_test_srv_crt_len);
     if (ret != 0) {
-        mbedtls_printf(" failed\n  !  mbedtls_x509_crt_parse returned %d\n\n", ret);
+        mbedtls_printf(" failed\n  !  mbedtls_x509_crt_parse_file returned %d\n\n", ret);
         goto exit;
     }
 
-    ret = mbedtls_x509_crt_parse(&srvcert, (const unsigned char *) mbedtls_test_cas_pem,
-                                 mbedtls_test_cas_pem_len);
-    if (ret != 0) {
-        mbedtls_printf(" failed\n  !  mbedtls_x509_crt_parse returned %d\n\n", ret);
-        goto exit;
-    }
-
-    ret =  mbedtls_pk_parse_key(&pkey, (const unsigned char *) mbedtls_test_srv_key,
-                                mbedtls_test_srv_key_len, NULL, 0,
-                                mbedtls_ctr_drbg_random, &ctr_drbg);
+    ret = mbedtls_pk_parse_keyfile(&pkey, "server-private-key.pem", NULL, mbedtls_ctr_drbg_random, &ctr_drbg);
+    // ret =  mbedtls_pk_parse_key(&pkey, (const unsigned char *) mbedtls_test_srv_key, mbedtls_test_srv_key_len, NULL, 0, mbedtls_ctr_drbg_random, &ctr_drbg);
     if (ret != 0) {
         mbedtls_printf(" failed\n  !  mbedtls_pk_parse_key returned %d\n\n", ret);
         goto exit;
     }
-*/
+
     mbedtls_printf(" ok\n");
 
     /*
