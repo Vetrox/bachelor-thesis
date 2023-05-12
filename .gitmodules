@@ -3,10 +3,9 @@
 	url = https://github.com/Mbed-TLS/mbedtls.git
     ignore = dirty
 [submodule "dualec-cpp/mbedtls"]
-	path = mbedtls-server/mbedtls
-	url = https://github.com/Mbed-TLS/mbedtls.git
-    ignore = dirty
-[submodule "dualec-cpp/mbedtls"]
 	path = mbedtls-client/mbedtls
 	url = https://github.com/Mbed-TLS/mbedtls.git
     ignore = dirty
+[submodule "mbedtls-server/mbedtls"]
+	path = mbedtls-server/mbedtls
+	url = https://github.com/Mbed-TLS/mbedtls.git
