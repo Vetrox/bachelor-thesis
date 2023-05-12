@@ -1,48 +1,8 @@
-/*
- *  SSL server demonstration program
- *
- *  Copyright The Mbed TLS Contributors
- *  SPDX-License-Identifier: Apache-2.0
- *
- *  Licensed under the Apache License, Version 2.0 (the "License"); you may
- *  not use this file except in compliance with the License.
- *  You may obtain a copy of the License at
- *
- *  http://www.apache.org/licenses/LICENSE-2.0
- *
- *  Unless required by applicable law or agreed to in writing, software
- *  distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
- *  WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- *  See the License for the specific language governing permissions and
- *  limitations under the License.
- */
-
 #include "mbedtls/build_info.h"
-
 #include "mbedtls/platform.h"
-
-#if !defined(MBEDTLS_BIGNUM_C) || !defined(MBEDTLS_PEM_PARSE_C) || \
-    !defined(MBEDTLS_ENTROPY_C) || !defined(MBEDTLS_SSL_TLS_C) ||  \
-    !defined(MBEDTLS_SSL_SRV_C) || !defined(MBEDTLS_NET_C) ||      \
-    !defined(MBEDTLS_RSA_C) || !defined(MBEDTLS_CTR_DRBG_C) ||     \
-    !defined(MBEDTLS_X509_CRT_PARSE_C) || !defined(MBEDTLS_FS_IO)
-int main(void)
-{
-    mbedtls_printf("MBEDTLS_BIGNUM_C and/or MBEDTLS_ENTROPY_C "
-                   "and/or MBEDTLS_SSL_TLS_C and/or MBEDTLS_SSL_SRV_C and/or "
-                   "MBEDTLS_NET_C and/or MBEDTLS_RSA_C and/or "
-                   "MBEDTLS_CTR_DRBG_C and/or MBEDTLS_X509_CRT_PARSE_C "
-                   "and/or MBEDTLS_PEM_PARSE_C not defined.\n");
-    mbedtls_exit(0);
-}
-#else
 
 #include <stdlib.h>
 #include <string.h>
-
-#if defined(_WIN32)
-#include <windows.h>
-#endif
 
 #include "mbedtls/entropy.h"
 #include "mbedtls/ctr_drbg.h"
@@ -62,8 +22,7 @@ int main(void)
     "<h2>mbed TLS Test Server</h2>\r\n" \
     "<p>Successful connection using: %s</p>\r\n"
 
-#define DEBUG_LEVEL 0
-
+#define DEBUG_LEVEL 3
 
 static void my_debug(void *ctx, int level,
                      const char *file, int line,
@@ -75,7 +34,7 @@ static void my_debug(void *ctx, int level,
     fflush((FILE *) ctx);
 }
 
-int no_main(void)
+int main(void)
 {
     int ret, len;
     mbedtls_net_context listen_fd, client_fd;
@@ -356,7 +315,3 @@ exit:
 
     mbedtls_exit(ret);
 }
-#endif /* MBEDTLS_BIGNUM_C && MBEDTLS_ENTROPY_C &&
-          MBEDTLS_SSL_TLS_C && MBEDTLS_SSL_SRV_C && MBEDTLS_NET_C &&
-          MBEDTLS_RSA_C && MBEDTLS_CTR_DRBG_C && MBEDTLS_X509_CRT_PARSE_C
-          && MBEDTLS_FS_IO && MBEDTLS_PEM_PARSE_C */
