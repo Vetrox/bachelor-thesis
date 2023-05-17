@@ -36,6 +36,23 @@ static void my_debug(void *ctx, int level,
     fflush((FILE *) ctx);
 }
 
+int my_generate(void *p_rng, unsigned char *output, size_t output_len, const unsigned char *additional, size_t add_len)
+{
+    (void) p_rng;
+    (void) additional;
+    (void) add_len;
+    memset(output, 0x1a, output_len);
+    return 0;
+}
+
+int my_drbg_random(void *p_rng, unsigned char *output,
+                            size_t output_len)
+{
+    mbedtls_ctr_drbg_random(p_rng, output, output_len);
+    // my_generate(p_rng, output, output_len, NULL, 0);
+    return 0;
+}
+
 int main(void)
 {
     int ret, len;
@@ -75,6 +92,7 @@ int main(void)
     mbedtls_printf("  . Seeding the random number generator...");
     fflush(stdout);
 
+    // NOTE: This call is the DRBG_Instantiate call in SP 800-90A
     if ((ret = mbedtls_ctr_drbg_seed(&ctr_drbg, mbedtls_entropy_func, &entropy,
                                      (const unsigned char *) pers,
                                      strlen(pers))) != 0) {
@@ -96,14 +114,12 @@ int main(void)
      * server and CA certificates, as well as mbedtls_pk_parse_keyfile().
      */
     ret = mbedtls_x509_crt_parse_file(&srvcert, "server-cert.pem");
-    // ret = mbedtls_x509_crt_parse(&srvcert, (const unsigned char *) mbedtls_test_srv_crt, mbedtls_test_srv_crt_len);
     if (ret != 0) {
         mbedtls_printf(" failed\n  !  mbedtls_x509_crt_parse_file returned %d\n\n", ret);
         goto exit;
     }
 
     ret = mbedtls_pk_parse_keyfile(&pkey, "server-private-key.pem", NULL, mbedtls_ctr_drbg_random, &ctr_drbg);
-    // ret =  mbedtls_pk_parse_key(&pkey, (const unsigned char *) mbedtls_test_srv_key, mbedtls_test_srv_key_len, NULL, 0, mbedtls_ctr_drbg_random, &ctr_drbg);
     if (ret != 0) {
         mbedtls_printf(" failed\n  !  mbedtls_pk_parse_key returned %d\n\n", ret);
         goto exit;
@@ -138,7 +154,8 @@ int main(void)
         goto exit;
     }
 
-    mbedtls_ssl_conf_rng(&conf, mbedtls_ctr_drbg_random, &ctr_drbg);
+    // mbedtls_ctr_drbg_random; my_drbg_random;
+    mbedtls_ssl_conf_rng(&conf, my_drbg_random, &ctr_drbg);
     mbedtls_ssl_conf_dbg(&conf, my_debug, stdout);
 
 #if defined(MBEDTLS_SSL_CACHE_C)
