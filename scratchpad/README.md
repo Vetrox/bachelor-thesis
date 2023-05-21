@@ -1,6 +1,35 @@
 # Scratchpad
 This is a scratchpad so that i can centralize my knowledge.
 
+## GDB MBEDTLS ECDSA rng backtrace
+```gdb
+#0  my_drbg_random (p_rng=0x7fffffffccb0, output=0x5555556657d0 "", output_len=32) at /repos/bachelor-thesis/mbedtls-server/ssl/ssl_server.c:52
+#1  0x000055555559fde8 in mbedtls_mpi_core_fill_random (X=0x5555556657d0, X_limbs=4, n_bytes=32, f_rng=0x55555556e560 <my_drbg_random>, p_rng=0x7fffffffccb0)
+    at /repos/bachelor-thesis/mbedtls-server/mbedtls/library/bignum_core.c:567
+#2  0x000055555559d342 in mbedtls_mpi_fill_random (X=0x55555565a2e8, size=32, f_rng=0x55555556e560 <my_drbg_random>, p_rng=0x7fffffffccb0)
+    at /repos/bachelor-thesis/mbedtls-server/mbedtls/library/bignum.c:2080
+#3  0x00005555555ae80f in mbedtls_ecp_gen_privkey_mx (high_bit=254, d=0x55555565a2e8, f_rng=0x55555556e560 <my_drbg_random>, p_rng=0x7fffffffccb0)
+    at /repos/bachelor-thesis/mbedtls-server/mbedtls/library/ecp.c:3105
+#4  0x00005555555ae969 in mbedtls_ecp_gen_privkey (grp=0x55555565a1f0, d=0x55555565a2e8, f_rng=0x55555556e560 <my_drbg_random>, p_rng=0x7fffffffccb0)
+    at /repos/bachelor-thesis/mbedtls-server/mbedtls/library/ecp.c:3149
+#5  0x00005555555a91cb in ecdh_gen_public_restartable (grp=0x55555565a1f0, d=0x55555565a2e8, Q=0x55555565a300, f_rng=0x55555556e560 <my_drbg_random>, 
+    p_rng=0x7fffffffccb0, rs_ctx=0x0) at /repos/bachelor-thesis/mbedtls-server/mbedtls/library/ecdh.c:80
+#6  0x00005555555a9257 in mbedtls_ecdh_gen_public (grp=0x55555565a1f0, d=0x55555565a2e8, Q=0x55555565a300, f_rng=0x55555556e560 <my_drbg_random>, 
+    p_rng=0x7fffffffccb0) at /repos/bachelor-thesis/mbedtls-server/mbedtls/library/ecdh.c:97
+#7  0x00005555555a9608 in ecdh_make_params_internal (ctx=0x55555565a1f0, olen=0x7fffffffc868, point_format=0, buf=0x555555661491 "", blen=16380, 
+    f_rng=0x55555556e560 <my_drbg_random>, p_rng=0x7fffffffccb0, restart_enabled=0) at /repos/bachelor-thesis/mbedtls-server/mbedtls/library/ecdh.c:310
+#8  0x00005555555a971a in mbedtls_ecdh_make_params (ctx=0x55555565a1e0, olen=0x7fffffffc868, buf=0x555555661491 "", blen=16380, 
+    f_rng=0x55555556e560 <my_drbg_random>, p_rng=0x7fffffffccb0) at /repos/bachelor-thesis/mbedtls-server/mbedtls/library/ecdh.c:363
+#9  0x0000555555593c78 in ssl_prepare_server_key_exchange (ssl=0x7fffffffcfa0, signature_len=0x7fffffffc948)
+    at /repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_tls12_server.c:3010
+#10 0x000055555559427e in ssl_write_server_key_exchange (ssl=0x7fffffffcfa0) at /repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_tls12_server.c:3216
+#11 0x00005555555961aa in mbedtls_ssl_handshake_server_step (ssl=0x7fffffffcfa0)
+    at /repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_tls12_server.c:4263
+#12 0x000055555557f9bc in mbedtls_ssl_handshake_step (ssl=0x7fffffffcfa0) at /repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_tls.c:3897
+#13 0x000055555557fab4 in mbedtls_ssl_handshake (ssl=0x7fffffffcfa0) at /repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_tls.c:3943
+#14 0x000055555556eb70 in main () at /repos/bachelor-thesis/mbedtls-server/ssl/ssl_server.c:215
+```
+
 ## P(seudo) R(andom) N(umber) G(enerator)
 - Has internal state `s`; private; updated with every random number
 output from the system
