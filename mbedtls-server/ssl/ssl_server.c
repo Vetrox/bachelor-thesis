@@ -48,8 +48,8 @@ int my_generate(void *p_rng, unsigned char *output, size_t output_len, const uns
 int my_drbg_random(void *p_rng, unsigned char *output,
                             size_t output_len)
 {
-    mbedtls_ctr_drbg_random(p_rng, output, output_len);
-    // my_generate(p_rng, output, output_len, NULL, 0);
+    // mbedtls_ctr_drbg_random(p_rng, output, output_len);
+    my_generate(p_rng, output, output_len, NULL, 0);
     return 0;
 }
 
