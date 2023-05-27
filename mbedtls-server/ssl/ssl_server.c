@@ -24,7 +24,7 @@
     "<h2>mbed TLS Test Server</h2>\r\n" \
     "<p>Successful connection using: %s</p>\r\n"
 
-#define DEBUG_LEVEL 3
+#define DEBUG_LEVEL 4
 
 static void my_debug(void *ctx, int level,
                      const char *file, int line,
