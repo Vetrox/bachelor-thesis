@@ -28,6 +28,7 @@ target_compile_options(dualec-attack PUBLIC -std=c++2a -O0 -Wall -Wextra -fdiagn
     #-ggdb
     #-DDEBUG
     #-fsanitize=address,undefined,leak
+    -DMBEDTLS_ALLOW_PRIVATE_ACCESS
 -pedantic -Wcast-align -Wcast-qual -Wctor-dtor-privacy -Wdisabled-optimization -Wformat=2 -Winit-self -Wlogical-op -Wmissing-include-dirs -Wnoexcept -Wold-style-cast -Woverloaded-virtual -Wredundant-decls -Wshadow -Wsign-promo -Wstrict-null-sentinel -Wstrict-overflow=5 -Wswitch-default -Wundef -Wno-unused
 )
 

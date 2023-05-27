@@ -1,4 +1,5 @@
 #include "bitstr.h"
+#include "mbedtls/cipher.h"
 #include <array>
 #include <bits/stdint-uintn.h>
 #include <iomanip>
@@ -113,6 +114,23 @@ WorkingKeys generate_working_keys(barr master_secret, barr random_seed)
 
     /* NOTE: Macs are left out, bc maclen = 0 */
     return wk;
+}
+
+void encrypt(WorkingKeys wk) {
+    barr data = { 0x41, 0x42, 0x43, 0x44 };
+    mbedtls_cipher_context_t c;
+
+    mbedtls_cipher_definitions def;
+#if 0
+    mbedtls_cipher_auth_encrypt_ext(
+    auto ret = mbedtls_cipher_auth_encrypt_ext(wk.server_write_key,
+                                                   &wk.iv_enc.front(), wk.iv_enc.size(),
+                                                   add_data, add_data_len,
+                                                   &data.front(), data.size(), /* src */
+                                                   &data.front(), rec->buf_len - ((&data.front()) - rec->buf), /* dst */
+                                                   data.size(),
+                                                   transform->taglen);
+#endif
 }
 
 int main()
