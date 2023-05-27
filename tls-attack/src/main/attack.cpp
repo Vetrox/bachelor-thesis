@@ -48,15 +48,38 @@ barr calculate_master_secret(barr const& pre_master_secret, barr const& server_h
     return prf(pre_master_secret, "master secret", random, MASTER_SECRET_LEN);
 }
 
+static void print_barr(barr input)
+{
+    for (auto const& b : input)
+        std::cout << std::hex << std::setw(2) << std::setfill('0') << static_cast<int>(b) << " ";
+}
+
 struct WorkingKeys {
-    barr const client_write_MAC_key;
-    barr const server_write_MAX_key;
-    barr const client_write_key;
-    barr const server_write_key;
+    barr client_write_MAC_key;
+    barr server_write_MAX_key;
+    barr client_write_key;
+    barr server_write_key;
+    barr iv_enc;
+    barr iv_dec;
+
+    void print() const
+    {
+        std::cout << "working_keys: ";
+        std::cout << "\n\tclient_write_key: ";
+        print_barr(client_write_key);
+        std::cout << "\n\tserver_write_key: ";
+        print_barr(server_write_key);
+        std::cout << "\n\tiv_enc: ";
+        print_barr(iv_enc);
+        std::cout << "\n\tiv_dec: ";
+        print_barr(iv_dec);
+        std::cout << std::endl;
+    }
 };
 
 WorkingKeys generate_working_keys(barr master_secret, barr random_seed)
 {
+    WorkingKeys wk;
     barr keyblk = prf(master_secret,
             "key expansion",
             random_seed,
@@ -69,7 +92,27 @@ WorkingKeys generate_working_keys(barr master_secret, barr random_seed)
     for (auto const& b : expect_keyblock)
         std::cout << std::hex << std::setw(2) << std::setfill('0') << static_cast<int>(b) << " ";
     std::cout << std::endl;
-    return {};
+    // keylen: 32, minlen: 16, ivlen: 12, maclen: 0
+
+    auto keylen = 32;
+    auto transform_ivlen = 12;
+    auto mac_key_len = 0;
+    decltype(auto) blkptr = &keyblk.front();
+    auto key_enc = blkptr + mac_key_len * 2 + keylen;
+    auto key_dec = blkptr + mac_key_len * 2;
+    auto mac_enc = blkptr + mac_key_len;
+    auto mac_dec = blkptr;
+
+    auto iv_copy_len = /*(transform->fixed_ivlen) ?
+                      transform->fixed_ivlen : */ transform_ivlen;
+
+    wk.server_write_key.insert(wk.server_write_key.begin(), key_enc, key_enc + keylen);
+    wk.client_write_key.insert(wk.client_write_key.begin(), key_dec, key_dec + keylen);
+    wk.iv_dec.insert(wk.iv_dec.begin(), key_enc + keylen, key_enc + keylen + iv_copy_len);
+    wk.iv_enc.insert(wk.iv_enc.begin(), key_enc + keylen + iv_copy_len, key_enc + keylen + iv_copy_len + iv_copy_len);
+
+    /* NOTE: Macs are left out, bc maclen = 0 */
+    return wk;
 }
 
 int main()
@@ -111,7 +154,7 @@ int main()
     barr random_;
     random_.insert(random_.end(), client_hello_random.begin(), client_hello_random.end());
     random_.insert(random_.end(), server_hello_random.begin(), server_hello_random.end());
-    generate_working_keys(master_secret, random_);
-
+    auto working_keys = generate_working_keys(master_secret, random_);
+    working_keys.print();
     return 0;
 }
