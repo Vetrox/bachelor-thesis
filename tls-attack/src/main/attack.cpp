@@ -9,9 +9,12 @@
 #include <vector>
 #include <mbedtls/ssl.h>
 
+#define TLS_ATTACK_DETERMINISTIC
+
 typedef std::vector<uint8_t> barr;
 constexpr auto MASTER_SECRET_LEN = 48;
 
+static auto* cipher_info = mbedtls_cipher_info_from_type(MBEDTLS_CIPHER_CHACHA20_POLY1305);
 
 barr expect_premaster ={0xdb, 0x39, 0xe0, 0xb2, 0x91, 0x1c, 0x20, 0x7d, 0xdb, 0xf5, 0x2d, 0x6a, 0xac, 0x47, 0x29, 0xdf, 0xfe, 0x41, 0x70, 0xf0, 0x32, 0xe5, 0x55, 0x0d, 0x4f, 0x73, 0x94, 0xcc, 0xc3, 0x40, 0x7f, 0xf9, 0xcc, 0x15, 0x4a, 0x43, 0xa3, 0x4e, 0xbc, 0xe1, 0x52, 0x43, 0x8f, 0x8e, 0xc8, 0x68, 0x5d, 0x46, 0x0e, 0x0f, 0x48, 0x7d, 0x3f, 0x4f, 0x18, 0x24, 0x78, 0xf9, 0x8b, 0x7e, 0x56, 0x57, 0xa0, 0xca, 0xe9, 0x92, 0xa1, 0xec, 0xde, 0xe6, 0x1b, 0xab, 0xfb, 0x98, 0x9a, 0x89, 0xf1, 0x30, 0xb6, 0x79, 0xaf, 0x15, 0x67, 0x07, 0xe6, 0x09, 0x86, 0x90, 0xc0, 0x16, 0xa6, 0xf6, 0x22, 0x6d, 0x68, 0x05, 0x39, 0xba, 0x80, 0x1e, 0x78, 0xfc, 0x86, 0xce, 0xc0, 0xe7, 0xf6, 0xb3, 0x5e, 0xdb, 0xcc, 0x96, 0xfa, 0x24, 0x2c, 0xe1, 0x4f, 0x29, 0x24, 0xfc, 0xd1, 0x9d, 0xb4, 0x92, 0xe3, 0xd0, 0x01, 0xad, 0xc6, 0x39, 0xa5, 0x30, 0x47, 0x9b, 0x00, 0x6a, 0xe0, 0xa2, 0xa6, 0xc7, 0x15, 0xd9, 0x2f, 0xd8, 0x74, 0xd3, 0xd3, 0x9c, 0xb8, 0x54, 0xb7, 0x4e, 0x6c, 0xc0, 0x1e, 0xd4, 0x50, 0x47, 0x1c, 0x47, 0x2e, 0x6c, 0xb2, 0x09, 0x8b, 0xfb, 0x23, 0x2f, 0x19, 0x33, 0xde, 0xe5, 0x0a, 0xa8, 0x68, 0xfd, 0xf9, 0x63, 0x1f, 0x9f, 0x47, 0xdc, 0x2b, 0x5c, 0x24, 0x2b, 0x9b, 0x7d, 0xdd, 0xe2, 0x59, 0x76, 0x60, 0x8a, 0x3e, 0xf4, 0x91, 0xbe, 0xa6, 0x53, 0x8f, 0xcf, 0xa3, 0xa3, 0xd3, 0x97, 0xf5, 0xdf, 0x31, 0xaa, 0xc4, 0x42, 0x51, 0x25, 0xda, 0xe7, 0x8b, 0xfa, 0xcc, 0x02, 0xed, 0x9e, 0x35, 0x04, 0xee, 0xef, 0x3b, 0x63, 0x5c, 0xa7, 0x88, 0x84, 0x84, 0xfd, 0xab, 0x22, 0x96, 0x2b, 0x6d, 0xdb, 0x87, 0xf9, 0x37, 0x0f, 0xe8, 0x18, 0x39, 0x15, 0x7d, 0x24, 0xb5, 0x59, 0x13, 0x34, 0x49, 0x56};
 barr expect_master_secret={0xac, 0xbe, 0x54, 0x3f, 0x17, 0x2f, 0xcf, 0x9a, 0x8a, 0x47, 0x97, 0xdc, 0x24, 0xc4, 0xc0, 0x2e, 0x6b, 0x22, 0xeb, 0x45, 0x9d, 0x4a, 0x0f, 0x17, 0x87, 0xed, 0x54, 0x13, 0x21, 0xce, 0x11, 0x4b, 0x7f, 0xea, 0xb0, 0x20, 0x3f, 0x4a, 0x43, 0x3d, 0x7e, 0xc3, 0x70, 0x5e, 0xdd, 0x1a, 0x6f, 0x90};
@@ -57,12 +60,10 @@ static void print_barr(barr input)
 }
 
 struct WorkingKeys {
-    barr client_write_MAC_key;
-    barr server_write_MAX_key;
     barr client_write_key;
     barr server_write_key;
-    barr iv_enc;
-    barr iv_dec;
+    barr server_enc_iv;
+    barr client_enc_iv;
 
     void print() const
     {
@@ -72,9 +73,9 @@ struct WorkingKeys {
         std::cout << "\n\tserver_write_key: ";
         print_barr(server_write_key);
         std::cout << "\n\tiv_enc: ";
-        print_barr(iv_enc);
+        print_barr(server_enc_iv);
         std::cout << "\n\tiv_dec: ";
-        print_barr(iv_dec);
+        print_barr(client_enc_iv);
         std::cout << std::endl;
     }
 };
@@ -82,84 +83,112 @@ struct WorkingKeys {
 WorkingKeys generate_working_keys(barr master_secret, barr random_seed)
 {
     WorkingKeys wk;
-    barr keyblk = prf(master_secret,
-            "key expansion",
-            random_seed,
-            256);
+    barr keyblk = prf(master_secret, "key expansion", random_seed, 256);
+#ifdef TLS_ATTACK_DETERMINISTIC
     std::cout << "key block: ";
-    for (auto const& b : keyblk)
-        std::cout << std::hex << std::setw(2) << std::setfill('0') << static_cast<int>(b) << " ";
+    print_barr(keyblk);
     std::cout << std::endl;
     std::cout << "expected key block: ";
-    for (auto const& b : expect_keyblock)
-        std::cout << std::hex << std::setw(2) << std::setfill('0') << static_cast<int>(b) << " ";
+    print_barr(expect_keyblock);
     std::cout << std::endl;
-    // keylen: 32, minlen: 16, ivlen: 12, maclen: 0
+    // Observed testcase keylen: 32, minlen: 16, ivlen: 12, maclen: 0
+#endif
 
-    auto keylen = 32;
-    auto transform_ivlen = 12;
+    auto keylen = cipher_info->key_bitlen / 8;
+    auto ivlen = cipher_info->iv_size;
     auto mac_key_len = 0;
     decltype(auto) blkptr = &keyblk.front();
-    auto key_enc = blkptr + mac_key_len * 2 + keylen;
-    auto key_dec = blkptr + mac_key_len * 2;
-    auto mac_enc = blkptr + mac_key_len;
     auto mac_dec = blkptr;
+    auto mac_enc = blkptr + mac_key_len;
+    auto key_dec = blkptr + mac_key_len * 2;
+    auto key_enc = blkptr + mac_key_len * 2 + keylen;
 
-    auto iv_copy_len = /*(transform->fixed_ivlen) ?
-                      transform->fixed_ivlen : */ transform_ivlen;
+    auto iv_copy_len = ivlen;
 
     wk.server_write_key.insert(wk.server_write_key.begin(), key_enc, key_enc + keylen);
     wk.client_write_key.insert(wk.client_write_key.begin(), key_dec, key_dec + keylen);
-    wk.iv_dec.insert(wk.iv_dec.begin(), key_enc + keylen, key_enc + keylen + iv_copy_len);
-    wk.iv_enc.insert(wk.iv_enc.begin(), key_enc + keylen + iv_copy_len, key_enc + keylen + iv_copy_len + iv_copy_len);
+    wk.client_enc_iv.insert(wk.client_enc_iv.begin(), key_enc + keylen, key_enc + keylen + iv_copy_len);
+    wk.server_enc_iv.insert(wk.server_enc_iv.begin(), key_enc + keylen + iv_copy_len, key_enc + keylen + iv_copy_len + iv_copy_len);
 
     /* NOTE: Macs are left out, bc maclen = 0 */
     return wk;
 }
 
-void encrypt(WorkingKeys wk) {
-    barr data = { 0x14, 0x00, 0x00, 0x0c, 0xaf, 0x90, 0x68, 0x34, 0xca, 0x30, 0xb4, 0x0b, 0x34, 0x63, 0xb6, 0x3f};
-    barr add_data = { 0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x16,0x03,0x03,0x00,0x10 };
+barr encrypt(WorkingKeys wk, barr data, barr add_data) {
+#ifdef TLS_ATTACK_DETERMINISTIC
+    data = { 0x14, 0x00, 0x00, 0x0c, 0xaf, 0x90, 0x68, 0x34, 0xca, 0x30, 0xb4, 0x0b, 0x34, 0x63, 0xb6, 0x3f};
+    add_data = { 0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x16,0x03,0x03,0x00,0x10 };
+#endif
+    constexpr auto taglen = 16;
+
     mbedtls_cipher_context_t c;
-    auto* cipher_info = mbedtls_cipher_info_from_type(MBEDTLS_CIPHER_CHACHA20_POLY1305);
     mbedtls_cipher_init(&c);
     mbedtls_cipher_setup(&c, cipher_info);
-    mbedtls_cipher_set_iv(&c, &wk.iv_enc.front(), wk.iv_enc.size());
+    mbedtls_cipher_set_iv(&c, &wk.server_enc_iv.front(), wk.server_enc_iv.size());
     mbedtls_cipher_setkey(&c, &wk.server_write_key.front(), wk.server_write_key.size()*8, MBEDTLS_ENCRYPT);
     mbedtls_cipher_setkey(&c, &wk.client_write_key.front(), wk.client_write_key.size()*8, MBEDTLS_DECRYPT);
-    std::cout << "sizeof(c) " << sizeof(c) << std::endl;
 
     barr output;
-    output.resize(data.size() + 16);
+    output.resize(data.size() + taglen);
     size_t olen = 0;
     mbedtls_cipher_auth_encrypt_ext(&c,
-                                    &wk.iv_enc.front(), wk.iv_enc.size(),
+                                    &wk.server_enc_iv.front(), wk.server_enc_iv.size(),
                                     &add_data.front(), add_data.size(),
                                     &data.front(), data.size(), /* src */
                                     &output.front(), output.size(), /* dst */
-                                    &olen, 16);
+                                    &olen, taglen);
+#ifdef TLS_ATTACK_DETERMINISTIC
     std::cout << "Encrypted: ";
     print_barr(output);
     std::cout << std::endl;
+#endif
+    return output;
+}
 
-    barr client_ad = {0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x01, 0x17, 0x03, 0x03, 0x00, 0x12};
-    barr client_encrypted = {0x62, 0x47, 0x85, 0xb3, 0x81, 0x32, 0xab, 0x9e, 0x87, 0x56, 0xf8, 0x22, 0x22, 0x38, 0xa4, 0x1b, 0x15, 0xa0, 0x38, 0xad, 0x2c, 0x80, 0x59, 0x44, 0x6d, 0xcf, 0x0c, 0xeb, 0x24, 0x74, 0x68, 0xa7, 0xcb, 0xa8};
-    barr iv_used = {0x39, 0x37, 0xb9, 0x5d, 0x63, 0xf4, 0x15, 0x45, 0xb2, 0x3a, 0xe8, 0xfe};
-    barr client_decrypted;
-    client_decrypted.resize(100);
+barr decrypt(WorkingKeys wk, barr enc_input, barr ad_input, barr iv_input, size_t decrypted_len)
+{
+#ifdef TLS_ATTACK_DETERMINISTIC
+    ad_input = {0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x01, 0x17, 0x03, 0x03, 0x00, 0x12};
+    enc_input = {0x62, 0x47, 0x85, 0xb3, 0x81, 0x32, 0xab, 0x9e, 0x87, 0x56, 0xf8, 0x22, 0x22, 0x38, 0xa4, 0x1b, 0x15, 0xa0, 0x38, 0xad, 0x2c, 0x80, 0x59, 0x44, 0x6d, 0xcf, 0x0c, 0xeb, 0x24, 0x74, 0x68, 0xa7, 0xcb, 0xa8};
+    iv_input = {0x39, 0x37, 0xb9, 0x5d, 0x63, 0xf4, 0x15, 0x45, 0xb2, 0x3a, 0xe8, 0xfe};
+#endif
+
+    mbedtls_cipher_context_t c;
+    mbedtls_cipher_init(&c);
+    mbedtls_cipher_setup(&c, cipher_info);
+    mbedtls_cipher_set_iv(&c, &wk.server_enc_iv.front(), wk.server_enc_iv.size());
+    mbedtls_cipher_setkey(&c, &wk.server_write_key.front(), wk.server_write_key.size()*8, MBEDTLS_ENCRYPT);
+    mbedtls_cipher_setkey(&c, &wk.client_write_key.front(), wk.client_write_key.size()*8, MBEDTLS_DECRYPT);
+
+    barr dec_output;
+    dec_output.resize(decrypted_len);
+    size_t olen;
     mbedtls_cipher_auth_decrypt_ext(&c,
-            &iv_used.front(), iv_used.size(),
-            &client_ad.front(), client_ad.size(),
-            &client_encrypted.front(), client_encrypted.size(),
-            &client_decrypted.front(), client_decrypted.size(),
+            &iv_input.front(), iv_input.size(),
+            &ad_input.front(), ad_input.size(),
+            &enc_input.front(), enc_input.size(),
+            &dec_output.front(), dec_output.size(),
             &olen, 16);
+#ifdef TLS_ATTACK_DETERMINISTIC
     std::cout << "Client decrypted: ";
-    print_barr(client_decrypted);
+    print_barr(dec_output);
+    std::cout << std::endl;
+#endif
+    return dec_output;
+}
+
+void print_cipher_info()
+{
+    std::cout << std::dec << "Used cipher: ";
+    std::cout << "\n\tname: " << cipher_info->name;
+    std::cout << "\n\tkeylen: " << cipher_info->key_bitlen;
+    std::cout << "\n\tiv-size: " << cipher_info->iv_size;
     std::cout << std::endl;
 }
 
 int main()
 {
+    print_cipher_info();
     barr pre_master_secret = expect_premaster;
     barr server_hello_random;
     barr client_hello_random;
@@ -199,6 +228,7 @@ int main()
     random_.insert(random_.end(), server_hello_random.begin(), server_hello_random.end());
     auto working_keys = generate_working_keys(master_secret, random_);
     working_keys.print();
-    encrypt(working_keys);
+    encrypt(working_keys, {}, {});
+    decrypt(working_keys, {}, {}, {}, 39);
     return 0;
 }
