@@ -126,7 +126,7 @@ barr encrypt(WorkingKeys wk, barr data, barr add_data) {
     mbedtls_cipher_setup(&c, cipher_info);
     mbedtls_cipher_set_iv(&c, &wk.server_enc_iv.front(), wk.server_enc_iv.size());
     mbedtls_cipher_setkey(&c, &wk.server_write_key.front(), wk.server_write_key.size()*8, MBEDTLS_ENCRYPT);
-    mbedtls_cipher_setkey(&c, &wk.client_write_key.front(), wk.client_write_key.size()*8, MBEDTLS_DECRYPT);
+    // mbedtls_cipher_setkey(&c, &wk.client_write_key.front(), wk.client_write_key.size()*8, MBEDTLS_DECRYPT);
 
     barr output;
     output.resize(data.size() + taglen);
@@ -157,7 +157,7 @@ barr decrypt(WorkingKeys wk, barr enc_input, barr ad_input, barr iv_input, size_
     mbedtls_cipher_init(&c);
     mbedtls_cipher_setup(&c, cipher_info);
     mbedtls_cipher_set_iv(&c, &wk.server_enc_iv.front(), wk.server_enc_iv.size());
-    mbedtls_cipher_setkey(&c, &wk.server_write_key.front(), wk.server_write_key.size()*8, MBEDTLS_ENCRYPT);
+    // mbedtls_cipher_setkey(&c, &wk.server_write_key.front(), wk.server_write_key.size()*8, MBEDTLS_ENCRYPT);
     mbedtls_cipher_setkey(&c, &wk.client_write_key.front(), wk.client_write_key.size()*8, MBEDTLS_DECRYPT);
 
     barr dec_output;
