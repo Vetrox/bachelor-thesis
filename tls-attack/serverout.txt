@@ -1,0 +1,1025 @@
+  . Seeding the random number generator... ok
+
+  . Loading the server cert. and key... ok
+  . Bind on https://localhost:4433/ ... ok
+  . Setting up the SSL data..../repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_tls.c:1317: The SSL configuration is tls12 only.
+ ok
+  . Waiting for a remote connection ... ok
+  . Performing the SSL/TLS handshake.../repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_tls.c:3939: => handshake
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_msg.c:2124: => flush output
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_msg.c:2133: <= flush output
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_tls12_server.c:4228: server state: 0
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_msg.c:2124: => flush output
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_msg.c:2133: <= flush output
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_tls12_server.c:4228: server state: 1
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_tls12_server.c:0914: => parse client hello
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_msg.c:1926: => fetch input
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_msg.c:2066: in_left: 0, nb_want: 5
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_msg.c:2086: in_left: 0, nb_want: 5
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_msg.c:2089: ssl->f_recv(_timeout)() returned 5 (-0xfffffffb)
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_msg.c:2111: <= fetch input
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_tls12_server.c:0940: dumping 'record header' (5 bytes)
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_tls12_server.c:0940: 0000:  16 03 03 01 49                                   ....I
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_tls12_server.c:0951: client hello, message type: 22
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_tls12_server.c:0959: client hello, message len.: 329
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_tls12_server.c:0962: client hello, protocol version: [3:3]
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_msg.c:1926: => fetch input
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_msg.c:2066: in_left: 5, nb_want: 334
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_msg.c:2086: in_left: 5, nb_want: 334
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_msg.c:2089: ssl->f_recv(_timeout)() returned 329 (-0xfffffeb7)
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_msg.c:2111: <= fetch input
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_tls12_server.c:1027: dumping 'record contents' (329 bytes)
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_tls12_server.c:1027: 0000:  01 00 01 45 03 03 64 71 e3 ff e1 d8 ad 18 30 ac  ...E..dq......0.
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_tls12_server.c:1027: 0010:  5e 9c 0d b3 b3 90 73 63 f1 8e 37 06 46 8a 0f 78  ^.....sc..7.F..x
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_tls12_server.c:1027: 0020:  36 42 f5 ab ef e5 00 00 d0 cc a8 cc a9 cc aa c0  6B..............
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_tls12_server.c:1027: 0030:  2c c0 30 00 9f c0 ad c0 9f c0 24 c0 28 00 6b c0  ,.0.......$.(.k.
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_tls12_server.c:1027: 0040:  0a c0 14 00 39 c0 af c0 a3 c0 87 c0 8b c0 7d c0  ....9.........}.
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_tls12_server.c:1027: 0050:  73 c0 77 00 c4 00 88 c0 5d c0 61 c0 53 c0 49 c0  s.w.....].a.S.I.
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_tls12_server.c:1027: 0060:  4d c0 45 c0 2b c0 2f 00 9e c0 ac c0 9e c0 23 c0  M.E.+./.......#.
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_tls12_server.c:1027: 0070:  27 00 67 c0 09 c0 13 00 33 c0 ae c0 a2 c0 86 c0  '.g.....3.......
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_tls12_server.c:1027: 0080:  8a c0 7c c0 72 c0 76 00 be 00 45 c0 5c c0 60 c0  ..|.r.v...E.\.`.
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_tls12_server.c:1027: 0090:  52 c0 48 c0 4c c0 44 00 9d c0 9d 00 3d 00 35 c0  R.H.L.D.....=.5.
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_tls12_server.c:1027: 00a0:  32 c0 2a c0 0f c0 2e c0 26 c0 05 c0 a1 c0 7b 00  2.*.....&.....{.
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_tls12_server.c:1027: 00b0:  c0 00 84 c0 8d c0 79 c0 89 c0 75 c0 5f c0 63 c0  ......y...u._.c.
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_tls12_server.c:1027: 00c0:  51 c0 4b c0 4f c0 3d 00 9c c0 9c 00 3c 00 2f c0  Q.K.O.=.....<./.
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_tls12_server.c:1027: 00d0:  31 c0 29 c0 0e c0 2d c0 25 c0 04 c0 a0 c0 7a 00  1.)...-.%.....z.
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_tls12_server.c:1027: 00e0:  ba 00 41 c0 8c c0 78 c0 88 c0 74 c0 5e c0 62 c0  ..A...x...t.^.b.
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_tls12_server.c:1027: 00f0:  50 c0 4a c0 4e c0 3c 00 ff 01 00 00 4c 00 00 00  P.J.N.<.....L...
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_tls12_server.c:1027: 0100:  0e 00 0c 00 00 09 6c 6f 63 61 6c 68 6f 73 74 00  ......localhost.
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_tls12_server.c:1027: 0110:  0a 00 12 00 10 00 1d 00 17 00 18 00 1e 00 19 00  ................
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_tls12_server.c:1027: 0120:  1a 00 1b 00 1c 00 0d 00 0e 00 0c 06 03 06 01 05  ................
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_tls12_server.c:1027: 0130:  03 05 01 04 03 04 01 00 0b 00 02 01 00 00 16 00  ................
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_tls12_server.c:1027: 0140:  00 00 17 00 00 00 23 00 00                       ......#..
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_tls12_server.c:1048: client hello v3, handshake type: 1
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_tls12_server.c:1056: client hello v3, handshake len.: 325
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_tls12_server.c:1158: dumping 'client hello, version' (2 bytes)
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_tls12_server.c:1158: 0000:  03 03                                            ..
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_tls12_server.c:1173: dumping 'client hello, random bytes' (32 bytes)
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_tls12_server.c:1173: 0000:  64 71 e3 ff e1 d8 ad 18 30 ac 5e 9c 0d b3 b3 90  dq......0.^.....
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_tls12_server.c:1173: 0010:  73 63 f1 8e 37 06 46 8a 0f 78 36 42 f5 ab ef e5  sc..7.F..x6B....
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_tls12_server.c:1190: dumping 'client hello, session id' (0 bytes)
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_tls12_server.c:1264: dumping 'client hello, ciphersuitelist' (208 bytes)
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_tls12_server.c:1264: 0000:  cc a8 cc a9 cc aa c0 2c c0 30 00 9f c0 ad c0 9f  .......,.0......
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_tls12_server.c:1264: 0010:  c0 24 c0 28 00 6b c0 0a c0 14 00 39 c0 af c0 a3  .$.(.k.....9....
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_tls12_server.c:1264: 0020:  c0 87 c0 8b c0 7d c0 73 c0 77 00 c4 00 88 c0 5d  .....}.s.w.....]
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_tls12_server.c:1264: 0030:  c0 61 c0 53 c0 49 c0 4d c0 45 c0 2b c0 2f 00 9e  .a.S.I.M.E.+./..
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_tls12_server.c:1264: 0040:  c0 ac c0 9e c0 23 c0 27 00 67 c0 09 c0 13 00 33  .....#.'.g.....3
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_tls12_server.c:1264: 0050:  c0 ae c0 a2 c0 86 c0 8a c0 7c c0 72 c0 76 00 be  .........|.r.v..
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_tls12_server.c:1264: 0060:  00 45 c0 5c c0 60 c0 52 c0 48 c0 4c c0 44 00 9d  .E.\.`.R.H.L.D..
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_tls12_server.c:1264: 0070:  c0 9d 00 3d 00 35 c0 32 c0 2a c0 0f c0 2e c0 26  ...=.5.2.*.....&
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_tls12_server.c:1264: 0080:  c0 05 c0 a1 c0 7b 00 c0 00 84 c0 8d c0 79 c0 89  .....{.......y..
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_tls12_server.c:1264: 0090:  c0 75 c0 5f c0 63 c0 51 c0 4b c0 4f c0 3d 00 9c  .u._.c.Q.K.O.=..
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_tls12_server.c:1264: 00a0:  c0 9c 00 3c 00 2f c0 31 c0 29 c0 0e c0 2d c0 25  ...<./.1.)...-.%
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_tls12_server.c:1264: 00b0:  c0 04 c0 a0 c0 7a 00 ba 00 41 c0 8c c0 78 c0 88  .....z...A...x..
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_tls12_server.c:1264: 00c0:  c0 74 c0 5e c0 62 c0 50 c0 4a c0 4e c0 3c 00 ff  .t.^.b.P.J.N.<..
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_tls12_server.c:1286: dumping 'client hello, compression' (1 bytes)
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_tls12_server.c:1286: 0000:  00                                               .
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_tls12_server.c:1315: dumping 'client hello extensions' (76 bytes)
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_tls12_server.c:1315: 0000:  00 00 00 0e 00 0c 00 00 09 6c 6f 63 61 6c 68 6f  .........localho
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_tls12_server.c:1315: 0010:  73 74 00 0a 00 12 00 10 00 1d 00 17 00 18 00 1e  st..............
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_tls12_server.c:1315: 0020:  00 19 00 1a 00 1b 00 1c 00 0d 00 0e 00 0c 06 03  ................
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_tls12_server.c:1315: 0030:  06 01 05 03 05 01 04 03 04 01 00 0b 00 02 01 00  ................
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_tls12_server.c:1315: 0040:  00 16 00 00 00 17 00 00 00 23 00 00              .........#..
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_tls12_server.c:1338: found ServerName extension
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_tls.c:9483: parse ServerName extension
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_tls12_server.c:1375: found supported elliptic curves extension
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_tls12_server.c:1361: found signature_algorithms extension
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_tls.c:5983: received signature algorithm: 0x603 ecdsa_secp521r1_sha512
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_tls.c:5994: valid signature algorithm: ecdsa_secp521r1_sha512
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_tls.c:5983: received signature algorithm: 0x601 rsa_pkcs1_sha512
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_tls.c:5994: valid signature algorithm: rsa_pkcs1_sha512
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_tls.c:5983: received signature algorithm: 0x503 ecdsa_secp384r1_sha384
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_tls.c:5994: valid signature algorithm: ecdsa_secp384r1_sha384
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_tls.c:5983: received signature algorithm: 0x501 rsa_pkcs1_sha384
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_tls.c:5994: valid signature algorithm: rsa_pkcs1_sha384
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_tls.c:5983: received signature algorithm: 0x403 ecdsa_secp256r1_sha256
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_tls.c:5994: valid signature algorithm: ecdsa_secp256r1_sha256
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_tls.c:5983: received signature algorithm: 0x401 rsa_pkcs1_sha256
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_tls.c:5994: valid signature algorithm: rsa_pkcs1_sha256
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_tls12_server.c:1384: found supported point formats extension
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_tls12_server.c:0279: point format selected: 0
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_tls12_server.c:1430: found encrypt then mac extension
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_tls12_server.c:1441: found extended master secret extension
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_tls12_server.c:1452: found session ticket extension
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_tls12_server.c:1527: received TLS_EMPTY_RENEGOTIATION_INFO 
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_tls12_server.c:0814: trying ciphersuite: 0xcca9 (TLS-ECDHE-ECDSA-WITH-CHACHA20-POLY1305-SHA256)
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_tls12_server.c:0723: ciphersuite requires certificate
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_tls12_server.c:0732: candidate certificate chain, certificate #1:
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_tls12_server.c:0732: cert. version     : 3
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_tls12_server.c:0732: serial number     : 1E:92:2E:91:81:7B:9E:3B:02:49:D4:A0:4F:47:66:96:3E:C4:01:43
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_tls12_server.c:0732: issuer name       : C=DE, ST=UMR-Land, L=Marburg, O=Uni-Marburg, OU=FB12, CN=Test-Server, emailAddress=abc@example.com
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_tls12_server.c:0732: subject name      : C=DE, ST=UMR-Land, L=Marburg, O=Uni-Marburg, OU=FB12, CN=Test-Server, emailAddress=abc@example.com
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_tls12_server.c:0732: issued  on        : 2023-05-12 08:38:10
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_tls12_server.c:0732: expires on        : 2050-09-26 08:38:10
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_tls12_server.c:0732: signed using      : RSA with SHA-512
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_tls12_server.c:0732: RSA key size      : 4096 bits
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_tls12_server.c:0732: basic constraints : CA=true
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_tls12_server.c:0732: value of 'crt->rsa.N' (4096 bits) is:
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_tls12_server.c:0732:  bd ed 1a 76 68 a2 40 f7 23 e0 23 5c 6e 12 29 7b
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_tls12_server.c:0732:  c6 52 52 3c e1 94 13 52 06 41 55 a6 c7 56 3e 18
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_tls12_server.c:0732:  83 b0 6d 72 9f 4f e6 cd 35 a2 c5 00 6c ac 11 60
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_tls12_server.c:0732:  9b 14 a8 66 9e aa 50 ee 35 2a 2c 4a ed 4a 27 8d
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_tls12_server.c:0732:  94 bf 49 da c5 d3 32 86 88 df f4 cf df 73 de 1b
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_tls12_server.c:0732:  ba 7d a9 09 38 1c a3 59 ab a0 81 3e d5 64 32 f8
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_tls12_server.c:0732:  f2 f2 05 e1 2c 9e e3 e6 28 78 f0 5e c9 75 b8 fc
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_tls12_server.c:0732:  4c a9 7c fe de 00 86 da a8 fb c0 61 26 0d 10 35
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_tls12_server.c:0732:  7f 7c 19 95 ee 50 2b a2 19 25 80 63 27 3b 0a c9
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_tls12_server.c:0732:  76 40 e4 a4 4a 6e 9d 52 06 60 a9 d5 6b 94 cb f5
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_tls12_server.c:0732:  06 13 6d 56 be a3 63 fd f6 b8 53 b6 b8 a9 cf da
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_tls12_server.c:0732:  79 34 bb d7 f3 6b a8 52 c7 99 e8 26 34 6d 11 92
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_tls12_server.c:0732:  cb 9c 72 22 88 5e 00 ba a9 40 7b 4c 56 f0 45 14
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_tls12_server.c:0732:  9d 14 7c 19 46 7d 51 21 b3 4c a9 cd d5 4d 40 c8
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_tls12_server.c:0732:  4a cc 33 9f 7f 7f d2 bb d7 63 18 6f de bb 0f d7
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_tls12_server.c:0732:  3b 7a 4e 23 1f 4e a4 a4 ed cb ef 1c 1e bd 79 b0
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_tls12_server.c:0732:  a6 6c 69 d9 36 30 5c 87 03 32 0b 24 d5 b5 31 ec
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_tls12_server.c:0732:  1b 78 44 c9 27 f2 19 db 20 17 f1 e0 41 63 b4 84
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_tls12_server.c:0732:  e4 04 50 09 ce d1 8e 61 68 35 a6 59 0b ce 53 f3
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_tls12_server.c:0732:  06 7f 6f 6a 89 a7 d6 ce 3d 8a 4e 35 09 b4 52 ed
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_tls12_server.c:0732:  e7 99 4f ca 2d 15 b7 7f d6 25 ad 9d e9 88 fb 51
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_tls12_server.c:0732:  a1 de 0f 89 7b 01 de 37 9a 25 55 32 8c 7f 8d 93
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_tls12_server.c:0732:  94 e3 20 e9 8f 45 19 b3 3e 61 1d 18 04 65 47 9c
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_tls12_server.c:0732:  1d 40 e2 70 3b a9 49 77 a7 79 ba b6 c0 cc 8b 52
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_tls12_server.c:0732:  f0 df 5c c5 d9 b7 02 0e 52 06 b3 2b 52 b1 b0 27
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_tls12_server.c:0732:  39 a8 c6 5c 52 aa 70 d5 51 0e 79 4f d0 8a a2 c1
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_tls12_server.c:0732:  be 7c 79 ac 1e 05 6d 16 e4 05 d3 51 42 23 04 54
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_tls12_server.c:0732:  74 49 97 2c a0 de 06 ad 66 f1 3d 0b 64 ce 14 c0
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_tls12_server.c:0732:  3b 78 15 30 b5 63 a8 07 60 68 65 c5 74 64 7b 48
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_tls12_server.c:0732:  bc 8c 69 ba 4b 6f df f7 73 b5 24 21 c5 58 a8 d8
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_tls12_server.c:0732:  e0 5f 38 6d de b9 57 dc 46 29 ed bd 79 c8 e3 1c
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_tls12_server.c:0732:  47 3b 1b 30 5b 68 14 33 71 f2 20 53 fa 25 4c 8d
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_tls12_server.c:0732: value of 'crt->rsa.E' (17 bits) is:
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_tls12_server.c:0732:  01 00 01
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_tls12_server.c:0750: certificate mismatch: key type
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_tls12_server.c:0862: ciphersuite mismatch: no suitable certificate
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_tls12_server.c:0814: trying ciphersuite: 0xccaa (TLS-DHE-RSA-WITH-CHACHA20-POLY1305-SHA256)
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_tls12_server.c:0723: ciphersuite requires certificate
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_tls12_server.c:0732: candidate certificate chain, certificate #1:
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_tls12_server.c:0732: cert. version     : 3
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_tls12_server.c:0732: serial number     : 1E:92:2E:91:81:7B:9E:3B:02:49:D4:A0:4F:47:66:96:3E:C4:01:43
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_tls12_server.c:0732: issuer name       : C=DE, ST=UMR-Land, L=Marburg, O=Uni-Marburg, OU=FB12, CN=Test-Server, emailAddress=abc@example.com
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_tls12_server.c:0732: subject name      : C=DE, ST=UMR-Land, L=Marburg, O=Uni-Marburg, OU=FB12, CN=Test-Server, emailAddress=abc@example.com
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_tls12_server.c:0732: issued  on        : 2023-05-12 08:38:10
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_tls12_server.c:0732: expires on        : 2050-09-26 08:38:10
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_tls12_server.c:0732: signed using      : RSA with SHA-512
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_tls12_server.c:0732: RSA key size      : 4096 bits
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_tls12_server.c:0732: basic constraints : CA=true
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_tls12_server.c:0732: value of 'crt->rsa.N' (4096 bits) is:
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_tls12_server.c:0732:  bd ed 1a 76 68 a2 40 f7 23 e0 23 5c 6e 12 29 7b
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_tls12_server.c:0732:  c6 52 52 3c e1 94 13 52 06 41 55 a6 c7 56 3e 18
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_tls12_server.c:0732:  83 b0 6d 72 9f 4f e6 cd 35 a2 c5 00 6c ac 11 60
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_tls12_server.c:0732:  9b 14 a8 66 9e aa 50 ee 35 2a 2c 4a ed 4a 27 8d
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_tls12_server.c:0732:  94 bf 49 da c5 d3 32 86 88 df f4 cf df 73 de 1b
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_tls12_server.c:0732:  ba 7d a9 09 38 1c a3 59 ab a0 81 3e d5 64 32 f8
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_tls12_server.c:0732:  f2 f2 05 e1 2c 9e e3 e6 28 78 f0 5e c9 75 b8 fc
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_tls12_server.c:0732:  4c a9 7c fe de 00 86 da a8 fb c0 61 26 0d 10 35
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_tls12_server.c:0732:  7f 7c 19 95 ee 50 2b a2 19 25 80 63 27 3b 0a c9
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_tls12_server.c:0732:  76 40 e4 a4 4a 6e 9d 52 06 60 a9 d5 6b 94 cb f5
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_tls12_server.c:0732:  06 13 6d 56 be a3 63 fd f6 b8 53 b6 b8 a9 cf da
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_tls12_server.c:0732:  79 34 bb d7 f3 6b a8 52 c7 99 e8 26 34 6d 11 92
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_tls12_server.c:0732:  cb 9c 72 22 88 5e 00 ba a9 40 7b 4c 56 f0 45 14
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_tls12_server.c:0732:  9d 14 7c 19 46 7d 51 21 b3 4c a9 cd d5 4d 40 c8
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_tls12_server.c:0732:  4a cc 33 9f 7f 7f d2 bb d7 63 18 6f de bb 0f d7
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_tls12_server.c:0732:  3b 7a 4e 23 1f 4e a4 a4 ed cb ef 1c 1e bd 79 b0
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_tls12_server.c:0732:  a6 6c 69 d9 36 30 5c 87 03 32 0b 24 d5 b5 31 ec
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_tls12_server.c:0732:  1b 78 44 c9 27 f2 19 db 20 17 f1 e0 41 63 b4 84
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_tls12_server.c:0732:  e4 04 50 09 ce d1 8e 61 68 35 a6 59 0b ce 53 f3
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_tls12_server.c:0732:  06 7f 6f 6a 89 a7 d6 ce 3d 8a 4e 35 09 b4 52 ed
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_tls12_server.c:0732:  e7 99 4f ca 2d 15 b7 7f d6 25 ad 9d e9 88 fb 51
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_tls12_server.c:0732:  a1 de 0f 89 7b 01 de 37 9a 25 55 32 8c 7f 8d 93
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_tls12_server.c:0732:  94 e3 20 e9 8f 45 19 b3 3e 61 1d 18 04 65 47 9c
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_tls12_server.c:0732:  1d 40 e2 70 3b a9 49 77 a7 79 ba b6 c0 cc 8b 52
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_tls12_server.c:0732:  f0 df 5c c5 d9 b7 02 0e 52 06 b3 2b 52 b1 b0 27
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_tls12_server.c:0732:  39 a8 c6 5c 52 aa 70 d5 51 0e 79 4f d0 8a a2 c1
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_tls12_server.c:0732:  be 7c 79 ac 1e 05 6d 16 e4 05 d3 51 42 23 04 54
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_tls12_server.c:0732:  74 49 97 2c a0 de 06 ad 66 f1 3d 0b 64 ce 14 c0
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_tls12_server.c:0732:  3b 78 15 30 b5 63 a8 07 60 68 65 c5 74 64 7b 48
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_tls12_server.c:0732:  bc 8c 69 ba 4b 6f df f7 73 b5 24 21 c5 58 a8 d8
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_tls12_server.c:0732:  e0 5f 38 6d de b9 57 dc 46 29 ed bd 79 c8 e3 1c
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_tls12_server.c:0732:  47 3b 1b 30 5b 68 14 33 71 f2 20 53 fa 25 4c 8d
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_tls12_server.c:0732: value of 'crt->rsa.E' (17 bits) is:
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_tls12_server.c:0732:  01 00 01
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_tls12_server.c:0785: selected certificate chain, certificate #1:
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_tls12_server.c:0785: cert. version     : 3
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_tls12_server.c:0785: serial number     : 1E:92:2E:91:81:7B:9E:3B:02:49:D4:A0:4F:47:66:96:3E:C4:01:43
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_tls12_server.c:0785: issuer name       : C=DE, ST=UMR-Land, L=Marburg, O=Uni-Marburg, OU=FB12, CN=Test-Server, emailAddress=abc@example.com
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_tls12_server.c:0785: subject name      : C=DE, ST=UMR-Land, L=Marburg, O=Uni-Marburg, OU=FB12, CN=Test-Server, emailAddress=abc@example.com
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_tls12_server.c:0785: issued  on        : 2023-05-12 08:38:10
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_tls12_server.c:0785: expires on        : 2050-09-26 08:38:10
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_tls12_server.c:0785: signed using      : RSA with SHA-512
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_tls12_server.c:0785: RSA key size      : 4096 bits
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_tls12_server.c:0785: basic constraints : CA=true
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_tls12_server.c:0785: value of 'crt->rsa.N' (4096 bits) is:
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_tls12_server.c:0785:  bd ed 1a 76 68 a2 40 f7 23 e0 23 5c 6e 12 29 7b
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_tls12_server.c:0785:  c6 52 52 3c e1 94 13 52 06 41 55 a6 c7 56 3e 18
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_tls12_server.c:0785:  83 b0 6d 72 9f 4f e6 cd 35 a2 c5 00 6c ac 11 60
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_tls12_server.c:0785:  9b 14 a8 66 9e aa 50 ee 35 2a 2c 4a ed 4a 27 8d
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_tls12_server.c:0785:  94 bf 49 da c5 d3 32 86 88 df f4 cf df 73 de 1b
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_tls12_server.c:0785:  ba 7d a9 09 38 1c a3 59 ab a0 81 3e d5 64 32 f8
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_tls12_server.c:0785:  f2 f2 05 e1 2c 9e e3 e6 28 78 f0 5e c9 75 b8 fc
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_tls12_server.c:0785:  4c a9 7c fe de 00 86 da a8 fb c0 61 26 0d 10 35
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_tls12_server.c:0785:  7f 7c 19 95 ee 50 2b a2 19 25 80 63 27 3b 0a c9
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_tls12_server.c:0785:  76 40 e4 a4 4a 6e 9d 52 06 60 a9 d5 6b 94 cb f5
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_tls12_server.c:0785:  06 13 6d 56 be a3 63 fd f6 b8 53 b6 b8 a9 cf da
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_tls12_server.c:0785:  79 34 bb d7 f3 6b a8 52 c7 99 e8 26 34 6d 11 92
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_tls12_server.c:0785:  cb 9c 72 22 88 5e 00 ba a9 40 7b 4c 56 f0 45 14
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_tls12_server.c:0785:  9d 14 7c 19 46 7d 51 21 b3 4c a9 cd d5 4d 40 c8
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_tls12_server.c:0785:  4a cc 33 9f 7f 7f d2 bb d7 63 18 6f de bb 0f d7
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_tls12_server.c:0785:  3b 7a 4e 23 1f 4e a4 a4 ed cb ef 1c 1e bd 79 b0
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_tls12_server.c:0785:  a6 6c 69 d9 36 30 5c 87 03 32 0b 24 d5 b5 31 ec
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_tls12_server.c:0785:  1b 78 44 c9 27 f2 19 db 20 17 f1 e0 41 63 b4 84
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_tls12_server.c:0785:  e4 04 50 09 ce d1 8e 61 68 35 a6 59 0b ce 53 f3
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_tls12_server.c:0785:  06 7f 6f 6a 89 a7 d6 ce 3d 8a 4e 35 09 b4 52 ed
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_tls12_server.c:0785:  e7 99 4f ca 2d 15 b7 7f d6 25 ad 9d e9 88 fb 51
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_tls12_server.c:0785:  a1 de 0f 89 7b 01 de 37 9a 25 55 32 8c 7f 8d 93
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_tls12_server.c:0785:  94 e3 20 e9 8f 45 19 b3 3e 61 1d 18 04 65 47 9c
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_tls12_server.c:0785:  1d 40 e2 70 3b a9 49 77 a7 79 ba b6 c0 cc 8b 52
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_tls12_server.c:0785:  f0 df 5c c5 d9 b7 02 0e 52 06 b3 2b 52 b1 b0 27
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_tls12_server.c:0785:  39 a8 c6 5c 52 aa 70 d5 51 0e 79 4f d0 8a a2 c1
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_tls12_server.c:0785:  be 7c 79 ac 1e 05 6d 16 e4 05 d3 51 42 23 04 54
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_tls12_server.c:0785:  74 49 97 2c a0 de 06 ad 66 f1 3d 0b 64 ce 14 c0
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_tls12_server.c:0785:  3b 78 15 30 b5 63 a8 07 60 68 65 c5 74 64 7b 48
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_tls12_server.c:0785:  bc 8c 69 ba 4b 6f df f7 73 b5 24 21 c5 58 a8 d8
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_tls12_server.c:0785:  e0 5f 38 6d de b9 57 dc 46 29 ed bd 79 c8 e3 1c
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_tls12_server.c:0785:  47 3b 1b 30 5b 68 14 33 71 f2 20 53 fa 25 4c 8d
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_tls12_server.c:0785: value of 'crt->rsa.E' (17 bits) is:
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_tls12_server.c:0785:  01 00 01
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_tls12_server.c:1651: selected ciphersuite: TLS-DHE-RSA-WITH-CHACHA20-POLY1305-SHA256
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_tls12_server.c:1671: client hello v3, signature_algorithm ext: 6
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_tls12_server.c:1679: <= parse client hello
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_msg.c:2124: => flush output
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_msg.c:2133: <= flush output
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_tls12_server.c:4228: server state: 2
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_tls12_server.c:2163: => write server hello
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_tls12_server.c:2193: server hello, chosen version: [3:3]
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_tls12_server.c:2201: server hello, current time: 1685185535
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_tls12_server.c:2219: dumping 'server hello, random bytes' (32 bytes)
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_tls12_server.c:2219: 0000:  64 71 e3 ff 1a 1a 1a 1a 1a 1a 1a 1a 1a 1a 1a 1a  dq..............
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_tls12_server.c:2219: 0010:  1a 1a 1a 1a 1a 1a 1a 1a 1a 1a 1a 1a 1a 1a 1a 1a  ................
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_tls12_server.c:2272: server hello, session id len.: 32
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_tls12_server.c:2273: dumping 'server hello, session id' (32 bytes)
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_tls12_server.c:2273: 0000:  1a 1a 1a 1a 1a 1a 1a 1a 1a 1a 1a 1a 1a 1a 1a 1a  ................
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_tls12_server.c:2273: 0010:  1a 1a 1a 1a 1a 1a 1a 1a 1a 1a 1a 1a 1a 1a 1a 1a  ................
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_tls12_server.c:2274: no session has been resumed
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_tls12_server.c:2281: server hello, chosen ciphersuite: TLS-DHE-RSA-WITH-CHACHA20-POLY1305-SHA256
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_tls12_server.c:2283: server hello, compress alg.: 0x00
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_tls12_server.c:1834: server hello, secure renegotiation extension
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_tls12_server.c:1786: server hello, adding extended master secret extension
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_tls12_server.c:2347: server hello, total extension length: 9
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_msg.c:2554: => write handshake message
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_msg.c:2714: => write record
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_msg.c:2798: output record: msgtype = 22, version = [3:3], msglen = 85
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_msg.c:2803: dumping 'output record sent to network' (90 bytes)
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_msg.c:2803: 0000:  16 03 03 00 55 02 00 00 51 03 03 64 71 e3 ff 1a  ....U...Q..dq...
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_msg.c:2803: 0010:  1a 1a 1a 1a 1a 1a 1a 1a 1a 1a 1a 1a 1a 1a 1a 1a  ................
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_msg.c:2803: 0020:  1a 1a 1a 1a 1a 1a 1a 1a 1a 1a 1a 20 1a 1a 1a 1a  ........... ....
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_msg.c:2803: 0030:  1a 1a 1a 1a 1a 1a 1a 1a 1a 1a 1a 1a 1a 1a 1a 1a  ................
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_msg.c:2803: 0040:  1a 1a 1a 1a 1a 1a 1a 1a 1a 1a 1a 1a cc aa 00 00  ................
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_msg.c:2803: 0050:  09 ff 01 00 01 00 00 17 00 00                    ..........
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_msg.c:2124: => flush output
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_msg.c:2138: message length: 90, out_left: 90
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_msg.c:2145: ssl->f_send() returned 90 (-0xffffffa6)
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_msg.c:2172: <= flush output
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_msg.c:2851: <= write record
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_msg.c:2675: <= write handshake message
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_tls12_server.c:2361: <= write server hello
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_msg.c:2124: => flush output
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_msg.c:2133: <= flush output
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_tls12_server.c:4228: server state: 3
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_tls.c:6963: => write certificate
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_tls.c:6990: own certificate #1:
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_tls.c:6990: cert. version     : 3
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_tls.c:6990: serial number     : 1E:92:2E:91:81:7B:9E:3B:02:49:D4:A0:4F:47:66:96:3E:C4:01:43
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_tls.c:6990: issuer name       : C=DE, ST=UMR-Land, L=Marburg, O=Uni-Marburg, OU=FB12, CN=Test-Server, emailAddress=abc@example.com
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_tls.c:6990: subject name      : C=DE, ST=UMR-Land, L=Marburg, O=Uni-Marburg, OU=FB12, CN=Test-Server, emailAddress=abc@example.com
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_tls.c:6990: issued  on        : 2023-05-12 08:38:10
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_tls.c:6990: expires on        : 2050-09-26 08:38:10
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_tls.c:6990: signed using      : RSA with SHA-512
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_tls.c:6990: RSA key size      : 4096 bits
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_tls.c:6990: basic constraints : CA=true
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_tls.c:6990: value of 'crt->rsa.N' (4096 bits) is:
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_tls.c:6990:  bd ed 1a 76 68 a2 40 f7 23 e0 23 5c 6e 12 29 7b
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_tls.c:6990:  c6 52 52 3c e1 94 13 52 06 41 55 a6 c7 56 3e 18
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_tls.c:6990:  83 b0 6d 72 9f 4f e6 cd 35 a2 c5 00 6c ac 11 60
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_tls.c:6990:  9b 14 a8 66 9e aa 50 ee 35 2a 2c 4a ed 4a 27 8d
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_tls.c:6990:  94 bf 49 da c5 d3 32 86 88 df f4 cf df 73 de 1b
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_tls.c:6990:  ba 7d a9 09 38 1c a3 59 ab a0 81 3e d5 64 32 f8
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_tls.c:6990:  f2 f2 05 e1 2c 9e e3 e6 28 78 f0 5e c9 75 b8 fc
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_tls.c:6990:  4c a9 7c fe de 00 86 da a8 fb c0 61 26 0d 10 35
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_tls.c:6990:  7f 7c 19 95 ee 50 2b a2 19 25 80 63 27 3b 0a c9
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_tls.c:6990:  76 40 e4 a4 4a 6e 9d 52 06 60 a9 d5 6b 94 cb f5
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_tls.c:6990:  06 13 6d 56 be a3 63 fd f6 b8 53 b6 b8 a9 cf da
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_tls.c:6990:  79 34 bb d7 f3 6b a8 52 c7 99 e8 26 34 6d 11 92
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_tls.c:6990:  cb 9c 72 22 88 5e 00 ba a9 40 7b 4c 56 f0 45 14
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_tls.c:6990:  9d 14 7c 19 46 7d 51 21 b3 4c a9 cd d5 4d 40 c8
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_tls.c:6990:  4a cc 33 9f 7f 7f d2 bb d7 63 18 6f de bb 0f d7
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_tls.c:6990:  3b 7a 4e 23 1f 4e a4 a4 ed cb ef 1c 1e bd 79 b0
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_tls.c:6990:  a6 6c 69 d9 36 30 5c 87 03 32 0b 24 d5 b5 31 ec
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_tls.c:6990:  1b 78 44 c9 27 f2 19 db 20 17 f1 e0 41 63 b4 84
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_tls.c:6990:  e4 04 50 09 ce d1 8e 61 68 35 a6 59 0b ce 53 f3
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_tls.c:6990:  06 7f 6f 6a 89 a7 d6 ce 3d 8a 4e 35 09 b4 52 ed
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_tls.c:6990:  e7 99 4f ca 2d 15 b7 7f d6 25 ad 9d e9 88 fb 51
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_tls.c:6990:  a1 de 0f 89 7b 01 de 37 9a 25 55 32 8c 7f 8d 93
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_tls.c:6990:  94 e3 20 e9 8f 45 19 b3 3e 61 1d 18 04 65 47 9c
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_tls.c:6990:  1d 40 e2 70 3b a9 49 77 a7 79 ba b6 c0 cc 8b 52
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_tls.c:6990:  f0 df 5c c5 d9 b7 02 0e 52 06 b3 2b 52 b1 b0 27
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_tls.c:6990:  39 a8 c6 5c 52 aa 70 d5 51 0e 79 4f d0 8a a2 c1
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_tls.c:6990:  be 7c 79 ac 1e 05 6d 16 e4 05 d3 51 42 23 04 54
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_tls.c:6990:  74 49 97 2c a0 de 06 ad 66 f1 3d 0b 64 ce 14 c0
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_tls.c:6990:  3b 78 15 30 b5 63 a8 07 60 68 65 c5 74 64 7b 48
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_tls.c:6990:  bc 8c 69 ba 4b 6f df f7 73 b5 24 21 c5 58 a8 d8
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_tls.c:6990:  e0 5f 38 6d de b9 57 dc 46 29 ed bd 79 c8 e3 1c
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_tls.c:6990:  47 3b 1b 30 5b 68 14 33 71 f2 20 53 fa 25 4c 8d
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_tls.c:6990: value of 'crt->rsa.E' (17 bits) is:
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_tls.c:6990:  01 00 01
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_msg.c:2554: => write handshake message
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_msg.c:2714: => write record
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_msg.c:2798: output record: msgtype = 22, version = [3:3], msglen = 1549
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_msg.c:2803: dumping 'output record sent to network' (1554 bytes)
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_msg.c:2803: 0000:  16 03 03 06 0d 0b 00 06 09 00 06 06 00 06 03 30  ...............0
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_msg.c:2803: 0010:  82 05 ff 30 82 03 e7 a0 03 02 01 02 02 14 1e 92  ...0............
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_msg.c:2803: 0020:  2e 91 81 7b 9e 3b 02 49 d4 a0 4f 47 66 96 3e c4  ...{.;.I..OGf.>.
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_msg.c:2803: 0030:  01 43 30 0d 06 09 2a 86 48 86 f7 0d 01 01 0d 05  .C0...*.H.......
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_msg.c:2803: 0040:  00 30 81 8d 31 0b 30 09 06 03 55 04 06 13 02 44  .0..1.0...U....D
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_msg.c:2803: 0050:  45 31 11 30 0f 06 03 55 04 08 0c 08 55 4d 52 2d  E1.0...U....UMR-
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_msg.c:2803: 0060:  4c 61 6e 64 31 10 30 0e 06 03 55 04 07 0c 07 4d  Land1.0...U....M
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_msg.c:2803: 0070:  61 72 62 75 72 67 31 14 30 12 06 03 55 04 0a 0c  arburg1.0...U...
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_msg.c:2803: 0080:  0b 55 6e 69 2d 4d 61 72 62 75 72 67 31 0d 30 0b  .Uni-Marburg1.0.
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_msg.c:2803: 0090:  06 03 55 04 0b 0c 04 46 42 31 32 31 14 30 12 06  ..U....FB121.0..
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_msg.c:2803: 00a0:  03 55 04 03 0c 0b 54 65 73 74 2d 53 65 72 76 65  .U....Test-Serve
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_msg.c:2803: 00b0:  72 31 1e 30 1c 06 09 2a 86 48 86 f7 0d 01 09 01  r1.0...*.H......
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_msg.c:2803: 00c0:  16 0f 61 62 63 40 65 78 61 6d 70 6c 65 2e 63 6f  ..abc@example.co
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_msg.c:2803: 00d0:  6d 30 20 17 0d 32 33 30 35 31 32 30 38 33 38 31  m0 ..23051208381
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_msg.c:2803: 00e0:  30 5a 18 0f 32 30 35 30 30 39 32 36 30 38 33 38  0Z..205009260838
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_msg.c:2803: 00f0:  31 30 5a 30 81 8d 31 0b 30 09 06 03 55 04 06 13  10Z0..1.0...U...
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_msg.c:2803: 0100:  02 44 45 31 11 30 0f 06 03 55 04 08 0c 08 55 4d  .DE1.0...U....UM
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_msg.c:2803: 0110:  52 2d 4c 61 6e 64 31 10 30 0e 06 03 55 04 07 0c  R-Land1.0...U...
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_msg.c:2803: 0120:  07 4d 61 72 62 75 72 67 31 14 30 12 06 03 55 04  .Marburg1.0...U.
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_msg.c:2803: 0130:  0a 0c 0b 55 6e 69 2d 4d 61 72 62 75 72 67 31 0d  ...Uni-Marburg1.
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_msg.c:2803: 0140:  30 0b 06 03 55 04 0b 0c 04 46 42 31 32 31 14 30  0...U....FB121.0
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_msg.c:2803: 0150:  12 06 03 55 04 03 0c 0b 54 65 73 74 2d 53 65 72  ...U....Test-Ser
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_msg.c:2803: 0160:  76 65 72 31 1e 30 1c 06 09 2a 86 48 86 f7 0d 01  ver1.0...*.H....
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_msg.c:2803: 0170:  09 01 16 0f 61 62 63 40 65 78 61 6d 70 6c 65 2e  ....abc@example.
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_msg.c:2803: 0180:  63 6f 6d 30 82 02 22 30 0d 06 09 2a 86 48 86 f7  com0.."0...*.H..
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_msg.c:2803: 0190:  0d 01 01 01 05 00 03 82 02 0f 00 30 82 02 0a 02  ...........0....
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_msg.c:2803: 01a0:  82 02 01 00 bd ed 1a 76 68 a2 40 f7 23 e0 23 5c  .......vh.@.#.#\
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_msg.c:2803: 01b0:  6e 12 29 7b c6 52 52 3c e1 94 13 52 06 41 55 a6  n.){.RR<...R.AU.
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_msg.c:2803: 01c0:  c7 56 3e 18 83 b0 6d 72 9f 4f e6 cd 35 a2 c5 00  .V>...mr.O..5...
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_msg.c:2803: 01d0:  6c ac 11 60 9b 14 a8 66 9e aa 50 ee 35 2a 2c 4a  l..`...f..P.5*,J
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_msg.c:2803: 01e0:  ed 4a 27 8d 94 bf 49 da c5 d3 32 86 88 df f4 cf  .J'...I...2.....
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_msg.c:2803: 01f0:  df 73 de 1b ba 7d a9 09 38 1c a3 59 ab a0 81 3e  .s...}..8..Y...>
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_msg.c:2803: 0200:  d5 64 32 f8 f2 f2 05 e1 2c 9e e3 e6 28 78 f0 5e  .d2.....,...(x.^
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_msg.c:2803: 0210:  c9 75 b8 fc 4c a9 7c fe de 00 86 da a8 fb c0 61  .u..L.|........a
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_msg.c:2803: 0220:  26 0d 10 35 7f 7c 19 95 ee 50 2b a2 19 25 80 63  &..5.|...P+..%.c
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_msg.c:2803: 0230:  27 3b 0a c9 76 40 e4 a4 4a 6e 9d 52 06 60 a9 d5  ';..v@..Jn.R.`..
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_msg.c:2803: 0240:  6b 94 cb f5 06 13 6d 56 be a3 63 fd f6 b8 53 b6  k.....mV..c...S.
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_msg.c:2803: 0250:  b8 a9 cf da 79 34 bb d7 f3 6b a8 52 c7 99 e8 26  ....y4...k.R...&
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_msg.c:2803: 0260:  34 6d 11 92 cb 9c 72 22 88 5e 00 ba a9 40 7b 4c  4m....r".^...@{L
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_msg.c:2803: 0270:  56 f0 45 14 9d 14 7c 19 46 7d 51 21 b3 4c a9 cd  V.E...|.F}Q!.L..
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_msg.c:2803: 0280:  d5 4d 40 c8 4a cc 33 9f 7f 7f d2 bb d7 63 18 6f  .M@.J.3......c.o
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_msg.c:2803: 0290:  de bb 0f d7 3b 7a 4e 23 1f 4e a4 a4 ed cb ef 1c  ....;zN#.N......
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_msg.c:2803: 02a0:  1e bd 79 b0 a6 6c 69 d9 36 30 5c 87 03 32 0b 24  ..y..li.60\..2.$
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_msg.c:2803: 02b0:  d5 b5 31 ec 1b 78 44 c9 27 f2 19 db 20 17 f1 e0  ..1..xD.'... ...
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_msg.c:2803: 02c0:  41 63 b4 84 e4 04 50 09 ce d1 8e 61 68 35 a6 59  Ac....P....ah5.Y
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_msg.c:2803: 02d0:  0b ce 53 f3 06 7f 6f 6a 89 a7 d6 ce 3d 8a 4e 35  ..S...oj....=.N5
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_msg.c:2803: 02e0:  09 b4 52 ed e7 99 4f ca 2d 15 b7 7f d6 25 ad 9d  ..R...O.-....%..
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_msg.c:2803: 02f0:  e9 88 fb 51 a1 de 0f 89 7b 01 de 37 9a 25 55 32  ...Q....{..7.%U2
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_msg.c:2803: 0300:  8c 7f 8d 93 94 e3 20 e9 8f 45 19 b3 3e 61 1d 18  ...... ..E..>a..
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_msg.c:2803: 0310:  04 65 47 9c 1d 40 e2 70 3b a9 49 77 a7 79 ba b6  .eG..@.p;.Iw.y..
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_msg.c:2803: 0320:  c0 cc 8b 52 f0 df 5c c5 d9 b7 02 0e 52 06 b3 2b  ...R..\.....R..+
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_msg.c:2803: 0330:  52 b1 b0 27 39 a8 c6 5c 52 aa 70 d5 51 0e 79 4f  R..'9..\R.p.Q.yO
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_msg.c:2803: 0340:  d0 8a a2 c1 be 7c 79 ac 1e 05 6d 16 e4 05 d3 51  .....|y...m....Q
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_msg.c:2803: 0350:  42 23 04 54 74 49 97 2c a0 de 06 ad 66 f1 3d 0b  B#.TtI.,....f.=.
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_msg.c:2803: 0360:  64 ce 14 c0 3b 78 15 30 b5 63 a8 07 60 68 65 c5  d...;x.0.c..`he.
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_msg.c:2803: 0370:  74 64 7b 48 bc 8c 69 ba 4b 6f df f7 73 b5 24 21  td{H..i.Ko..s.$!
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_msg.c:2803: 0380:  c5 58 a8 d8 e0 5f 38 6d de b9 57 dc 46 29 ed bd  .X..._8m..W.F)..
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_msg.c:2803: 0390:  79 c8 e3 1c 47 3b 1b 30 5b 68 14 33 71 f2 20 53  y...G;.0[h.3q. S
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_msg.c:2803: 03a0:  fa 25 4c 8d 02 03 01 00 01 a3 53 30 51 30 1d 06  .%L.......S0Q0..
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_msg.c:2803: 03b0:  03 55 1d 0e 04 16 04 14 9c 12 f2 38 5a 95 62 8a  .U.........8Z.b.
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_msg.c:2803: 03c0:  4e 27 78 cd f5 19 a0 55 d7 8d 25 09 30 1f 06 03  N'x....U..%.0...
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_msg.c:2803: 03d0:  55 1d 23 04 18 30 16 80 14 9c 12 f2 38 5a 95 62  U.#..0......8Z.b
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_msg.c:2803: 03e0:  8a 4e 27 78 cd f5 19 a0 55 d7 8d 25 09 30 0f 06  .N'x....U..%.0..
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_msg.c:2803: 03f0:  03 55 1d 13 01 01 ff 04 05 30 03 01 01 ff 30 0d  .U.......0....0.
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_msg.c:2803: 0400:  06 09 2a 86 48 86 f7 0d 01 01 0d 05 00 03 82 02  ..*.H...........
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_msg.c:2803: 0410:  01 00 14 c9 a6 ec e6 3f 96 8c b3 21 da 51 c5 8f  .......?...!.Q..
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_msg.c:2803: 0420:  a8 2e a3 ba 1e 76 fe a7 3f e1 65 93 ae a9 eb 77  .....v..?.e....w
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_msg.c:2803: 0430:  57 df b9 0b d7 d8 ff 36 e8 e5 88 5e c2 41 b9 b1  W......6...^.A..
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_msg.c:2803: 0440:  3e 4b 07 9d 25 57 56 3f 37 77 94 19 86 5b bf e0  >K..%WV?7w...[..
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_msg.c:2803: 0450:  5a 6e f2 da 17 2f 24 94 d1 0e cf b7 fd 02 f3 5c  Zn.../$........\
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_msg.c:2803: 0460:  1a 89 ea 47 f8 51 e0 b1 47 d5 3d a3 b3 fd f0 36  ...G.Q..G.=....6
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_msg.c:2803: 0470:  40 25 17 7c d1 ca dd 85 f9 bb 20 6c cb 31 1f e1  @%.|...... l.1..
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_msg.c:2803: 0480:  90 c7 12 45 c6 bf fe da 5d f1 e1 b0 4b f0 f0 e8  ...E....]...K...
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_msg.c:2803: 0490:  95 50 5d 1b 2d 19 c8 52 bd fa 99 4f 79 1c 70 0f  .P].-..R...Oy.p.
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_msg.c:2803: 04a0:  23 30 1a a1 74 2c 90 fd 25 3e 99 90 37 75 89 0c  #0..t,..%>..7u..
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_msg.c:2803: 04b0:  4e b3 12 f4 92 d9 10 d4 ca 5a 6c 95 b4 85 37 7e  N........Zl...7~
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_msg.c:2803: 04c0:  cf 7e ac 7e 05 09 fc 67 96 0b 9e 17 28 23 30 bf  .~.~...g....(#0.
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_msg.c:2803: 04d0:  d0 1d 6f 2c f4 87 c4 42 8d 83 02 e1 d2 bc fd f7  ..o,...B........
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_msg.c:2803: 04e0:  a4 0f 93 fe d9 81 82 9d d4 f8 01 18 f9 21 4d 28  .............!M(
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_msg.c:2803: 04f0:  a9 83 a6 e1 d2 89 ff dd 5a 69 cb 67 e1 a7 bb 64  ........Zi.g...d
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_msg.c:2803: 0500:  50 80 dd db 26 b7 a4 a6 07 f8 a7 65 90 1d 49 8f  P...&......e..I.
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_msg.c:2803: 0510:  64 10 38 be 98 6d b0 19 45 6f 76 6b e9 12 14 ea  d.8..m..Eovk....
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_msg.c:2803: 0520:  e3 ee 91 8a 39 01 e5 7c 2e 5c 84 fd 26 be 97 1f  ....9..|.\..&...
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_msg.c:2803: 0530:  17 21 e8 bb 67 f6 73 74 d5 4d 68 d1 bb e7 e9 52  .!..g.st.Mh....R
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_msg.c:2803: 0540:  09 ad 79 a5 5b be a1 18 d7 d2 4e 24 1a 83 10 56  ..y.[.....N$...V
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_msg.c:2803: 0550:  a7 bb dc ae bb 7b 0b 2b 32 f9 08 5f 08 30 9c 01  .....{.+2.._.0..
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_msg.c:2803: 0560:  71 1d 54 02 85 a7 55 42 d3 87 41 ab 31 dc 86 af  q.T...UB..A.1...
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_msg.c:2803: 0570:  43 30 26 4b e0 43 25 28 93 3e 18 1d ae 15 d9 1b  C0&K.C%(.>......
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_msg.c:2803: 0580:  9c 27 53 2b 0a 8b b4 32 c7 b2 bf ff 9c 85 87 c7  .'S+...2........
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_msg.c:2803: 0590:  3b ff 13 f7 87 84 86 18 ce 0d d7 ae 1d 11 0c b7  ;...............
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_msg.c:2803: 05a0:  85 14 5b c4 02 f3 86 d9 07 7a 35 da c6 7c d2 d0  ..[......z5..|..
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_msg.c:2803: 05b0:  d7 90 76 fa 94 15 d0 16 03 41 4f 79 54 4e d2 b4  ..v......AOyTN..
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_msg.c:2803: 05c0:  c6 f6 8f 26 98 ee 24 7e 71 cb 8e 8f 41 85 9d e8  ...&..$~q...A...
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_msg.c:2803: 05d0:  3e 1c e1 c0 6b 50 a1 29 7b b7 07 66 87 72 88 84  >...kP.){..f.r..
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_msg.c:2803: 05e0:  cc 86 fd df da 7d 92 55 db 4d 1c f4 e2 16 5e c4  .....}.U.M....^.
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_msg.c:2803: 05f0:  bc 94 0d 9c c6 8f 43 89 5e 0d 56 91 cd 72 9c f4  ......C.^.V..r..
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_msg.c:2803: 0600:  47 5e 2a 0e 76 2c f7 f5 f7 19 fb a6 c9 ed cb 8d  G^*.v,..........
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_msg.c:2803: 0610:  46 ac                                            F.
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_msg.c:2124: => flush output
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_msg.c:2138: message length: 1554, out_left: 1554
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_msg.c:2145: ssl->f_send() returned 1554 (-0xfffff9ee)
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_msg.c:2172: <= flush output
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_msg.c:2851: <= write record
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_msg.c:2675: <= write handshake message
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_tls.c:7036: <= write certificate
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_msg.c:2124: => flush output
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_msg.c:2133: <= flush output
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_tls12_server.c:4228: server state: 4
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_tls12_server.c:3178: => write server key exchange
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_tls12_server.c:2871: value of 'DHM: X ' (2045 bits) is:
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_tls12_server.c:2871:  1a 1a 1a 1a 1a 1a 1a 1a 1a 1a 1a 1a 1a 1a 1a 1a
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_tls12_server.c:2871:  1a 1a 1a 1a 1a 1a 1a 1a 1a 1a 1a 1a 1a 1a 1a 1a
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_tls12_server.c:2871:  1a 1a 1a 1a 1a 1a 1a 1a 1a 1a 1a 1a 1a 1a 1a 1a
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_tls12_server.c:2871:  1a 1a 1a 1a 1a 1a 1a 1a 1a 1a 1a 1a 1a 1a 1a 1a
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_tls12_server.c:2871:  1a 1a 1a 1a 1a 1a 1a 1a 1a 1a 1a 1a 1a 1a 1a 1a
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_tls12_server.c:2871:  1a 1a 1a 1a 1a 1a 1a 1a 1a 1a 1a 1a 1a 1a 1a 1a
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_tls12_server.c:2871:  1a 1a 1a 1a 1a 1a 1a 1a 1a 1a 1a 1a 1a 1a 1a 1a
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_tls12_server.c:2871:  1a 1a 1a 1a 1a 1a 1a 1a 1a 1a 1a 1a 1a 1a 1a 1a
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_tls12_server.c:2871:  1a 1a 1a 1a 1a 1a 1a 1a 1a 1a 1a 1a 1a 1a 1a 1a
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_tls12_server.c:2871:  1a 1a 1a 1a 1a 1a 1a 1a 1a 1a 1a 1a 1a 1a 1a 1a
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_tls12_server.c:2871:  1a 1a 1a 1a 1a 1a 1a 1a 1a 1a 1a 1a 1a 1a 1a 1a
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_tls12_server.c:2871:  1a 1a 1a 1a 1a 1a 1a 1a 1a 1a 1a 1a 1a 1a 1a 1a
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_tls12_server.c:2871:  1a 1a 1a 1a 1a 1a 1a 1a 1a 1a 1a 1a 1a 1a 1a 1a
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_tls12_server.c:2871:  1a 1a 1a 1a 1a 1a 1a 1a 1a 1a 1a 1a 1a 1a 1a 1a
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_tls12_server.c:2871:  1a 1a 1a 1a 1a 1a 1a 1a 1a 1a 1a 1a 1a 1a 1a 1a
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_tls12_server.c:2871:  1a 1a 1a 1a 1a 1a 1a 1a 1a 1a 1a 1a 1a 1a 1a 19
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_tls12_server.c:2872: value of 'DHM: P ' (2048 bits) is:
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_tls12_server.c:2872:  ff ff ff ff ff ff ff ff c9 0f da a2 21 68 c2 34
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_tls12_server.c:2872:  c4 c6 62 8b 80 dc 1c d1 29 02 4e 08 8a 67 cc 74
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_tls12_server.c:2872:  02 0b be a6 3b 13 9b 22 51 4a 08 79 8e 34 04 dd
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_tls12_server.c:2872:  ef 95 19 b3 cd 3a 43 1b 30 2b 0a 6d f2 5f 14 37
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_tls12_server.c:2872:  4f e1 35 6d 6d 51 c2 45 e4 85 b5 76 62 5e 7e c6
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_tls12_server.c:2872:  f4 4c 42 e9 a6 37 ed 6b 0b ff 5c b6 f4 06 b7 ed
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_tls12_server.c:2872:  ee 38 6b fb 5a 89 9f a5 ae 9f 24 11 7c 4b 1f e6
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_tls12_server.c:2872:  49 28 66 51 ec e4 5b 3d c2 00 7c b8 a1 63 bf 05
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_tls12_server.c:2872:  98 da 48 36 1c 55 d3 9a 69 16 3f a8 fd 24 cf 5f
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_tls12_server.c:2872:  83 65 5d 23 dc a3 ad 96 1c 62 f3 56 20 85 52 bb
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_tls12_server.c:2872:  9e d5 29 07 70 96 96 6d 67 0c 35 4e 4a bc 98 04
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_tls12_server.c:2872:  f1 74 6c 08 ca 18 21 7c 32 90 5e 46 2e 36 ce 3b
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_tls12_server.c:2872:  e3 9e 77 2c 18 0e 86 03 9b 27 83 a2 ec 07 a2 8f
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_tls12_server.c:2872:  b5 c5 5d f0 6f 4c 52 c9 de 2b cb f6 95 58 17 18
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_tls12_server.c:2872:  39 95 49 7c ea 95 6a e5 15 d2 26 18 98 fa 05 10
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_tls12_server.c:2872:  15 72 8e 5a 8a ac aa 68 ff ff ff ff ff ff ff ff
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_tls12_server.c:2873: value of 'DHM: G ' (2 bits) is:
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_tls12_server.c:2873:  02
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_tls12_server.c:2874: value of 'DHM: GX' (2048 bits) is:
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_tls12_server.c:2874:  a9 63 e7 02 e2 fc b9 52 4b 7d ab 20 6c 03 ad f1
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_tls12_server.c:2874:  c5 e6 f1 27 27 3f 35 1f ba fc c5 12 53 d3 40 7d
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_tls12_server.c:2874:  d7 88 72 20 e0 8b f5 40 31 77 fa b2 e8 1b 5d 49
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_tls12_server.c:2874:  e6 72 d9 fe 16 d0 c2 5d 58 24 4b d9 0b 4a 9b db
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_tls12_server.c:2874:  89 dc f5 42 76 b9 bb 07 92 63 ee 6e ae 35 e8 ec
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_tls12_server.c:2874:  2a 86 94 6e 81 8b c3 a7 e7 4b c6 40 32 95 8a 1a
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_tls12_server.c:2874:  22 72 ae af 43 4b 4e 2b e1 29 0b 4a a2 4e 90 73
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_tls12_server.c:2874:  f4 8e e7 6d 4d 5a 98 6c 68 bc 40 dc 77 45 fe 73
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_tls12_server.c:2874:  64 e1 b7 1c 39 c7 8c 69 c4 37 ba c8 e4 43 8c 1e
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_tls12_server.c:2874:  ce 72 f4 4d 2b f7 64 af d2 63 89 cc 7e 81 60 8f
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_tls12_server.c:2874:  36 26 eb 7c cc d2 08 1e dd d3 90 f0 01 20 bb a4
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_tls12_server.c:2874:  65 c6 72 55 9e 98 91 89 cb d7 c9 f3 df 72 69 63
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_tls12_server.c:2874:  c0 89 1a 30 e3 75 a2 08 56 15 21 af 01 f8 72 b2
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_tls12_server.c:2874:  39 ad b2 b7 de c9 ce a3 75 e5 cd 0e 83 39 a9 ef
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_tls12_server.c:2874:  bf bb 12 bc 37 2a fc 7b 59 3f b8 3b b1 a0 4e 2a
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_tls12_server.c:2874:  9d 5f dc 05 d3 93 d6 b9 ff 81 f7 1b 3e b9 fa 9d
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_tls12_server.c:3074: pick hash algorithm 6 for signing
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_tls.c:8836: Perform mbedtls-based computation of digest of ServerKeyExchange
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_tls12_server.c:3092: dumping 'parameters hash' (64 bytes)
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_tls12_server.c:3092: 0000:  aa e4 b1 7d 8d 0a 0b f2 57 5e 49 35 49 60 6a 5e  ...}....W^I5I`j^
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_tls12_server.c:3092: 0010:  67 e3 e5 05 78 ef 74 ba 4e 11 1b 96 39 cb 31 fd  g...x.t.N...9.1.
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_tls12_server.c:3092: 0020:  f8 c6 4f 58 56 e6 d5 a1 2f 39 44 79 30 f5 db 19  ..OXV.../9Dy0...
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_tls12_server.c:3092: 0030:  8d d5 59 7b 75 3c da a5 d7 e7 51 c4 93 6d 46 15  ..Y{u<....Q..mF.
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_tls12_server.c:3240: dumping 'my signature' (512 bytes)
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_tls12_server.c:3240: 0000:  5d 60 33 13 f8 04 5b 54 e0 b1 e7 3b 4b f9 ba 67  ]`3...[T...;K..g
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_tls12_server.c:3240: 0010:  5c c9 a4 b1 a1 c9 c1 5b c6 31 c8 eb 65 91 7b 38  \......[.1..e.{8
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_tls12_server.c:3240: 0020:  8c 89 0e bb 82 87 2a a0 c0 a7 35 73 87 f2 c3 91  ......*...5s....
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_tls12_server.c:3240: 0030:  e1 85 79 7f bf f0 e3 f3 e5 02 14 0f d3 a6 59 65  ..y...........Ye
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_tls12_server.c:3240: 0040:  d8 5a ca 45 42 81 72 2a 33 fa 57 60 70 5c 69 b5  .Z.EB.r*3.W`p\i.
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_tls12_server.c:3240: 0050:  46 1a 4d bd 35 22 4a 45 47 81 57 b9 0d a2 08 eb  F.M.5"JEG.W.....
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_tls12_server.c:3240: 0060:  e6 6f 4d 70 b1 bf 8b 73 ea 97 7a dc 80 85 2d 53  .oMp...s..z...-S
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_tls12_server.c:3240: 0070:  4a 82 e4 e3 44 38 ef 40 f1 09 79 cc 7f 6a e8 55  J...D8.@..y..j.U
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_tls12_server.c:3240: 0080:  f5 b8 c7 f6 26 86 fc d4 26 d4 37 3d bc 6a e4 a1  ....&...&.7=.j..
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_tls12_server.c:3240: 0090:  01 d0 d7 77 79 ca 87 4a 60 45 3b 7f 37 85 1e 95  ...wy..J`E;.7...
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_tls12_server.c:3240: 00a0:  01 fe a4 dd f8 73 cf b9 28 03 ce e3 e5 f7 50 d6  .....s..(.....P.
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_tls12_server.c:3240: 00b0:  b9 93 41 93 64 1f 3d 15 59 47 96 c2 8a ef 45 58  ..A.d.=.YG....EX
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_tls12_server.c:3240: 00c0:  bb 0d 58 17 73 a0 45 1c 42 b8 03 66 3e dc 82 49  ..X.s.E.B..f>..I
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_tls12_server.c:3240: 00d0:  49 d2 6a 83 07 1b 63 c4 e0 0a 4a 28 7b 51 e7 d2  I.j...c...J({Q..
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_tls12_server.c:3240: 00e0:  ce 71 d9 23 b6 4d 32 7d 42 cb fb 2f 37 55 7c 43  .q.#.M2}B../7U|C
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_tls12_server.c:3240: 00f0:  00 d5 95 a6 ed fb 7d 05 b3 c4 43 13 f0 f1 35 ea  ......}...C...5.
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_tls12_server.c:3240: 0100:  06 96 f2 f3 52 31 1d 6b 19 39 93 29 e3 ff a4 99  ....R1.k.9.)....
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_tls12_server.c:3240: 0110:  a1 63 75 7b 5d d5 b0 dc ae 66 be b7 d3 af bd a1  .cu{]....f......
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_tls12_server.c:3240: 0120:  23 8a db 25 94 b2 8c 53 30 22 51 23 3d 2f a2 58  #..%...S0"Q#=/.X
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_tls12_server.c:3240: 0130:  0d 5e ff b0 44 dd 44 fd 93 af 2b 4a 45 1c 39 e9  .^..D.D...+JE.9.
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_tls12_server.c:3240: 0140:  d4 2a c3 d5 16 6a 1b b7 67 c1 3b c0 1c cc 8a 47  .*...j..g.;....G
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_tls12_server.c:3240: 0150:  28 fc bd a2 8d 4e 77 bc 50 8d 94 ad 87 68 c7 1b  (....Nw.P....h..
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_tls12_server.c:3240: 0160:  07 9c a0 1f eb 82 b3 00 3c 37 25 5c 67 fe 51 31  ........<7%\g.Q1
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_tls12_server.c:3240: 0170:  4f 16 98 48 6a 9e b9 71 a4 55 72 af 23 78 ac aa  O..Hj..q.Ur.#x..
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_tls12_server.c:3240: 0180:  7d 12 27 1e d5 d6 56 2d fc 91 b5 51 d8 30 52 f3  }.'...V-...Q.0R.
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_tls12_server.c:3240: 0190:  38 15 64 7a 0c 6b 8c 2c d0 68 49 75 84 b6 90 7d  8.dz.k.,.hIu...}
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_tls12_server.c:3240: 01a0:  bf b3 f4 18 01 68 e7 ee af 0f 55 4d 37 c8 0f 0e  .....h....UM7...
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_tls12_server.c:3240: 01b0:  b6 91 6e 42 27 5e be 30 49 fb 44 a6 14 30 eb 8d  ..nB'^.0I.D..0..
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_tls12_server.c:3240: 01c0:  9d 9d 26 a0 c4 52 39 dd 7d ff 2d 53 14 b7 ba c5  ..&..R9.}.-S....
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_tls12_server.c:3240: 01d0:  7a 5f 26 42 8d f2 6d 74 06 49 40 a3 07 ff e4 83  z_&B..mt.I@.....
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_tls12_server.c:3240: 01e0:  91 f5 21 d4 8a 97 4c 0f ac d1 8d c4 90 de 89 67  ..!...L........g
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_tls12_server.c:3240: 01f0:  1d 6b 4f a4 66 46 6b 2d d5 10 61 ea 73 20 47 c6  .kO.fFk-..a.s G.
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_msg.c:2554: => write handshake message
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_msg.c:2714: => write record
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_msg.c:2798: output record: msgtype = 22, version = [3:3], msglen = 1039
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_msg.c:2803: dumping 'output record sent to network' (1044 bytes)
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_msg.c:2803: 0000:  16 03 03 04 0f 0c 00 04 0b 01 00 ff ff ff ff ff  ................
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_msg.c:2803: 0010:  ff ff ff c9 0f da a2 21 68 c2 34 c4 c6 62 8b 80  .......!h.4..b..
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_msg.c:2803: 0020:  dc 1c d1 29 02 4e 08 8a 67 cc 74 02 0b be a6 3b  ...).N..g.t....;
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_msg.c:2803: 0030:  13 9b 22 51 4a 08 79 8e 34 04 dd ef 95 19 b3 cd  .."QJ.y.4.......
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_msg.c:2803: 0040:  3a 43 1b 30 2b 0a 6d f2 5f 14 37 4f e1 35 6d 6d  :C.0+.m._.7O.5mm
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_msg.c:2803: 0050:  51 c2 45 e4 85 b5 76 62 5e 7e c6 f4 4c 42 e9 a6  Q.E...vb^~..LB..
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_msg.c:2803: 0060:  37 ed 6b 0b ff 5c b6 f4 06 b7 ed ee 38 6b fb 5a  7.k..\......8k.Z
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_msg.c:2803: 0070:  89 9f a5 ae 9f 24 11 7c 4b 1f e6 49 28 66 51 ec  .....$.|K..I(fQ.
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_msg.c:2803: 0080:  e4 5b 3d c2 00 7c b8 a1 63 bf 05 98 da 48 36 1c  .[=..|..c....H6.
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_msg.c:2803: 0090:  55 d3 9a 69 16 3f a8 fd 24 cf 5f 83 65 5d 23 dc  U..i.?..$._.e]#.
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_msg.c:2803: 00a0:  a3 ad 96 1c 62 f3 56 20 85 52 bb 9e d5 29 07 70  ....b.V .R...).p
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_msg.c:2803: 00b0:  96 96 6d 67 0c 35 4e 4a bc 98 04 f1 74 6c 08 ca  ..mg.5NJ....tl..
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_msg.c:2803: 00c0:  18 21 7c 32 90 5e 46 2e 36 ce 3b e3 9e 77 2c 18  .!|2.^F.6.;..w,.
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_msg.c:2803: 00d0:  0e 86 03 9b 27 83 a2 ec 07 a2 8f b5 c5 5d f0 6f  ....'........].o
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_msg.c:2803: 00e0:  4c 52 c9 de 2b cb f6 95 58 17 18 39 95 49 7c ea  LR..+...X..9.I|.
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_msg.c:2803: 00f0:  95 6a e5 15 d2 26 18 98 fa 05 10 15 72 8e 5a 8a  .j...&......r.Z.
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_msg.c:2803: 0100:  ac aa 68 ff ff ff ff ff ff ff ff 00 01 02 01 00  ..h.............
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_msg.c:2803: 0110:  a9 63 e7 02 e2 fc b9 52 4b 7d ab 20 6c 03 ad f1  .c.....RK}. l...
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_msg.c:2803: 0120:  c5 e6 f1 27 27 3f 35 1f ba fc c5 12 53 d3 40 7d  ...''?5.....S.@}
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_msg.c:2803: 0130:  d7 88 72 20 e0 8b f5 40 31 77 fa b2 e8 1b 5d 49  ..r ...@1w....]I
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_msg.c:2803: 0140:  e6 72 d9 fe 16 d0 c2 5d 58 24 4b d9 0b 4a 9b db  .r.....]X$K..J..
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_msg.c:2803: 0150:  89 dc f5 42 76 b9 bb 07 92 63 ee 6e ae 35 e8 ec  ...Bv....c.n.5..
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_msg.c:2803: 0160:  2a 86 94 6e 81 8b c3 a7 e7 4b c6 40 32 95 8a 1a  *..n.....K.@2...
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_msg.c:2803: 0170:  22 72 ae af 43 4b 4e 2b e1 29 0b 4a a2 4e 90 73  "r..CKN+.).J.N.s
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_msg.c:2803: 0180:  f4 8e e7 6d 4d 5a 98 6c 68 bc 40 dc 77 45 fe 73  ...mMZ.lh.@.wE.s
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_msg.c:2803: 0190:  64 e1 b7 1c 39 c7 8c 69 c4 37 ba c8 e4 43 8c 1e  d...9..i.7...C..
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_msg.c:2803: 01a0:  ce 72 f4 4d 2b f7 64 af d2 63 89 cc 7e 81 60 8f  .r.M+.d..c..~.`.
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_msg.c:2803: 01b0:  36 26 eb 7c cc d2 08 1e dd d3 90 f0 01 20 bb a4  6&.|......... ..
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_msg.c:2803: 01c0:  65 c6 72 55 9e 98 91 89 cb d7 c9 f3 df 72 69 63  e.rU.........ric
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_msg.c:2803: 01d0:  c0 89 1a 30 e3 75 a2 08 56 15 21 af 01 f8 72 b2  ...0.u..V.!...r.
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_msg.c:2803: 01e0:  39 ad b2 b7 de c9 ce a3 75 e5 cd 0e 83 39 a9 ef  9.......u....9..
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_msg.c:2803: 01f0:  bf bb 12 bc 37 2a fc 7b 59 3f b8 3b b1 a0 4e 2a  ....7*.{Y?.;..N*
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_msg.c:2803: 0200:  9d 5f dc 05 d3 93 d6 b9 ff 81 f7 1b 3e b9 fa 9d  ._..........>...
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_msg.c:2803: 0210:  06 01 02 00 5d 60 33 13 f8 04 5b 54 e0 b1 e7 3b  ....]`3...[T...;
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_msg.c:2803: 0220:  4b f9 ba 67 5c c9 a4 b1 a1 c9 c1 5b c6 31 c8 eb  K..g\......[.1..
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_msg.c:2803: 0230:  65 91 7b 38 8c 89 0e bb 82 87 2a a0 c0 a7 35 73  e.{8......*...5s
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_msg.c:2803: 0240:  87 f2 c3 91 e1 85 79 7f bf f0 e3 f3 e5 02 14 0f  ......y.........
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_msg.c:2803: 0250:  d3 a6 59 65 d8 5a ca 45 42 81 72 2a 33 fa 57 60  ..Ye.Z.EB.r*3.W`
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_msg.c:2803: 0260:  70 5c 69 b5 46 1a 4d bd 35 22 4a 45 47 81 57 b9  p\i.F.M.5"JEG.W.
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_msg.c:2803: 0270:  0d a2 08 eb e6 6f 4d 70 b1 bf 8b 73 ea 97 7a dc  .....oMp...s..z.
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_msg.c:2803: 0280:  80 85 2d 53 4a 82 e4 e3 44 38 ef 40 f1 09 79 cc  ..-SJ...D8.@..y.
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_msg.c:2803: 0290:  7f 6a e8 55 f5 b8 c7 f6 26 86 fc d4 26 d4 37 3d  .j.U....&...&.7=
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_msg.c:2803: 02a0:  bc 6a e4 a1 01 d0 d7 77 79 ca 87 4a 60 45 3b 7f  .j.....wy..J`E;.
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_msg.c:2803: 02b0:  37 85 1e 95 01 fe a4 dd f8 73 cf b9 28 03 ce e3  7........s..(...
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_msg.c:2803: 02c0:  e5 f7 50 d6 b9 93 41 93 64 1f 3d 15 59 47 96 c2  ..P...A.d.=.YG..
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_msg.c:2803: 02d0:  8a ef 45 58 bb 0d 58 17 73 a0 45 1c 42 b8 03 66  ..EX..X.s.E.B..f
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_msg.c:2803: 02e0:  3e dc 82 49 49 d2 6a 83 07 1b 63 c4 e0 0a 4a 28  >..II.j...c...J(
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_msg.c:2803: 02f0:  7b 51 e7 d2 ce 71 d9 23 b6 4d 32 7d 42 cb fb 2f  {Q...q.#.M2}B../
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_msg.c:2803: 0300:  37 55 7c 43 00 d5 95 a6 ed fb 7d 05 b3 c4 43 13  7U|C......}...C.
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_msg.c:2803: 0310:  f0 f1 35 ea 06 96 f2 f3 52 31 1d 6b 19 39 93 29  ..5.....R1.k.9.)
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_msg.c:2803: 0320:  e3 ff a4 99 a1 63 75 7b 5d d5 b0 dc ae 66 be b7  .....cu{]....f..
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_msg.c:2803: 0330:  d3 af bd a1 23 8a db 25 94 b2 8c 53 30 22 51 23  ....#..%...S0"Q#
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_msg.c:2803: 0340:  3d 2f a2 58 0d 5e ff b0 44 dd 44 fd 93 af 2b 4a  =/.X.^..D.D...+J
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_msg.c:2803: 0350:  45 1c 39 e9 d4 2a c3 d5 16 6a 1b b7 67 c1 3b c0  E.9..*...j..g.;.
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_msg.c:2803: 0360:  1c cc 8a 47 28 fc bd a2 8d 4e 77 bc 50 8d 94 ad  ...G(....Nw.P...
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_msg.c:2803: 0370:  87 68 c7 1b 07 9c a0 1f eb 82 b3 00 3c 37 25 5c  .h..........<7%\
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_msg.c:2803: 0380:  67 fe 51 31 4f 16 98 48 6a 9e b9 71 a4 55 72 af  g.Q1O..Hj..q.Ur.
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_msg.c:2803: 0390:  23 78 ac aa 7d 12 27 1e d5 d6 56 2d fc 91 b5 51  #x..}.'...V-...Q
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_msg.c:2803: 03a0:  d8 30 52 f3 38 15 64 7a 0c 6b 8c 2c d0 68 49 75  .0R.8.dz.k.,.hIu
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_msg.c:2803: 03b0:  84 b6 90 7d bf b3 f4 18 01 68 e7 ee af 0f 55 4d  ...}.....h....UM
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_msg.c:2803: 03c0:  37 c8 0f 0e b6 91 6e 42 27 5e be 30 49 fb 44 a6  7.....nB'^.0I.D.
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_msg.c:2803: 03d0:  14 30 eb 8d 9d 9d 26 a0 c4 52 39 dd 7d ff 2d 53  .0....&..R9.}.-S
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_msg.c:2803: 03e0:  14 b7 ba c5 7a 5f 26 42 8d f2 6d 74 06 49 40 a3  ....z_&B..mt.I@.
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_msg.c:2803: 03f0:  07 ff e4 83 91 f5 21 d4 8a 97 4c 0f ac d1 8d c4  ......!...L.....
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_msg.c:2803: 0400:  90 de 89 67 1d 6b 4f a4 66 46 6b 2d d5 10 61 ea  ...g.kO.fFk-..a.
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_msg.c:2803: 0410:  73 20 47 c6                                      s G.
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_msg.c:2124: => flush output
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_msg.c:2138: message length: 1044, out_left: 1044
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_msg.c:2145: ssl->f_send() returned 1044 (-0xfffffbec)
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_msg.c:2172: <= flush output
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_msg.c:2851: <= write record
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_msg.c:2675: <= write handshake message
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_tls12_server.c:3260: <= write server key exchange
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_msg.c:2124: => flush output
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_msg.c:2133: <= flush output
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_tls12_server.c:4228: server state: 5
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_tls12_server.c:2398: => write certificate request
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_tls12_server.c:2411: <= skip write certificate request
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_msg.c:2124: => flush output
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_msg.c:2133: <= flush output
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_tls12_server.c:4228: server state: 6
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_tls12_server.c:3269: => write server hello done
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_msg.c:2554: => write handshake message
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_msg.c:2714: => write record
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_msg.c:2798: output record: msgtype = 22, version = [3:3], msglen = 4
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_msg.c:2803: dumping 'output record sent to network' (9 bytes)
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_msg.c:2803: 0000:  16 03 03 00 04 0e 00 00 00                       .........
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_msg.c:2124: => flush output
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_msg.c:2138: message length: 9, out_left: 9
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_msg.c:2145: ssl->f_send() returned 9 (-0xfffffff7)
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_msg.c:2172: <= flush output
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_msg.c:2851: <= write record
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_msg.c:2675: <= write handshake message
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_tls12_server.c:3296: <= write server hello done
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_msg.c:2124: => flush output
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_msg.c:2133: <= flush output
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_tls12_server.c:4228: server state: 7
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_tls.c:7559: => parse certificate
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_tls.c:7563: <= skip parse certificate
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_msg.c:2124: => flush output
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_msg.c:2133: <= flush output
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_tls12_server.c:4228: server state: 8
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_tls12_server.c:3600: => parse client key exchange
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_msg.c:3887: => read record
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_msg.c:1926: => fetch input
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_msg.c:2066: in_left: 0, nb_want: 5
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_msg.c:2086: in_left: 0, nb_want: 5
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_msg.c:2089: ssl->f_recv(_timeout)() returned 5 (-0xfffffffb)
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_msg.c:2111: <= fetch input
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_msg.c:3632: dumping 'input record header' (5 bytes)
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_msg.c:3632: 0000:  16 03 03 01 06                                   .....
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_msg.c:3634: input record: msgtype = 22, version = [0x303], msglen = 262
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_msg.c:1926: => fetch input
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_msg.c:2066: in_left: 5, nb_want: 267
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_msg.c:2086: in_left: 5, nb_want: 267
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_msg.c:2089: ssl->f_recv(_timeout)() returned 262 (-0xfffffefa)
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_msg.c:2111: <= fetch input
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_msg.c:3741: dumping 'input record from network' (267 bytes)
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_msg.c:3741: 0000:  16 03 03 01 06 10 00 01 02 01 00 82 2b 35 29 0b  ............+5).
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_msg.c:3741: 0010:  44 c5 44 ac 34 96 dd c3 a5 80 91 00 58 79 93 84  D.D.4.......Xy..
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_msg.c:3741: 0020:  ea cc 05 b4 a4 3d 2c 63 39 63 ea 88 db f1 c6 4f  .....=,c9c.....O
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_msg.c:3741: 0030:  d6 fa 4c e9 86 51 13 5b 3d 97 cb 18 89 f1 d5 06  ..L..Q.[=.......
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_msg.c:3741: 0040:  5b fe 25 06 94 43 2d af 29 66 43 a2 d3 2d db 11  [.%..C-.)fC..-..
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_msg.c:3741: 0050:  29 c3 a3 7b a3 90 38 6b ad 63 7e 2a ed 16 d3 3d  )..{..8k.c~*...=
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_msg.c:3741: 0060:  aa 1a c4 98 64 33 21 5e bc dc 77 7e e8 ce ad 44  ....d3!^..w~...D
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_msg.c:3741: 0070:  65 ad 94 8f ba ef fa 4f 55 b9 fa 22 a4 a6 54 80  e......OU.."..T.
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_msg.c:3741: 0080:  44 21 50 68 34 ba b0 74 cb 75 03 f1 cb c6 70 bb  D!Ph4..t.u....p.
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_msg.c:3741: 0090:  77 10 ad 2b 96 0a fd 30 d0 5f f1 a3 70 45 bc 8e  w..+...0._..pE..
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_msg.c:3741: 00a0:  74 e7 51 0b ae d2 2f 1a 68 89 34 06 55 6b 56 8b  t.Q.../.h.4.UkV.
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_msg.c:3741: 00b0:  91 31 f3 cb 63 bb bf e4 cb 2f 8a 40 65 67 08 8a  .1..c..../.@eg..
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_msg.c:3741: 00c0:  f9 36 cf 2d 76 f8 94 f2 c9 4e 2d e5 f9 b1 97 15  .6.-v....N-.....
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_msg.c:3741: 00d0:  9f d5 3e d3 6d 92 9f 11 f6 4e c9 bf 41 0f 64 71  ..>.m....N..A.dq
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_msg.c:3741: 00e0:  a5 2d 5d 51 46 b1 3c 3c db 8b 14 f1 b3 6e 48 f3  .-]QF.<<.....nH.
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_msg.c:3741: 00f0:  73 6f d3 0e 2d 3e d5 60 f8 76 f4 f3 83 6d 57 04  so..->.`.v...mW.
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_msg.c:3741: 0100:  97 41 02 ee 6a f4 9d be eb ff 44                 .A..j.....D
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_msg.c:3008: handshake message: msglen = 262, type = 16, hslen = 262
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_msg.c:3959: <= read record
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_tls12_server.c:3333: value of 'DHM: GY' (2048 bits) is:
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_tls12_server.c:3333:  82 2b 35 29 0b 44 c5 44 ac 34 96 dd c3 a5 80 91
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_tls12_server.c:3333:  00 58 79 93 84 ea cc 05 b4 a4 3d 2c 63 39 63 ea
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_tls12_server.c:3333:  88 db f1 c6 4f d6 fa 4c e9 86 51 13 5b 3d 97 cb
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_tls12_server.c:3333:  18 89 f1 d5 06 5b fe 25 06 94 43 2d af 29 66 43
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_tls12_server.c:3333:  a2 d3 2d db 11 29 c3 a3 7b a3 90 38 6b ad 63 7e
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_tls12_server.c:3333:  2a ed 16 d3 3d aa 1a c4 98 64 33 21 5e bc dc 77
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_tls12_server.c:3333:  7e e8 ce ad 44 65 ad 94 8f ba ef fa 4f 55 b9 fa
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_tls12_server.c:3333:  22 a4 a6 54 80 44 21 50 68 34 ba b0 74 cb 75 03
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_tls12_server.c:3333:  f1 cb c6 70 bb 77 10 ad 2b 96 0a fd 30 d0 5f f1
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_tls12_server.c:3333:  a3 70 45 bc 8e 74 e7 51 0b ae d2 2f 1a 68 89 34
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_tls12_server.c:3333:  06 55 6b 56 8b 91 31 f3 cb 63 bb bf e4 cb 2f 8a
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_tls12_server.c:3333:  40 65 67 08 8a f9 36 cf 2d 76 f8 94 f2 c9 4e 2d
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_tls12_server.c:3333:  e5 f9 b1 97 15 9f d5 3e d3 6d 92 9f 11 f6 4e c9
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_tls12_server.c:3333:  bf 41 0f 64 71 a5 2d 5d 51 46 b1 3c 3c db 8b 14
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_tls12_server.c:3333:  f1 b3 6e 48 f3 73 6f d3 0e 2d 3e d5 60 f8 76 f4
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_tls12_server.c:3333:  f3 83 6d 57 04 97 41 02 ee 6a f4 9d be eb ff 44
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_tls12_server.c:3653: value of 'DHM: K ' (2048 bits) is:
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_tls12_server.c:3653:  d4 42 51 c8 6f 7f f2 39 cf cf 4e 89 ae e8 5e b2
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_tls12_server.c:3653:  11 16 69 d6 d5 8b 0f 25 47 3f c5 3a 80 dd c9 14
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_tls12_server.c:3653:  06 80 19 0f 4f 64 5b d0 d4 8e f1 19 b1 a9 51 c9
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_tls12_server.c:3653:  a8 dc 53 3d 4b 7e f0 01 a5 01 c6 42 0f 3f 25 5d
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_tls12_server.c:3653:  1a ee 71 91 69 2c 26 d1 07 f9 64 ad 74 b7 75 f0
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_tls12_server.c:3653:  e1 c7 e1 db e3 cc 66 a4 14 a2 a5 02 c3 28 97 a0
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_tls12_server.c:3653:  62 be 15 09 c3 1e f6 eb 86 9c 51 0f bc f1 59 8d
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_tls12_server.c:3653:  cf 42 02 e2 1e d0 6d 48 40 5d a4 15 5f 25 39 da
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_tls12_server.c:3653:  5b b5 52 43 a6 91 2f 57 37 39 08 e8 1c 5d 65 b9
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_tls12_server.c:3653:  51 be 75 0d 09 59 63 b2 ad 57 0b 30 cf 27 5b 4c
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_tls12_server.c:3653:  78 9d 98 a0 31 2c 69 15 d2 e2 4e 3a 7f 6c fb a4
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_tls12_server.c:3653:  cc 6e c5 b6 70 df 29 f6 63 a3 89 25 37 af b3 78
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_tls12_server.c:3653:  60 cf 04 17 46 09 fb 6b e2 89 25 13 55 74 99 97
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_tls12_server.c:3653:  03 80 8c a7 5c 24 52 5e f9 4c 1f 33 6c 47 71 6d
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_tls12_server.c:3653:  54 f4 dc b4 f2 06 a7 88 22 8c 4f c1 a9 3b e0 c4
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_tls12_server.c:3653:  39 ae 4b 82 62 f8 89 cd df d9 7c e3 c9 f0 37 3c
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_tls.c:6555: => derive keys
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_tls.c:6668: => calc verify sha256
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_tls.c:6686: dumping 'calculated verify result' (32 bytes)
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_tls.c:6686: 0000:  a4 4e 5f 70 9a cf 16 6f 7f 3f 7d cf a1 a8 60 09  .N_p...o.?}...`.
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_tls.c:6686: 0010:  74 e6 f3 4d 6e 2d 7b d8 79 d8 cf 44 ab 8f ba 63  t..Mn-{.y..D...c
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_tls.c:6687: <= calc verify
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_tls.c:6409: dumping 'session hash for extended master secret' (32 bytes)
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_tls.c:6409: 0000:  a4 4e 5f 70 9a cf 16 6f 7f 3f 7d cf a1 a8 60 09  .N_p...o.?}...`.
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_tls.c:6409: 0010:  74 e6 f3 4d 6e 2d 7b d8 79 d8 cf 44 ab 8f ba 63  t..Mn-{.y..D...c
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_tls.c:6538: dumping 'premaster secret' (256 bytes)
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_tls.c:6538: 0000:  d4 42 51 c8 6f 7f f2 39 cf cf 4e 89 ae e8 5e b2  .BQ.o..9..N...^.
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_tls.c:6538: 0010:  11 16 69 d6 d5 8b 0f 25 47 3f c5 3a 80 dd c9 14  ..i....%G?.:....
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_tls.c:6538: 0020:  06 80 19 0f 4f 64 5b d0 d4 8e f1 19 b1 a9 51 c9  ....Od[.......Q.
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_tls.c:6538: 0030:  a8 dc 53 3d 4b 7e f0 01 a5 01 c6 42 0f 3f 25 5d  ..S=K~.....B.?%]
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_tls.c:6538: 0040:  1a ee 71 91 69 2c 26 d1 07 f9 64 ad 74 b7 75 f0  ..q.i,&...d.t.u.
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_tls.c:6538: 0050:  e1 c7 e1 db e3 cc 66 a4 14 a2 a5 02 c3 28 97 a0  ......f......(..
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_tls.c:6538: 0060:  62 be 15 09 c3 1e f6 eb 86 9c 51 0f bc f1 59 8d  b.........Q...Y.
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_tls.c:6538: 0070:  cf 42 02 e2 1e d0 6d 48 40 5d a4 15 5f 25 39 da  .B....mH@].._%9.
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_tls.c:6538: 0080:  5b b5 52 43 a6 91 2f 57 37 39 08 e8 1c 5d 65 b9  [.RC../W79...]e.
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_tls.c:6538: 0090:  51 be 75 0d 09 59 63 b2 ad 57 0b 30 cf 27 5b 4c  Q.u..Yc..W.0.'[L
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_tls.c:6538: 00a0:  78 9d 98 a0 31 2c 69 15 d2 e2 4e 3a 7f 6c fb a4  x...1,i...N:.l..
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_tls.c:6538: 00b0:  cc 6e c5 b6 70 df 29 f6 63 a3 89 25 37 af b3 78  .n..p.).c..%7..x
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_tls.c:6538: 00c0:  60 cf 04 17 46 09 fb 6b e2 89 25 13 55 74 99 97  `...F..k..%.Ut..
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_tls.c:6538: 00d0:  03 80 8c a7 5c 24 52 5e f9 4c 1f 33 6c 47 71 6d  ....\$R^.L.3lGqm
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_tls.c:6538: 00e0:  54 f4 dc b4 f2 06 a7 88 22 8c 4f c1 a9 3b e0 c4  T.......".O..;..
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_tls.c:6538: 00f0:  39 ae 4b 82 62 f8 89 cd df d9 7c e3 c9 f0 37 3c  9.K.b.....|...7<
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_tls.c:8371: ciphersuite = TLS-DHE-RSA-WITH-CHACHA20-POLY1305-SHA256
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_tls.c:8373: dumping 'master secret' (48 bytes)
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_tls.c:8373: 0000:  4f fe 45 32 45 c7 a3 b7 cc 42 ee ee 1d de 36 3b  O.E2E....B....6;
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_tls.c:8373: 0010:  62 3e 52 f1 0d b1 c9 a4 4e b3 c8 47 f5 6a e5 47  b>R.....N..G.j.G
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_tls.c:8373: 0020:  bd a4 34 31 7e b2 ed 5a 84 bd 10 2c f4 dd e5 6c  ..41~..Z...,...l
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_tls.c:8374: dumping 'random bytes' (64 bytes)
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_tls.c:8374: 0000:  64 71 e3 ff 1a 1a 1a 1a 1a 1a 1a 1a 1a 1a 1a 1a  dq..............
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_tls.c:8374: 0010:  1a 1a 1a 1a 1a 1a 1a 1a 1a 1a 1a 1a 1a 1a 1a 1a  ................
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_tls.c:8374: 0020:  64 71 e3 ff e1 d8 ad 18 30 ac 5e 9c 0d b3 b3 90  dq......0.^.....
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_tls.c:8374: 0030:  73 63 f1 8e 37 06 46 8a 0f 78 36 42 f5 ab ef e5  sc..7.F..x6B....
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_tls.c:8375: dumping 'key block' (256 bytes)
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_tls.c:8375: 0000:  80 85 75 59 6b 57 fc 4f 1f 12 ec 54 9f e8 1f 9c  ..uYkW.O...T....
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_tls.c:8375: 0010:  3c a0 d9 f0 14 1a 6b f1 89 9d 24 32 54 67 61 96  <.....k...$2Tga.
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_tls.c:8375: 0020:  f3 a1 41 d0 53 e3 5a 08 fb ac e7 65 7d ee 25 fe  ..A.S.Z....e}.%.
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_tls.c:8375: 0030:  8b 74 1c 3e e7 34 05 4d 72 23 3a 73 4b a5 49 76  .t.>.4.Mr#:sK.Iv
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_tls.c:8375: 0040:  db 79 22 24 c5 fa 76 7c 34 c4 cb 42 e9 56 00 51  .y"$..v|4..B.V.Q
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_tls.c:8375: 0050:  c0 a5 9e 27 02 dd 72 95 9f a2 d8 47 7a d1 a6 5d  ...'..r....Gz..]
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_tls.c:8375: 0060:  ed 3f 44 58 ac e5 6f bb e4 04 45 39 3d d6 6e f8  .?DX..o...E9=.n.
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_tls.c:8375: 0070:  ce 4c 60 39 5b f2 b9 09 5a 4a 51 ce 2f 33 20 72  .L`9[...ZJQ./3 r
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_tls.c:8375: 0080:  92 83 c1 d8 94 cd c9 2d 1f 4d 4a f8 83 6f 07 02  .......-.MJ..o..
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_tls.c:8375: 0090:  4b 3d cd fd 08 44 31 e1 5b 9d 22 c6 aa b0 9e 9e  K=...D1.[.".....
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_tls.c:8375: 00a0:  31 62 95 b1 6e 8b aa 76 dd 00 e1 9a af d5 21 3b  1b..n..v......!;
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_tls.c:8375: 00b0:  e8 53 59 99 9e a5 7f e6 7b c8 6e 6c c7 62 01 04  .SY.....{.nl.b..
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_tls.c:8375: 00c0:  9a a0 77 fd ef 32 f1 08 82 50 f0 6d 33 71 b1 09  ..w..2...P.m3q..
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_tls.c:8375: 00d0:  9a fb 24 9e 3b ee 8e b2 3d 27 52 04 ee b0 e5 c1  ..$.;...='R.....
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_tls.c:8375: 00e0:  b6 67 b3 83 04 8a f4 49 4a c6 09 1c 24 d8 2f 2c  .g.....IJ...$./,
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_tls.c:8375: 00f0:  79 8f a7 35 0c 28 01 a6 db d0 db c7 2a c5 90 a2  y..5.(......*...
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_tls.c:8495: keylen: 32, minlen: 16, ivlen: 12, maclen: 0
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_tls.c:6606: <= derive keys
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_tls12_server.c:3984: <= parse client key exchange
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_msg.c:2124: => flush output
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_msg.c:2133: <= flush output
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_tls12_server.c:4228: server state: 9
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_tls12_server.c:4022: => parse certificate verify
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_tls12_server.c:4032: <= skip parse certificate verify
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_msg.c:2124: => flush output
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_msg.c:2133: <= flush output
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_tls12_server.c:4228: server state: 10
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_msg.c:4911: => parse change cipher spec
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_msg.c:3887: => read record
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_msg.c:1926: => fetch input
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_msg.c:2066: in_left: 0, nb_want: 5
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_msg.c:2086: in_left: 0, nb_want: 5
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_msg.c:2089: ssl->f_recv(_timeout)() returned 5 (-0xfffffffb)
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_msg.c:2111: <= fetch input
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_msg.c:3632: dumping 'input record header' (5 bytes)
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_msg.c:3632: 0000:  14 03 03 00 01                                   .....
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_msg.c:3634: input record: msgtype = 20, version = [0x303], msglen = 1
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_msg.c:1926: => fetch input
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_msg.c:2066: in_left: 5, nb_want: 6
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_msg.c:2086: in_left: 5, nb_want: 6
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_msg.c:2089: ssl->f_recv(_timeout)() returned 1 (-0xffffffff)
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_msg.c:2111: <= fetch input
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_msg.c:3741: dumping 'input record from network' (6 bytes)
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_msg.c:3741: 0000:  14 03 03 00 01 01                                ......
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_msg.c:3959: <= read record
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_msg.c:4932: switching to new transform spec for inbound data
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_msg.c:4959: <= parse change cipher spec
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_msg.c:2124: => flush output
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_msg.c:2133: <= flush output
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_tls12_server.c:4228: server state: 11
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_tls.c:8078: => parse finished
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_tls.c:7740: => calc  finished tls sha256
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_tls.c:7763: dumping 'finished sha256 output' (32 bytes)
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_tls.c:7763: 0000:  a4 4e 5f 70 9a cf 16 6f 7f 3f 7d cf a1 a8 60 09  .N_p...o.?}...`.
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_tls.c:7763: 0010:  74 e6 f3 4d 6e 2d 7b d8 79 d8 cf 44 ab 8f ba 63  t..Mn-{.y..D...c
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_tls.c:7768: dumping 'calc finished result' (12 bytes)
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_tls.c:7768: 0000:  2b e3 5e c0 68 ec cd 64 8e d0 08 94              +.^.h..d....
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_tls.c:7772: <= calc  finished
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_msg.c:3887: => read record
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_msg.c:1926: => fetch input
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_msg.c:2066: in_left: 0, nb_want: 5
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_msg.c:2086: in_left: 0, nb_want: 5
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_msg.c:2089: ssl->f_recv(_timeout)() returned 5 (-0xfffffffb)
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_msg.c:2111: <= fetch input
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_msg.c:3632: dumping 'input record header' (5 bytes)
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_msg.c:3632: 0000:  16 03 03 00 20                                   .... 
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_msg.c:3634: input record: msgtype = 22, version = [0x303], msglen = 32
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_msg.c:1926: => fetch input
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_msg.c:2066: in_left: 5, nb_want: 37
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_msg.c:2086: in_left: 5, nb_want: 37
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_msg.c:2089: ssl->f_recv(_timeout)() returned 32 (-0xffffffe0)
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_msg.c:2111: <= fetch input
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_msg.c:3741: dumping 'input record from network' (37 bytes)
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_msg.c:3741: 0000:  16 03 03 00 20 91 0e e5 0c 63 5d aa 20 2d 50 fb  .... ....c]. -P.
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_msg.c:3741: 0010:  1b f5 b2 23 f1 3d ce 80 a1 df 51 60 d8 35 3f 75  ...#.=....Q`.5?u
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_msg.c:3741: 0020:  c2 cd ef 33 89                                   ...3.
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_msg.c:1291: => decrypt buf
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_msg.c:1382: dumping 'additional data used for AEAD' (13 bytes)
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_msg.c:1382: 0000:  00 00 00 00 00 00 00 00 16 03 03 00 10           .............
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_msg.c:1391: dumping 'IV used' (12 bytes)
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_msg.c:1391: 0000:  db 79 22 24 c5 fa 76 7c 34 c4 cb 42              .y"$..v|4..B
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_msg.c:1392: dumping 'TAG used' (16 bytes)
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_msg.c:1392: 0000:  3d ce 80 a1 df 51 60 d8 35 3f 75 c2 cd ef 33 89  =....Q`.5?u...3.
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_msg.c:1892: <= decrypt buf
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_msg.c:3782: dumping 'input payload after decrypt' (16 bytes)
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_msg.c:3782: 0000:  14 00 00 0c 2b e3 5e c0 68 ec cd 64 8e d0 08 94  ....+.^.h..d....
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_msg.c:3008: handshake message: msglen = 16, type = 20, hslen = 16
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_msg.c:3959: <= read record
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_tls.c:8148: <= parse finished
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_msg.c:2124: => flush output
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_msg.c:2133: <= flush output
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_tls12_server.c:4228: server state: 12
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_msg.c:4889: => write change cipher spec
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_msg.c:2554: => write handshake message
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_msg.c:2714: => write record
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_msg.c:2798: output record: msgtype = 20, version = [3:3], msglen = 1
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_msg.c:2803: dumping 'output record sent to network' (6 bytes)
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_msg.c:2803: 0000:  14 03 03 00 01 01                                ......
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_msg.c:2124: => flush output
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_msg.c:2138: message length: 6, out_left: 6
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_msg.c:2145: ssl->f_send() returned 6 (-0xfffffffa)
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_msg.c:2172: <= flush output
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_msg.c:2851: <= write record
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_msg.c:2675: <= write handshake message
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_msg.c:4902: <= write change cipher spec
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_msg.c:2124: => flush output
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_msg.c:2133: <= flush output
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_tls12_server.c:4228: server state: 13
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_tls.c:7963: => write finished
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_tls.c:7740: => calc  finished tls sha256
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_tls.c:7763: dumping 'finished sha256 output' (32 bytes)
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_tls.c:7763: 0000:  2c d0 26 49 4c 4c 3a 87 78 a9 7a 9d b2 b0 f9 09  ,.&ILL:.x.z.....
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_tls.c:7763: 0010:  2a 6b ff 5e d6 ce ba a7 87 05 5d b4 e2 b2 23 a5  *k.^......]...#.
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_tls.c:7768: dumping 'calc finished result' (12 bytes)
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_tls.c:7768: 0000:  44 83 81 c3 d5 c2 29 39 09 e1 0e ba              D.....)9....
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_tls.c:7772: <= calc  finished
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_tls.c:8012: switching to new transform spec for outbound data
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_msg.c:2554: => write handshake message
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_msg.c:2714: => write record
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_msg.c:0715: => encrypt buf
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_msg.c:0737: dumping 'before encrypt: output payload' (16 bytes)
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_msg.c:0737: 0000:  14 00 00 0c 44 83 81 c3 d5 c2 29 39 09 e1 0e ba  ....D.....)9....
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_msg.c:0783: dumping 'CID' (0 bytes)
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_msg.c:0964: dumping 'IV used (internal)' (12 bytes)
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_msg.c:0964: 0000:  e9 56 00 51 c0 a5 9e 27 02 dd 72 95              .V.Q...'..r.
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_msg.c:0966: dumping 'IV used (transmitted)' (0 bytes)
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_msg.c:0969: dumping 'additional data used for AEAD' (13 bytes)
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_msg.c:0969: 0000:  00 00 00 00 00 00 00 00 16 03 03 00 10           .............
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_msg.c:0971: before encrypt: msglen = 16, including 0 bytes of padding
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_msg.c:1005: dumping 'after encrypt: tag' (16 bytes)
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_msg.c:1005: 0000:  70 5b 2b 13 23 d5 29 a4 ca 44 80 f6 ab 80 74 40  p[+.#.)..D....t@
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_msg.c:1256: <= encrypt buf
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_msg.c:2798: output record: msgtype = 22, version = [3:3], msglen = 32
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_msg.c:2803: dumping 'output record sent to network' (37 bytes)
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_msg.c:2803: 0000:  16 03 03 00 20 94 ae 43 a5 4e ae a6 64 be b7 2f  .... ..C.N..d../
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_msg.c:2803: 0010:  0c 19 6b 64 31 70 5b 2b 13 23 d5 29 a4 ca 44 80  ..kd1p[+.#.)..D.
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_msg.c:2803: 0020:  f6 ab 80 74 40                                   ...t@
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_msg.c:2124: => flush output
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_msg.c:2138: message length: 37, out_left: 37
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_msg.c:2145: ssl->f_send() returned 37 (-0xffffffdb)
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_msg.c:2172: <= flush output
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_msg.c:2851: <= write record
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_msg.c:2675: <= write handshake message
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_tls.c:8065: <= write finished
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_msg.c:2124: => flush output
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_msg.c:2133: <= flush output
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_tls12_server.c:4228: server state: 14
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_tls12_server.c:4320: handshake: done
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_msg.c:2124: => flush output
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_msg.c:2133: <= flush output
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_tls12_server.c:4228: server state: 15
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_tls.c:7902: => handshake wrapup
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_tls.c:7876: => handshake wrapup: final free
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_tls.c:7895: <= handshake wrapup: final free
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_tls.c:7956: <= handshake wrapup
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_tls.c:3950: <= handshake
+ ok
+  < Read from client:/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_msg.c:5441: => read
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_msg.c:3887: => read record
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_msg.c:1926: => fetch input
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_msg.c:2066: in_left: 0, nb_want: 5
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_msg.c:2086: in_left: 0, nb_want: 5
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_msg.c:2089: ssl->f_recv(_timeout)() returned 5 (-0xfffffffb)
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_msg.c:2111: <= fetch input
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_msg.c:3632: dumping 'input record header' (5 bytes)
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_msg.c:3632: 0000:  17 03 03 00 22                                   ...."
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_msg.c:3634: input record: msgtype = 23, version = [0x303], msglen = 34
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_msg.c:1926: => fetch input
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_msg.c:2066: in_left: 5, nb_want: 39
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_msg.c:2086: in_left: 5, nb_want: 39
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_msg.c:2089: ssl->f_recv(_timeout)() returned 34 (-0xffffffde)
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_msg.c:2111: <= fetch input
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_msg.c:3741: dumping 'input record from network' (39 bytes)
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_msg.c:3741: 0000:  17 03 03 00 22 af b7 98 73 2f 39 2f a1 3c 9b 9b  ...."...s/9/.<..
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_msg.c:3741: 0010:  f3 0c 94 df 2c 18 a5 75 88 82 46 ac 80 d7 55 48  ....,..u..F...UH
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_msg.c:3741: 0020:  6e 00 e1 e1 37 21 b4                             n...7!.
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_msg.c:1291: => decrypt buf
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_msg.c:1382: dumping 'additional data used for AEAD' (13 bytes)
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_msg.c:1382: 0000:  00 00 00 00 00 00 00 01 17 03 03 00 12           .............
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_msg.c:1391: dumping 'IV used' (12 bytes)
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_msg.c:1391: 0000:  db 79 22 24 c5 fa 76 7c 34 c4 cb 43              .y"$..v|4..C
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_msg.c:1392: dumping 'TAG used' (16 bytes)
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_msg.c:1392: 0000:  75 88 82 46 ac 80 d7 55 48 6e 00 e1 e1 37 21 b4  u..F...UHn...7!.
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_msg.c:1892: <= decrypt buf
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_msg.c:3782: dumping 'input payload after decrypt' (18 bytes)
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_msg.c:3782: 0000:  47 45 54 20 2f 20 48 54 54 50 2f 31 2e 30 0d 0a  GET / HTTP/1.0..
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_msg.c:3782: 0010:  0d 0a                                            ..
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_msg.c:3959: <= read record
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_msg.c:5620: <= read
+ 18 bytes read
+
+GET / HTTP/1.0
+
+  > Write to client:/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_msg.c:5701: => write
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_msg.c:2714: => write record
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_msg.c:0715: => encrypt buf
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_msg.c:0737: dumping 'before encrypt: output payload' (154 bytes)
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_msg.c:0737: 0000:  48 54 54 50 2f 31 2e 30 20 32 30 30 20 4f 4b 0d  HTTP/1.0 200 OK.
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_msg.c:0737: 0010:  0a 43 6f 6e 74 65 6e 74 2d 54 79 70 65 3a 20 74  .Content-Type: t
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_msg.c:0737: 0020:  65 78 74 2f 68 74 6d 6c 0d 0a 0d 0a 3c 68 32 3e  ext/html....<h2>
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_msg.c:0737: 0030:  6d 62 65 64 20 54 4c 53 20 54 65 73 74 20 53 65  mbed TLS Test Se
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_msg.c:0737: 0040:  72 76 65 72 3c 2f 68 32 3e 0d 0a 3c 70 3e 53 75  rver</h2>..<p>Su
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_msg.c:0737: 0050:  63 63 65 73 73 66 75 6c 20 63 6f 6e 6e 65 63 74  ccessful connect
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_msg.c:0737: 0060:  69 6f 6e 20 75 73 69 6e 67 3a 20 54 4c 53 2d 44  ion using: TLS-D
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_msg.c:0737: 0070:  48 45 2d 52 53 41 2d 57 49 54 48 2d 43 48 41 43  HE-RSA-WITH-CHAC
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_msg.c:0737: 0080:  48 41 32 30 2d 50 4f 4c 59 31 33 30 35 2d 53 48  HA20-POLY1305-SH
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_msg.c:0737: 0090:  41 32 35 36 3c 2f 70 3e 0d 0a                    A256</p>..
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_msg.c:0783: dumping 'CID' (0 bytes)
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_msg.c:0964: dumping 'IV used (internal)' (12 bytes)
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_msg.c:0964: 0000:  e9 56 00 51 c0 a5 9e 27 02 dd 72 94              .V.Q...'..r.
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_msg.c:0966: dumping 'IV used (transmitted)' (0 bytes)
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_msg.c:0969: dumping 'additional data used for AEAD' (13 bytes)
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_msg.c:0969: 0000:  00 00 00 00 00 00 00 01 17 03 03 00 9a           .............
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_msg.c:0971: before encrypt: msglen = 154, including 0 bytes of padding
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_msg.c:1005: dumping 'after encrypt: tag' (16 bytes)
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_msg.c:1005: 0000:  f2 a1 c6 02 54 ed 3f a1 eb 2c f0 54 58 23 50 f9  ....T.?..,.TX#P.
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_msg.c:1256: <= encrypt buf
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_msg.c:2798: output record: msgtype = 23, version = [3:3], msglen = 170
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_msg.c:2803: dumping 'output record sent to network' (175 bytes)
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_msg.c:2803: 0000:  17 03 03 00 aa d7 0a 5d 37 b9 4a 6d 7e e3 db 18  .......]7.Jm~...
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_msg.c:2803: 0010:  63 b4 d7 4e ff 25 56 f7 d2 40 8a 40 c7 bb 91 bb  c..N.%V..@.@....
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_msg.c:2803: 0020:  c4 14 0d 3e 07 2f fb 98 38 2c c2 6d b1 ce e0 8a  ...>./..8,.m....
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_msg.c:2803: 0030:  6e 11 58 7d bb d8 4b 3a 3c 8f 5d a2 bb ce 20 30  n.X}..K:<.]... 0
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_msg.c:2803: 0040:  e9 3d 09 8d ea 48 95 87 9b 24 c1 45 36 de 33 3e  .=...H...$.E6.3>
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_msg.c:2803: 0050:  b1 ef 0d b6 db a6 02 6b 4b ef b0 e9 97 98 0a 5a  .......kK......Z
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_msg.c:2803: 0060:  54 99 54 e9 7c c9 df 58 b3 c8 8e 07 e5 ec f9 15  T.T.|..X........
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_msg.c:2803: 0070:  c4 5b 9e 66 36 69 df 37 9c 9a e9 d1 5e fd ef 7b  .[.f6i.7....^..{
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_msg.c:2803: 0080:  d5 3f 6f c0 e5 4a 41 c1 60 8f 85 0c 7d 9b f3 60  .?o..JA.`...}..`
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_msg.c:2803: 0090:  49 6c e3 c9 38 6b d5 7a 92 2a c5 18 3b 2b ad f2  Il..8k.z.*..;+..
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_msg.c:2803: 00a0:  a1 c6 02 54 ed 3f a1 eb 2c f0 54 58 23 50 f9     ...T.?..,.TX#P.
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_msg.c:2124: => flush output
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_msg.c:2138: message length: 175, out_left: 175
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_msg.c:2145: ssl->f_send() returned 175 (-0xffffff51)
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_msg.c:2172: <= flush output
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_msg.c:2851: <= write record
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_msg.c:5723: <= write
+ 154 bytes written
+
+HTTP/1.0 200 OK
+Content-Type: text/html
+
+<h2>mbed TLS Test Server</h2>
+<p>Successful connection using: TLS-DHE-RSA-WITH-CHACHA20-POLY1305-SHA256</p>
+
+  . Closing the connection.../repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_msg.c:5739: => write close notify
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_msg.c:4868: => send alert message
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_msg.c:4869: send alert level=1 message=0
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_msg.c:2714: => write record
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_msg.c:0715: => encrypt buf
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_msg.c:0737: dumping 'before encrypt: output payload' (2 bytes)
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_msg.c:0737: 0000:  01 00                                            ..
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_msg.c:0783: dumping 'CID' (0 bytes)
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_msg.c:0964: dumping 'IV used (internal)' (12 bytes)
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_msg.c:0964: 0000:  e9 56 00 51 c0 a5 9e 27 02 dd 72 97              .V.Q...'..r.
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_msg.c:0966: dumping 'IV used (transmitted)' (0 bytes)
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_msg.c:0969: dumping 'additional data used for AEAD' (13 bytes)
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_msg.c:0969: 0000:  00 00 00 00 00 00 00 02 15 03 03 00 02           .............
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_msg.c:0971: before encrypt: msglen = 2, including 0 bytes of padding
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_msg.c:1005: dumping 'after encrypt: tag' (16 bytes)
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_msg.c:1005: 0000:  d7 13 0e a5 a0 6e c5 98 36 a4 5c 61 40 18 18 54  .....n..6.\a@..T
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_msg.c:1256: <= encrypt buf
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_msg.c:2798: output record: msgtype = 21, version = [3:3], msglen = 18
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_msg.c:2803: dumping 'output record sent to network' (23 bytes)
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_msg.c:2803: 0000:  15 03 03 00 12 40 03 d7 13 0e a5 a0 6e c5 98 36  .....@......n..6
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_msg.c:2803: 0010:  a4 5c 61 40 18 18 54                             .\a@..T
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_msg.c:2124: => flush output
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_msg.c:2138: message length: 23, out_left: 23
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_msg.c:2145: ssl->f_send() returned 23 (-0xffffffe9)
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_msg.c:2172: <= flush output
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_msg.c:2851: <= write record
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_msg.c:4880: <= send alert message
+/repos/bachelor-thesis/mbedtls-server/mbedtls/library/ssl_msg.c:5750: <= write close notify
+ ok
+  . Waiting for a remote connection ...
