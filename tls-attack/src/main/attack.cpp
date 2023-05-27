@@ -126,21 +126,36 @@ void encrypt(WorkingKeys wk) {
     mbedtls_cipher_setup(&c, cipher_info);
     mbedtls_cipher_set_iv(&c, &wk.iv_enc.front(), wk.iv_enc.size());
     mbedtls_cipher_setkey(&c, &wk.server_write_key.front(), wk.server_write_key.size()*8, MBEDTLS_ENCRYPT);
-    //mbedtls_cipher_setkey(&c, &wk.client_write_key.front(), wk.client_write_key.size()*8, MBEDTLS_DECRYPT);
+    mbedtls_cipher_setkey(&c, &wk.client_write_key.front(), wk.client_write_key.size()*8, MBEDTLS_DECRYPT);
     std::cout << "sizeof(c) " << sizeof(c) << std::endl;
 
     barr output;
-    output.resize(100);
-  //  mbedtls_cipher_definitions def;
+    output.resize(data.size() + 16);
     size_t olen = 0;
-    mbedtls_cipher_auth_encrypt_ext;
     mbedtls_cipher_auth_encrypt_ext(&c,
                                     &wk.iv_enc.front(), wk.iv_enc.size(),
                                     &add_data.front(), add_data.size(),
                                     &data.front(), data.size(), /* src */
                                     &output.front(), output.size(), /* dst */
                                     &olen, 16);
+    std::cout << "Encrypted: ";
     print_barr(output);
+    std::cout << std::endl;
+
+    barr client_ad = {0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x01, 0x17, 0x03, 0x03, 0x00, 0x12};
+    barr client_encrypted = {0x62, 0x47, 0x85, 0xb3, 0x81, 0x32, 0xab, 0x9e, 0x87, 0x56, 0xf8, 0x22, 0x22, 0x38, 0xa4, 0x1b, 0x15, 0xa0, 0x38, 0xad, 0x2c, 0x80, 0x59, 0x44, 0x6d, 0xcf, 0x0c, 0xeb, 0x24, 0x74, 0x68, 0xa7, 0xcb, 0xa8};
+    barr iv_used = {0x39, 0x37, 0xb9, 0x5d, 0x63, 0xf4, 0x15, 0x45, 0xb2, 0x3a, 0xe8, 0xfe};
+    barr client_decrypted;
+    client_decrypted.resize(100);
+    mbedtls_cipher_auth_decrypt_ext(&c,
+            &iv_used.front(), iv_used.size(),
+            &client_ad.front(), client_ad.size(),
+            &client_encrypted.front(), client_encrypted.size(),
+            &client_decrypted.front(), client_decrypted.size(),
+            &olen, 16);
+    std::cout << "Client decrypted: ";
+    print_barr(client_decrypted);
+    std::cout << std::endl;
 }
 
 int main()
