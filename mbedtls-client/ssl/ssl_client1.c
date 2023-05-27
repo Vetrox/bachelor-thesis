@@ -45,6 +45,23 @@ static void my_debug(void *ctx, int level,
     fflush((FILE *) ctx);
 }
 
+int my_generate(void *p_rng, unsigned char *output, size_t output_len, const unsigned char *additional, size_t add_len)
+{
+    (void) p_rng;
+    (void) additional;
+    (void) add_len;
+    memset(output, 0x1b, output_len);
+    return 0;
+}
+
+int my_drbg_random(void *p_rng, unsigned char *output,
+                            size_t output_len)
+{
+    // mbedtls_ctr_drbg_random(p_rng, output, output_len);
+    my_generate(p_rng, output, output_len, NULL, 0);
+    return 0;
+}
+
 int main(void)
 {
     int ret = 1, len;
@@ -77,7 +94,7 @@ int main(void)
     fflush(stdout);
 
     mbedtls_entropy_init(&entropy);
-    if ((ret = mbedtls_ctr_drbg_seed(&ctr_drbg, mbedtls_entropy_func, &entropy,
+    if ((ret = mbedtls_ctr_drbg_seed(&ctr_drbg, my_drbg_random, &entropy,
                                      (const unsigned char *) pers,
                                      strlen(pers))) != 0) {
         mbedtls_printf(" failed\n  ! mbedtls_ctr_drbg_seed returned %d\n", ret);
@@ -136,7 +153,7 @@ int main(void)
      * but makes interop easier in this simplified example */
     mbedtls_ssl_conf_authmode(&conf, MBEDTLS_SSL_VERIFY_OPTIONAL);
     mbedtls_ssl_conf_ca_chain(&conf, &cacert, NULL);
-    mbedtls_ssl_conf_rng(&conf, mbedtls_ctr_drbg_random, &ctr_drbg);
+    mbedtls_ssl_conf_rng(&conf, my_drbg_random, &ctr_drbg);
     mbedtls_ssl_conf_dbg(&conf, my_debug, stdout);
 
     if ((ret = mbedtls_ssl_setup(&ssl, &conf)) != 0) {
