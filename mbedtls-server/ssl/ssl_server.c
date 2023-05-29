@@ -13,11 +13,6 @@
 #include "mbedtls/error.h"
 #include "mbedtls/debug.h"
 #include "mbedtls/x509_crt.h"
-// #include "test/certs.h"
-
-#if defined(MBEDTLS_SSL_CACHE_C)
-#include "mbedtls/ssl_cache.h"
-#endif
 
 #define HTTP_RESPONSE \
     "HTTP/1.0 200 OK\r\nContent-Type: text/html\r\n\r\n" \
@@ -66,17 +61,11 @@ int main(void)
     mbedtls_ssl_config conf;
     mbedtls_x509_crt srvcert;
     mbedtls_pk_context pkey;
-#if defined(MBEDTLS_SSL_CACHE_C)
-    mbedtls_ssl_cache_context cache;
-#endif
 
     mbedtls_net_init(&listen_fd);
     mbedtls_net_init(&client_fd);
     mbedtls_ssl_init(&ssl);
     mbedtls_ssl_config_init(&conf);
-#if defined(MBEDTLS_SSL_CACHE_C)
-    mbedtls_ssl_cache_init(&cache);
-#endif
     mbedtls_x509_crt_init(&srvcert);
     mbedtls_pk_init(&pkey);
     mbedtls_entropy_init(&entropy);
@@ -157,12 +146,6 @@ int main(void)
     // mbedtls_ctr_drbg_random; my_drbg_random;
     mbedtls_ssl_conf_rng(&conf, my_drbg_random, &ctr_drbg);
     mbedtls_ssl_conf_dbg(&conf, my_debug, stdout);
-
-#if defined(MBEDTLS_SSL_CACHE_C)
-    mbedtls_ssl_conf_session_cache(&conf, &cache,
-                                   mbedtls_ssl_cache_get,
-                                   mbedtls_ssl_cache_set);
-#endif
 
     mbedtls_ssl_conf_ca_chain(&conf, srvcert.next, NULL);
     if ((ret = mbedtls_ssl_conf_own_cert(&conf, &srvcert, &pkey)) != 0) {
@@ -318,9 +301,6 @@ exit:
     mbedtls_pk_free(&pkey);
     mbedtls_ssl_free(&ssl);
     mbedtls_ssl_config_free(&conf);
-#if defined(MBEDTLS_SSL_CACHE_C)
-    mbedtls_ssl_cache_free(&cache);
-#endif
     mbedtls_ctr_drbg_free(&ctr_drbg);
     mbedtls_entropy_free(&entropy);
 
