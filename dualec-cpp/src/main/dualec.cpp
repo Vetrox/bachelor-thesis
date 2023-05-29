@@ -14,7 +14,6 @@
 #include <givaro/random-integer.h>
 #include <gmp++/gmp++_int.h>
 #include <limits>
-#include <mbedtls/psa_util.h>
 #include <queue>
 #include <random>
 #include <ratio>

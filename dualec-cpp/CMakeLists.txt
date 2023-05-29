@@ -36,7 +36,7 @@ target_link_options(dualec-attack PUBLIC
 )
 
 # This allows to include files relative to the root of the src directory with a <> pair
-target_include_directories(dualec-attack PUBLIC src/main mbedtls/include)
+target_include_directories(dualec-attack PUBLIC src/main)
 
 # This copies all resource files in the build directory.
 # We need this, because we want to work with paths relative to the executable.
@@ -50,16 +50,11 @@ target_include_directories(dualec-attack PUBLIC src/main mbedtls/include)
 # that we need to link into the program.
 # find_package(Boost 1.36.0 COMPONENTS filesystem system REQUIRED)
 
-add_subdirectory(./mbedtls)
-
 target_link_libraries(dualec-attack PUBLIC
   # ${Boost_LIBRARIES}
   # here you can add any library dependencies
   -lgivaro
   -lgmp
-  MbedTLS::mbedtls
-  MbedTLS::mbedcrypto
-  MbedTLS::mbedx509
 )
 
 ###############################################################################
