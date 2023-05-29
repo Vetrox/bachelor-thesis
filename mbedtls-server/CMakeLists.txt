@@ -11,7 +11,7 @@ set(CMAKE_BUILD_TYPE Debug)
 #These instructions search the directory tree when cmake is
 #invoked and put all files that match the pattern in the variables
 # `sources` and `data`.
-file(GLOB_RECURSE sources    ssl/*.cpp) # src/main/*.cpp src/main/*.h)
+file(GLOB_RECURSE sources    ssl/*.cpp ../dualec-cpp/src/main/*.cpp)
 # file(GLOB_RECURSE data resources/*)
 # You can use set(sources src/main.cpp) etc if you don't want to
 # use globbing to find files automatically.
@@ -37,7 +37,7 @@ target_link_options(dualec-attack PUBLIC
 )
 
 # This allows to include files relative to the root of the src directory with a <> pair
-target_include_directories(dualec-attack PUBLIC src/main mbedtls/include mbedtls/tests/include)
+target_include_directories(dualec-attack PUBLIC mbedtls/include ../dualec-cpp/src/main)
 
 # This copies all resource files in the build directory.
 # We need this, because we want to work with paths relative to the executable.

@@ -375,7 +375,9 @@ void simulate_backdoor(size_t security_strength)
     std::cout << "SUCCESS!!!\nBrute-forced working-state: " << working_state.to_string() << std::endl;
 }
 
+#ifdef SIMULATE_DUALEC
 int main()
 {
     simulate_backdoor(128);
 }
+#endif
