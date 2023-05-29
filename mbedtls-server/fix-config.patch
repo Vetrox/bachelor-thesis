@@ -1,0 +1,79 @@
+From 8a05f0d8f8771336d1a9677d33dfe2c467cba05f Mon Sep 17 00:00:00 2001
+From: Vetrox <39677514+Vetrox@users.noreply.github.com>
+Date: Mon, 22 May 2023 17:15:51 +0200
+Subject: [PATCH 1/2] Patch mbedtls_config to force DH key exchange
+
+---
+ include/mbedtls/mbedtls_config.h | 8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
+
+diff --git a/include/mbedtls/mbedtls_config.h b/include/mbedtls/mbedtls_config.h
+index 4292b493b..4973bf884 100644
+--- a/include/mbedtls/mbedtls_config.h
++++ b/include/mbedtls/mbedtls_config.h
+@@ -812,7 +812,7 @@
+  *      MBEDTLS_TLS_ECDHE_PSK_WITH_AES_128_CBC_SHA
+  *      MBEDTLS_TLS_ECDHE_PSK_WITH_CAMELLIA_128_CBC_SHA256
+  */
+-#define MBEDTLS_KEY_EXCHANGE_ECDHE_PSK_ENABLED
++// #define MBEDTLS_KEY_EXCHANGE_ECDHE_PSK_ENABLED
+ 
+ /**
+  * \def MBEDTLS_KEY_EXCHANGE_RSA_PSK_ENABLED
+@@ -835,7 +835,7 @@
+  *      MBEDTLS_TLS_RSA_PSK_WITH_CAMELLIA_128_GCM_SHA256
+  *      MBEDTLS_TLS_RSA_PSK_WITH_CAMELLIA_128_CBC_SHA256
+  */
+-#define MBEDTLS_KEY_EXCHANGE_RSA_PSK_ENABLED
++// #define MBEDTLS_KEY_EXCHANGE_RSA_PSK_ENABLED
+ 
+ /**
+  * \def MBEDTLS_KEY_EXCHANGE_RSA_ENABLED
+@@ -860,7 +860,7 @@
+  *      MBEDTLS_TLS_RSA_WITH_CAMELLIA_128_CBC_SHA256
+  *      MBEDTLS_TLS_RSA_WITH_CAMELLIA_128_CBC_SHA
+  */
+-#define MBEDTLS_KEY_EXCHANGE_RSA_ENABLED
++// #define MBEDTLS_KEY_EXCHANGE_RSA_ENABLED
+ 
+ /**
+  * \def MBEDTLS_KEY_EXCHANGE_DHE_RSA_ENABLED
+@@ -915,7 +915,7 @@
+  *      MBEDTLS_TLS_ECDHE_RSA_WITH_CAMELLIA_128_GCM_SHA256
+  *      MBEDTLS_TLS_ECDHE_RSA_WITH_CAMELLIA_128_CBC_SHA256
+  */
+-#define MBEDTLS_KEY_EXCHANGE_ECDHE_RSA_ENABLED
++// #define MBEDTLS_KEY_EXCHANGE_ECDHE_RSA_ENABLED
+ 
+ /**
+  * \def MBEDTLS_KEY_EXCHANGE_ECDHE_ECDSA_ENABLED
+-- 
+2.40.1
+
+
+From c5477ca7f8d3ad2bb40cc87a7b7d207341bf7662 Mon Sep 17 00:00:00 2001
+From: Vetrox <39677514+Vetrox@users.noreply.github.com>
+Date: Sat, 27 May 2023 13:47:34 +0200
+Subject: [PATCH 2/2] Disable Extended master secret as it wasn't supported
+ until 2015
+
+---
+ include/mbedtls/mbedtls_config.h | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/include/mbedtls/mbedtls_config.h b/include/mbedtls/mbedtls_config.h
+index 4973bf884..2b5418bf8 100644
+--- a/include/mbedtls/mbedtls_config.h
++++ b/include/mbedtls/mbedtls_config.h
+@@ -1491,7 +1491,7 @@
+  *
+  * Comment this macro to disable support for Extended Master Secret.
+  */
+-#define MBEDTLS_SSL_EXTENDED_MASTER_SECRET
++// #define MBEDTLS_SSL_EXTENDED_MASTER_SECRET
+ 
+ /**
+  * \def MBEDTLS_SSL_KEEP_PEER_CERTIFICATE
+-- 
+2.40.1
+

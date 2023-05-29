@@ -2,4 +2,6 @@
     path = tls-attack/mbedtls
     url = https://github.com/Mbed-TLS/mbedtls.git
     ignore = dirty
-
+[submodule "mbedtls-server/mbedtls"]
+	path = mbedtls-server/mbedtls
+	url = https://github.com/Mbed-TLS/mbedtls.git
