@@ -1,9 +1,0 @@
-*compile_commands.json
-.cache/clangd
-dualec-attack
-*.cmake
-Makefile
-CMakeFiles
-CMakeCache.txt
-*.ninja*
-callgrind*
