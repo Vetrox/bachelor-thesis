@@ -55,7 +55,7 @@ int main(void)
     unsigned char buf[1024];
     const char *pers = "ssl_server";
 
-    mbedtls_entropy_context entropy; // use MBEDTLS_ALLOW_PRIVATE_ACCESS to access and possibly modify the content to our will
+    mbedtls_entropy_context entropy;
     mbedtls_ctr_drbg_context ctr_drbg;
     mbedtls_ssl_context ssl;
     mbedtls_ssl_config conf;
@@ -71,9 +71,7 @@ int main(void)
     mbedtls_entropy_init(&entropy);
     mbedtls_ctr_drbg_init(&ctr_drbg);
 
-#if defined(MBEDTLS_DEBUG_C)
     mbedtls_debug_set_threshold(DEBUG_LEVEL);
-#endif
 
     /*
      * 1. Seed the RNG
@@ -143,7 +141,6 @@ int main(void)
         goto exit;
     }
 
-    // mbedtls_ctr_drbg_random; my_drbg_random;
     mbedtls_ssl_conf_rng(&conf, my_drbg_random, &ctr_drbg);
     mbedtls_ssl_conf_dbg(&conf, my_debug, stdout);
 
@@ -161,13 +158,11 @@ int main(void)
     mbedtls_printf(" ok\n");
 
 reset:
-#ifdef MBEDTLS_ERROR_C
     if (ret != 0) {
         char error_buf[100];
         mbedtls_strerror(ret, error_buf, 100);
         mbedtls_printf("Last error was: %d - %s\n\n", ret, error_buf);
     }
-#endif
 
     mbedtls_net_free(&client_fd);
 
@@ -286,13 +281,11 @@ reset:
 
 exit:
 
-#ifdef MBEDTLS_ERROR_C
     if (ret != 0) {
         char error_buf[100];
         mbedtls_strerror(ret, error_buf, 100);
         mbedtls_printf("Last error was: %d - %s\n\n", ret, error_buf);
     }
-#endif
 
     mbedtls_net_free(&client_fd);
     mbedtls_net_free(&listen_fd);

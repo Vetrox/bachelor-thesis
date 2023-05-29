@@ -11,7 +11,7 @@ set(CMAKE_BUILD_TYPE Debug)
 #These instructions search the directory tree when cmake is
 #invoked and put all files that match the pattern in the variables
 # `sources` and `data`.
-file(GLOB_RECURSE sources    ssl/*.c) # src/main/*.cpp src/main/*.h)
+file(GLOB_RECURSE sources    ssl/*.cpp) # src/main/*.cpp src/main/*.h)
 # file(GLOB_RECURSE data resources/*)
 # You can use set(sources src/main.cpp) etc if you don't want to
 # use globbing to find files automatically.
