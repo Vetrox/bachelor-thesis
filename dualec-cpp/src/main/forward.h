@@ -3,7 +3,7 @@
 #include <givaro/modular-integer.h>
 #include <span>
 
-#ifdef DEBUG
+#ifdef DUALEC_DEBUG
 #    define DBG std::cout
 #else
 #    define DBG    \
