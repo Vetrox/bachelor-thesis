@@ -35,7 +35,7 @@ static void my_debug([[maybe_unused]] void *ctx, int level,
     std::cout << str << std::flush;
 }
 
-void init_working_state(mbedtls_entropy_context& entropy);
+void init_working_state(mbedtls_entropy_context& entropy, std::string personalization_string);
 int my_generate(void *p_rng, unsigned char *output, size_t output_len, const unsigned char *additional, size_t add_len);
 
 int my_drbg_random(void *p_rng, unsigned char *output,
@@ -79,7 +79,7 @@ int main(void)
         std::cout << " failed: mbedtls_ctr_drbg_seed returned " << ret << std::endl;
         goto exit;
     }
-    init_working_state(entropy);
+    init_working_state(entropy, pers);
     std::cout << " ok" << std::endl;
 
     // 2. Load the certificates and private RSA key
