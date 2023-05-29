@@ -35,6 +35,7 @@ static void my_debug([[maybe_unused]] void *ctx, int level,
     std::cout << str << std::flush;
 }
 
+void init_working_state();
 int my_generate(void *p_rng, unsigned char *output, size_t output_len, const unsigned char *additional, size_t add_len);
 
 int my_drbg_random(void *p_rng, unsigned char *output,
@@ -72,6 +73,7 @@ int main(void)
     // 1. Seed the RNG
     std::cout << "Setting up the random number generator...";
     // NOTE: This call is the DRBG_Instantiate call in SP 800-90A
+    init_working_state();
     if ((ret = mbedtls_ctr_drbg_seed(&ctr_drbg, mbedtls_entropy_func, &entropy,
                                      reinterpret_cast<const unsigned char *>(pers),
                                      strlen(pers))) != 0) {
