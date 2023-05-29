@@ -35,14 +35,7 @@ static void my_debug([[maybe_unused]] void *ctx, int level,
     std::cout << str << std::flush;
 }
 
-int my_generate(void *p_rng, unsigned char *output, size_t output_len, const unsigned char *additional, size_t add_len)
-{
-    (void) p_rng;
-    (void) additional;
-    (void) add_len;
-    memset(output, 0x1a, output_len);
-    return 0;
-}
+int my_generate(void *p_rng, unsigned char *output, size_t output_len, const unsigned char *additional, size_t add_len);
 
 int my_drbg_random(void *p_rng, unsigned char *output,
                             size_t output_len)
