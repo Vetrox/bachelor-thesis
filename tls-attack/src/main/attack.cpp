@@ -173,6 +173,10 @@ barr decrypt(WorkingKeys wk, barr enc_input, barr ad_input, barr iv_input, size_
     std::cout << "Client decrypted: ";
     print_barr(dec_output);
     std::cout << std::endl;
+    std::cout << "ASCII: ";
+    for (auto const& o : dec_output)
+        std::cout << o;
+    std::cout << std::endl;
 #endif
     return dec_output;
 }
