@@ -240,8 +240,8 @@ def Dual_EC_DRBG_Generate(working_state: WorkingState, requested_number_of_bits,
     print(f"Generate(s = {hex_from_number_padded_to_num_of_bits(num_from_bitstr(working_state.s), working_state.seedlen)}, requested_number_of_bits = {requested_number_of_bits})")
     while True:
         print(f"Iteration {i}")
-        # 5. t = s XOR additional_input.
-        t = XOR(num_from_bitstr(working_state.s), num_from_bitstr(additional_input))
+        # 5. t = s XOR additional_input. [...] t should be be reduced mod n
+        t = XOR(num_from_bitstr(working_state.s), num_from_bitstr(additional_input)) % working_state.dual_ec_curve.ec.order
 
         # 6. s = phi(x(t * P)).
         working_state.s = cast_to_bitlen(Dual_EC_phi(Dual_EC_x(Dual_EC_mul(t, working_state.dual_ec_curve.P))), working_state.seedlen)
