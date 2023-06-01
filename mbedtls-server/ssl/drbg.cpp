@@ -27,8 +27,6 @@ void init_working_state(mbedtls_entropy_context& entropy, std::string personaliz
 int my_generate(void *p_rng, unsigned char *output, size_t output_len, const unsigned char *additional, size_t add_len)
 {
     (void) p_rng;
-    (void) additional;
-    (void) add_len;
 
     if (!working_state.has_value()) {
         std::cout << "WORKING STATE NOT INITIALIZED" << std::endl;
