@@ -413,9 +413,6 @@ def calculate_max_outlen(seedlen):
         return 504
     raise ValueError("Invalid seedlen provided.")
 
-def hash_outlen():
-    return len(Hash(b""))
-
 def num_from_bitstr(bitlist):
     num = 0
     for bit in bitlist:
@@ -423,21 +420,6 @@ def num_from_bitstr(bitlist):
         num <<= 1
     num >>= 1
     return num
-
-def generate_for(requested_bitlen, security_strength):
-    curve = pick_curve(security_strength)
-    curve_name = curve.name
-    print(f"Picking {curve_name}")
-
-    input_randomness = bits_from_num(Integer(secrets.randbelow(2^64-1)))
-    output_randomness, delta_time = test_for(input_randomness, requested_bitlen, security_strength, curve)
-    print(f"Generation took: {delta_time:.2f} ms")
-    bits = output_randomness
-    with open(f"{curve_name}.csv", 'w') as f:
-        writer = csv.writer(f)
-        writer.writerow(["bit"])
-        for bit in bits:
-            writer.writerow([bit])
 
 def attack_backdoor(security_strength):
     curve = pick_curve(security_strength)
@@ -523,8 +505,8 @@ def generate_Q(P):
     return (d, Q)
 
 if __name__ == "__main__":
-    bits, t = test_for([], 240*3, 128, Dual_EC_P256)
-    print(bits)
-#    if len(sys.argv) != 3:
- #       raise ValueError("Wrong number of command line arguments")
-   # attack_backdoor(int(sys.argv[1])) # int(sys.argv[2]))
+    if len(sys.argv) > 2:
+        bits, t = test_for([], Integer(sys.argv[2]), Integer(sys.argv[1]), pick_curve(int(sys.argv[1])))
+        print(bits)
+    else:
+        attack_backdoor(Integer(sys.argv[1]))
