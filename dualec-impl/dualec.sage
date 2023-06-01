@@ -117,7 +117,7 @@ integer.
     """
     # Hash gets selected from Table 4 in 10.3.1
     # Note: Since it's allowed for every allowed curve (P-256, P-384, P-521) we use SHA-256.
-    outlen = SHA_256_OUTLEN # max_outlen
+    outlen = SHA_256_OUTLEN
     assert no_of_bits_to_return <= 255 * outlen
     # The outlen of SHA-256 is 256 bit.
 
@@ -436,7 +436,7 @@ def attack_backdoor(security_strength):
     requested_bitlen = max_outlen * (2+num_of_predictions)
 
     input_randomness = bits_from_num(Integer(secrets.randbelow(2^64-1)))
-    output_randomness, delta_time = test_for(input_randomness, requested_bitlen, security_strength, curve)
+    output_randomness, delta_time = init_and_generate(input_randomness, requested_bitlen, security_strength, curve)
     print(f"Generation took: {delta_time:.2f} ms")
 
     s = compute_s_from_one_outlen_line_of_bits(output_randomness[:max_outlen], output_randomness[max_outlen:2*max_outlen], seedlen, max_outlen, d, Q, curve)
@@ -481,9 +481,9 @@ def calculate_Points_from_x(x, curve):
     y_candidates = yy.sqrt(extend=False, all=True)
     return [EC(FF(x), FF(y)) for y in y_candidates]
 
-def test_for(input_randomness, requested_amount_of_bits, security_strength, curve):
+def init_and_generate(input_randomness, requested_amount_of_bits, security_strength, curve):
     working_state = Dual_EC_DRBG_Instantiate(input_randomness, bits_from_num(0), bits_from_num(0), security_strength, curve)
-    print(f"WorkingState(s: {num_from_bitstr(working_state.s).hex()} seedlen: {working_state.seedlen} outlen: {working_state.outlen}")
+    print(f"WorkingState(s: {num_from_bitstr(working_state.s).hex()} seedlen: {working_state.seedlen} outlen: {working_state.outlen})")
 
     start_time = time.monotonic()
     returned_bits, working_state = Dual_EC_DRBG_Generate(working_state, requested_amount_of_bits, bits_from_num(0))
@@ -506,7 +506,8 @@ def generate_Q(P):
 
 if __name__ == "__main__":
     if len(sys.argv) > 2:
-        bits, t = test_for([], Integer(sys.argv[2]), Integer(sys.argv[1]), pick_curve(int(sys.argv[1])))
+        entropy_str = "" if len(sys.argv) < 4 else sys.argv[3]
+        bits, t = init_and_generate(bitstr_from_bytes(bytes(entropy_str, encoding="utf-8")), Integer(sys.argv[2]), Integer(sys.argv[1]), pick_curve(int(sys.argv[1])))
         print(bits)
     else:
         attack_backdoor(Integer(sys.argv[1]))
