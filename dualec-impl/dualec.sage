@@ -189,7 +189,7 @@ def Dual_EC_phi(x):
     Note: Further details depend on the implementation of the field
     """
     assert type(x) == sage.rings.finite_rings.integer_mod.IntegerMod_gmp
-    return x.lift() # TODO: figure out what to do here
+    return x.lift()
 
 def Dual_EC_mul(scalar, A):
     """
@@ -197,6 +197,13 @@ def Dual_EC_mul(scalar, A):
     """
     assert type(scalar) == Integer and type(A) == sage.schemes.elliptic_curves.ell_point.EllipticCurvePoint_finite_field
     return scalar * A
+
+def print_stripped_r(working_state, r, rightmost_outlen_bits_of_r):
+    stripped_bits = XOR(num_from_bitstr(rightmost_outlen_bits_of_r), r)
+    hex_outlen_bits_of_r = hex_from_number_padded_to_num_of_bits(num_from_bitstr(rightmost_outlen_bits_of_r), working_state.outlen)
+    hex_stripped_bits = hex_from_number_padded_to_num_of_bits(stripped_bits >> working_state.outlen, working_state.seedlen - working_state.outlen)
+    print(f"s <- {hex_from_number_padded_to_num_of_bits(num_from_bitstr(working_state.s), working_state.seedlen)}")
+    print(f"r <- {hex_outlen_bits_of_r}, stripped_bits = {hex_stripped_bits}")
 
 def Dual_EC_DRBG_Generate(working_state: WorkingState, requested_number_of_bits, additional_input):
     """
@@ -244,16 +251,12 @@ def Dual_EC_DRBG_Generate(working_state: WorkingState, requested_number_of_bits,
         # 6. s = phi(x(t * P)).
         working_state.s = cast_to_bitlen(Dual_EC_phi(Dual_EC_x(Dual_EC_mul(t, working_state.dual_ec_curve.P))), working_state.seedlen)
 
-        # 7. r = phi(x(s * Q)). BACKDOOR: x(d * (s * Q)) * Q
+        # 7. r = phi(x(s * Q)).
         r = Dual_EC_phi(Dual_EC_x(Dual_EC_mul(num_from_bitstr(working_state.s), working_state.dual_ec_curve.Q)))
 
         # 8. temp = temp || (rightmost outlen bits of r).
         rightmost_outlen_bits_of_r = cast_to_bitlen(r, working_state.outlen)
-        stripped_bits = XOR(num_from_bitstr(rightmost_outlen_bits_of_r), r)
-        hex_outlen_bits_of_r = hex_from_number_padded_to_num_of_bits(num_from_bitstr(rightmost_outlen_bits_of_r), working_state.outlen)
-        hex_stripped_bits = hex_from_number_padded_to_num_of_bits(stripped_bits >> working_state.outlen, working_state.seedlen - working_state.outlen)
-        print(f"s <- {hex_from_number_padded_to_num_of_bits(num_from_bitstr(working_state.s), working_state.seedlen)}")
-        print(f"r <- {hex_outlen_bits_of_r}, stripped_bits = {hex_stripped_bits}")
+        print_stripped_r(working_state, r, rightmost_outlen_bits_of_r)
         temp = ConcatBitStr(temp, rightmost_outlen_bits_of_r)
 
         # 9. additional_input=0
