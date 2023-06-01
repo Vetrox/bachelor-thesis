@@ -119,10 +119,10 @@ integer.
     # Note: Since it's allowed for every allowed curve (P-256, P-384, P-521) we use SHA-256.
     outlen = SHA_256_OUTLEN # max_outlen
     assert no_of_bits_to_return <= 255 * outlen
-    # The outlen of SHA-256 is TODO
+    # The outlen of SHA-256 is 256 bit.
 
     # 1. temp = the Null string
-    temp = bits_from_num(0)
+    temp = bits_from_num(0) # -> []
 
     # 2. len = ceil(no_of_bits_to_return / outlen)
     len_ = ceil(no_of_bits_to_return / outlen)
@@ -131,7 +131,7 @@ integer.
     counter = 1
 
     # 4. For i = 1 to len do
-    for i in range(1, len_ + 1): # TODO: check off by one error
+    for i in range(1, len_ + 1):
         # 4.1 temp = temp || Hash(counter || no_of_bits_to_return || input_string)
         temp = ConcatBitStr(temp,
                              Hash(ConcatBitStr(
@@ -223,16 +223,16 @@ def Dual_EC_DRBG_Generate(working_state: WorkingState, requested_number_of_bits,
 
 
     # 1. Check whether a reseed is required.
-    # Note: This isn't implemented yet
+    # Note: This isn't supported.
 
-    # 2. If additional_input_string??? = Null then additional_input = 0 else ...
-    # additional_input = bits_from_num(0)
-    # Note: we don't perform a check here, because the case Null can' happen
+    # 2. If additional_input_string = Null then additional_input = 0 else ...
+    if additional_input == None:
+        additional_input = bits_from_num(0)
 
     # 3. temp = the Null string
     temp = bits_from_num(0)
 
-    # 4. i=0
+    # 4. i = 0
     i = 0
 
     print(f"Generate(s = {hex_from_number_padded_to_num_of_bits(num_from_bitstr(working_state.s), working_state.seedlen)}, requested_number_of_bits = {requested_number_of_bits})")
@@ -241,9 +241,9 @@ def Dual_EC_DRBG_Generate(working_state: WorkingState, requested_number_of_bits,
         # 5. t = s XOR additional_input.
         t = XOR(num_from_bitstr(working_state.s), num_from_bitstr(additional_input))
 
-        # 6. s = phi(x(t * P)). BACKDOOR: x(s * (d * Q)) = x(d * (s * Q))
-        # next iter: x(x(d * (s * Q)) * (d * Q)) = d * x(x(d * (s * Q)) * Q) = d * r
+        # 6. s = phi(x(t * P)).
         working_state.s = cast_to_bitlen(Dual_EC_phi(Dual_EC_x(Dual_EC_mul(t, working_state.dual_ec_curve.P))), working_state.seedlen)
+
         # 7. r = phi(x(s * Q)). BACKDOOR: x(d * (s * Q)) * Q
         r = Dual_EC_phi(Dual_EC_x(Dual_EC_mul(num_from_bitstr(working_state.s), working_state.dual_ec_curve.Q)))
 
@@ -335,15 +335,14 @@ def hex_from_number_padded_to_num_of_bits(num, amount_of_bits):
     return ret + num.hex()
 
 def cast_to_bitlen(num, outlen):
-    """This also inserts 0s on the left if outlen > bitlen(x)"""
+    """Left equivalent of Dual_EC_Truncate.
+    This also inserts 0s on the left if outlen > bitlen(x)"""
     assert type(num) == type(outlen) == Integer
-    masked_num = num & (2^outlen - 1)
-    bitstr = bits_from_num(masked_num)
+    bitstr = bits_from_num(num)
     filler_amount = outlen - len(bitstr)
     if filler_amount > 0:
-        for i in range(filler_amount):
-            bitstr = [0] + bitstr
-    return bitstr
+        bitstr = [0]*filler_amount + bitstr
+    return bitstr[len(bitstr)-outlen:]
 
 def leftmost_no_of_bits_to_return_from(bitstr, no_of_bits_to_return):
     assert type(bitstr) == list and type(no_of_bits_to_return) == Integer
@@ -528,6 +527,7 @@ def generate_Q(P):
 
 if __name__ == "__main__":
     bits, t = test_for([], 240*3, 128, Dual_EC_P256)
+    print(bits)
 #    if len(sys.argv) != 3:
  #       raise ValueError("Wrong number of command line arguments")
    # attack_backdoor(int(sys.argv[1])) # int(sys.argv[2]))
