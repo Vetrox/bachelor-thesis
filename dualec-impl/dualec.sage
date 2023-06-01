@@ -152,11 +152,6 @@ def ConcatBitStr(bitstr_a, bitstr_b):
     assert type(bitstr_a) == type(bitstr_b) == list
     return bitstr_a + bitstr_b
 
-
-def Dual_EC_DRBG_Reseed(working_state, entropy_input,
-                        additional_input):
-    raise NotImplementedError("Reseeding isn't implemented yet")
-
 def Dual_EC_Truncate(bitstring, in_len, out_len):
     """
     Inputs a bitstring of in_len bits, returning
@@ -259,7 +254,7 @@ def Dual_EC_DRBG_Generate(working_state: WorkingState, requested_number_of_bits,
         print_stripped_r(working_state, r, rightmost_outlen_bits_of_r)
         temp = ConcatBitStr(temp, rightmost_outlen_bits_of_r)
 
-        # 9. additional_input=0
+        # 9. additional_input = 0
         additional_input = bits_from_num(0)
 
         # 10. reseed_counter = reseed_counter + 1.
@@ -272,14 +267,16 @@ def Dual_EC_DRBG_Generate(working_state: WorkingState, requested_number_of_bits,
         if not (len(temp) < requested_number_of_bits):
             break
 
-    # 13. returned_bits = Truncate (temp, i * outlen, requested_number_of_bits).
-    if (len(temp) != i * working_state.outlen):
-        raise AssertionError("Temp should be a multiple of outlen")
+    # 13. returned_bits = Truncate(temp, i * outlen, requested_number_of_bits).
+    if len(temp) != i * working_state.outlen:
+        raise AssertionError("Temp must be a multiple of outlen.")
+    if len(temp) < requested_number_of_bits:
+        raise AssertionError("Temp must be longer than the requested number of bits, otherwise we wouldn't get the requested entropy.")
     returned_bits = Dual_EC_Truncate(temp, i * working_state.outlen, requested_number_of_bits)
 
-    # 14. s = phi(x(s * P)). BACKDOOR: x(d * (s * Q)) * (d * Q) = d * r
+    # 14. s = phi(x(s * P)).
     working_state.s = cast_to_bitlen(Dual_EC_phi(Dual_EC_x(Dual_EC_mul(num_from_bitstr(working_state.s), working_state.dual_ec_curve.P))), working_state.seedlen)
-    #print(f"s <- {hex_from_number_padded_to_num_of_bits(num_from_bitstr(working_state.s), working_state.seedlen)}")
+
     # 15. Return SUCCESS, returned_bits, and s, seedlen, p, a, b, n, P, Q, and a reseed_counter for the new_working_state.
     return returned_bits, working_state
 
@@ -347,12 +344,6 @@ def cast_to_bitlen(num, outlen):
         bitstr = [0]*filler_amount + bitstr
     return bitstr[len(bitstr)-outlen:]
 
-def leftmost_no_of_bits_to_return_from(bitstr, no_of_bits_to_return):
-    assert type(bitstr) == list and type(no_of_bits_to_return) == Integer
-    if (no_of_bits_to_return > len(bitstr)):
-        raise ValueError("Tried to chop negative amount")
-    return bitstr[:no_of_bits_to_return]
-
 def bitlen(x):
     assert type(x) == int or type(x) == Integer
     return x.bit_length()
@@ -393,10 +384,7 @@ Dual_EC_P521 = Dual_EC_Curve("P-521",
             0x1f3bdba5_85295d9a_1110d1df_1f9430ef_8442c501_8976ff34_37ef91b8_1dc0b813_2c8d5c39_c32d0e00_4a3092b7_d327c0e7_a4d26d2c_7b69b58f_90666529_11e45777_9de))
 
 def pick_curve(security_strength):
-    """
-    Table 2 of 5.6.1.1 of SP 800 Pt. 1
-    https://nvlpubs.nist.gov/nistpubs/SpecialPublications/NIST.SP.800-57pt1r5.pdf#%5B%7B%22num%22%3A196%2C%22gen%22%3A0%7D%2C%7B%22name%22%3A%22XYZ%22%7D%2C319%2C345%2C0%5D
-    """
+    """See Definitions for the Dual_EC_DRBG"""
     if security_strength <= 128:
         return Dual_EC_P256
     if security_strength <= 192:
@@ -406,6 +394,7 @@ def pick_curve(security_strength):
     raise ValueError("Invalid Security strength requested.")
 
 def pick_seedlen(security_strength):
+    """See Definitions for the Dual_EC_DRBG"""
     if security_strength <= 128:
         return 256
     if security_strength <= 192:
@@ -415,9 +404,14 @@ def pick_seedlen(security_strength):
     raise ValueError("Invalid Security strength requested.")
 
 def calculate_max_outlen(seedlen):
-    # Largest multiple of 8 less than (size of the base field) - (13 + log2(the cofactor))
-    # TODO: the cofactor of 8 is only retrieved by trail and error. Recommended values are lower than 4, so something has to be off.
-    return Integer(8*floor(seedlen / 8) - (13 + log(8)/log(2)))
+    """See Definitions for the Dual_EC_DRBG"""
+    if seedlen <= 256:
+        return 240
+    if seedlen <= 384:
+        return 368
+    if seedlen <= 521:
+        return 504
+    raise ValueError("Invalid seedlen provided.")
 
 def hash_outlen():
     return len(Hash(b""))
