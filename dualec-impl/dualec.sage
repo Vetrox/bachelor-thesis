@@ -98,7 +98,7 @@ def Dual_EC_DRBG_Instantiate(entropy_input, nonce,
     # 5. Return s, seedlen, p, a, b, n, P, Q, and a reseed_counter for the initial_working_state.
     return WorkingState(s, seedlen, curve, reseed_counter, calculate_max_outlen(seedlen))
 
-def Hash_df(input_string, no_of_bits_to_return): #, max_outlen):
+def Hash_df(input_string, no_of_bits_to_return):
     """
     The hash-based derivation function hashes an input
     string and returns the requested number of bits. Let Hash be the hash function used by the DRBG mechanism, and let outlen be its output length.
@@ -227,9 +227,11 @@ def Dual_EC_DRBG_Generate(working_state: WorkingState, requested_number_of_bits,
     # 1. Check whether a reseed is required.
     # Note: This isn't supported.
 
-    # 2. If additional_input_string = Null then additional_input = 0 else ...
+    # 2. If additional_input_string = Null then additional_input = 0
     if additional_input == None:
         additional_input = bits_from_num(0)
+    else: # Else additional_input = Hash_df (pad8 (additional_input), seedlen).
+        additional_input = Hash_df(cast_to_bitlen(num_from_bitstr(additional_input), 8*ceil(bitlen(num_from_bitstr(additional_input)) / 8)), working_state.seedlen)
 
     # 3. temp = the Null string
     temp = bits_from_num(0)
@@ -240,8 +242,8 @@ def Dual_EC_DRBG_Generate(working_state: WorkingState, requested_number_of_bits,
     print(f"Generate(s = {hex_from_number_padded_to_num_of_bits(num_from_bitstr(working_state.s), working_state.seedlen)}, requested_number_of_bits = {requested_number_of_bits})")
     while True:
         print(f"Iteration {i}")
-        # 5. t = s XOR additional_input. [...] t should be be reduced mod n
-        t = XOR(num_from_bitstr(working_state.s), num_from_bitstr(additional_input)) % working_state.dual_ec_curve.ec.order
+        # 5. t = s XOR additional_input.
+        t = XOR(num_from_bitstr(working_state.s), num_from_bitstr(additional_input))
 
         # 6. s = phi(x(t * P)).
         working_state.s = cast_to_bitlen(Dual_EC_phi(Dual_EC_x(Dual_EC_mul(t, working_state.dual_ec_curve.P))), working_state.seedlen)
@@ -482,7 +484,9 @@ def calculate_Points_from_x(x, curve):
     return [EC(FF(x), FF(y)) for y in y_candidates]
 
 def init_and_generate(input_randomness, requested_amount_of_bits, security_strength, curve):
-    working_state = Dual_EC_DRBG_Instantiate(input_randomness, bits_from_num(0), bits_from_num(0), security_strength, curve)
+    nonce = bits_from_num(123)
+    personalization_string = bitstr_from_bytes(b"sage_dual_ec")
+    working_state = Dual_EC_DRBG_Instantiate(input_randomness, nonce, personalization_string, security_strength, curve)
     print(f"WorkingState(s: {num_from_bitstr(working_state.s).hex()} seedlen: {working_state.seedlen} outlen: {working_state.outlen})")
 
     start_time = time.monotonic()
