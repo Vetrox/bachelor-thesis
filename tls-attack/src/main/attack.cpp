@@ -48,8 +48,8 @@ barr prf(barr secret, std::string label, barr seed, size_t dst_len)
 barr calculate_master_secret(barr const& pre_master_secret, barr const& server_hello_random, barr const& client_hello_random)
 {
     barr random;
-    random.insert(random.end(), server_hello_random.begin(), server_hello_random.end());
     random.insert(random.end(), client_hello_random.begin(), client_hello_random.end());
+    random.insert(random.end(), server_hello_random.begin(), server_hello_random.end());
     return prf(pre_master_secret, "master secret", random, MASTER_SECRET_LEN);
 }
 
@@ -196,8 +196,8 @@ int main()
     barr pre_master_secret = expect_premaster;
     barr server_hello_random;
     barr client_hello_random;
-    client_hello_random.insert(client_hello_random.begin(), expect_random_bytes.begin(), expect_random_bytes.begin() + 32);
-    server_hello_random.insert(server_hello_random.begin(), expect_random_bytes.begin() + 32, expect_random_bytes.end());
+    server_hello_random.insert(server_hello_random.begin(), expect_random_bytes.begin(), expect_random_bytes.begin() + 32);
+    client_hello_random.insert(client_hello_random.begin(), expect_random_bytes.begin() + 32, expect_random_bytes.end());
     std::cout << "Premaster secret: ";
     for (auto const& b : pre_master_secret)
         std::cout << std::hex << std::setw(2) << std::setfill('0') << static_cast<int>(b) << " ";
@@ -228,8 +228,8 @@ int main()
 
 
     barr random_;
-    random_.insert(random_.end(), client_hello_random.begin(), client_hello_random.end());
     random_.insert(random_.end(), server_hello_random.begin(), server_hello_random.end());
+    random_.insert(random_.end(), client_hello_random.begin(), client_hello_random.end());
     auto working_keys = generate_working_keys(master_secret, random_);
     working_keys.print();
     encrypt(working_keys, {}, {});
