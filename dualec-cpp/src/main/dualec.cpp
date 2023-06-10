@@ -148,7 +148,7 @@ AffinePoint Dual_EC_mul(BigInt scalar, AffinePoint const& point, EllipticCurve c
     return out;
 }
 
-BitStr Dual_EC_Truncate_Right(BitStr const& bitstr, size_t new_length)
+[[nodiscard]] BitStr Dual_EC_Truncate_Right(BitStr const& bitstr, size_t new_length)
 {
     // adds 0s on the left if new_length > len(bitstr)
     ssize_t amount_to_add = new_length - bitstr.bitlength();
@@ -159,13 +159,17 @@ BitStr Dual_EC_Truncate_Right(BitStr const& bitstr, size_t new_length)
     }
 }
 
-BitStr Dual_EC_DRBG_Generate(WorkingState& working_state, size_t requested_number_of_bits, BitStr additional_input)
+BitStr Dual_EC_DRBG_Generate(WorkingState& working_state, size_t requested_number_of_bits, std::optional<BitStr> additional_input_string)
 {
     // 1. Check whether a reseed is required.
     // Note: This isn't implemented yet.
 
-    // 2. If additional_input_string = Null then additional_input = 0 else ...
-    // Note:: Implementation omitted additional_input_string.
+    // 2. If additional_input_string = Null then additional_input = 0
+    BitStr additional_input(0);
+    if (additional_input_string.has_value()) { // Else additional_input = Hash_df (pad8 (additional_input), seedlen).
+        size_t next_higher_8_bits = 8 * containerlen_for_bitlength<uint8_t>(additional_input_string.value().bitlength());
+        additional_input = Hash_df(Dual_EC_Truncate_Right(additional_input_string.value(), next_higher_8_bits), working_state.seedlen);
+    }
 
     // 3. temp = the Null string
     BitStr temp(0);

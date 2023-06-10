@@ -2,6 +2,7 @@
 #include "bitstr.h"
 #include "dualec_curve.h"
 #include "forward.h"
+#include <optional>
 
 struct WorkingState {
     BitStr s;
@@ -25,4 +26,4 @@ WorkingState Dual_EC_DRBG_Instantiate(BitStr entropy_input, BitStr nonce,
     BitStr personalization_string, size_t security_strength,
     DualEcCurve const* curve = nullptr);
 
-BitStr Dual_EC_DRBG_Generate(WorkingState&, size_t requested_number_of_bits, BitStr additional_input);
+BitStr Dual_EC_DRBG_Generate(WorkingState&, size_t requested_number_of_bits, std::optional<BitStr> additional_input);
