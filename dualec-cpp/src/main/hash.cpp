@@ -1,9 +1,9 @@
 #include "hash.h"
 #include "SHA256.h"
 
-static SHA256 sha256;
 BitStr SHA256_Hash(BitStr const& input)
 {
+    SHA256 sha256;
     auto tmp = input.to_baked_array();
     sha256.update(tmp.data(), tmp.size());
     auto* digest = sha256.digest();
