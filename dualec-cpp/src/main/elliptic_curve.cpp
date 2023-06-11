@@ -89,8 +89,8 @@ void EllipticCurve::add(AffinePoint& out, AffinePoint const& p1, AffinePoint con
     Element den; // x2 - x1
     m_field.sub(den, p2.x(), p1.x());
 
-    Element slope; // l = (y2-y1) / (x2-x1)
-    m_field.div(slope, num, den);
+    Element slope;                // l = (y2-y1) / (x2-x1)
+    m_field.div(slope, num, den); // EXPENSIVE
 
     Element slope_sq; // l^2
     m_field.mul(slope_sq, slope, slope);
@@ -142,7 +142,7 @@ void EllipticCurve::_double(AffinePoint& out, AffinePoint const& in) const
 
     Element slope; // l = (3 * x^2 + a) / (2 * y)
     m_field.add(tmp_element, _3x_sq, m_a);
-    m_field.div(slope, tmp_element, _2y);
+    m_field.div(slope, tmp_element, _2y); // EXPENSIVE
 
     Element slope_sq; // l^2
     m_field.mul(slope_sq, slope, slope);
