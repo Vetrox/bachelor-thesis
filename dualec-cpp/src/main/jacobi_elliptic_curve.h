@@ -35,7 +35,7 @@ public:
         m_field.mul(Y3, 2, P.y());
 
         // 8. Z3 <- Y3 * Z1
-        m_field.mul(Z3, Y3, P.x());
+        m_field.mul(Z3, Y3, P.z());
 
         // 9. Y3 <- Y3^2
         {
@@ -45,7 +45,7 @@ public:
         }
 
         // 10. T3 <- Y3 * X1
-        m_field.mulin(T3, P.x());
+        m_field.mul(T3, Y3, P.x());
 
         // 11. Y3 <- Y3^2
         {
