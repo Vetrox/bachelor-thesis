@@ -5,6 +5,10 @@
 
 class JacobiPoint {
 public:
+    JacobiPoint(Zp field)
+        : JacobiPoint(1, 1, 0, field)
+    {
+    }
     JacobiPoint(Element const& x, Element const& y, Element const& z, Zp field)
         : m_field(field)
     {
@@ -17,12 +21,38 @@ public:
         : JacobiPoint(x, y, 1, field)
     {
     }
+
+    Element x() const
+    {
+        return m_X;
+    }
+
+    Element y() const
+    {
+        return m_Y;
+    }
+
+    Element z() const
+    {
+        return m_Z;
+    }
+
+    std::string to_string() const
+    {
+        return "(" + bigint_hex(x()) + ":" + bigint_hex(y()) + ":" + bigint_hex(z()) + ")";
+    }
+
+    bool is_identity() const
+    {
+        return m_Z == 0; // TODO: Consider X = Y = 1?
+    }
+
     void negate()
     {
         m_field.negin(m_Y);
     }
 
-    AffinePoint to_affine()
+    AffinePoint to_affine() const
     {
         if (m_Z == 0)
             return AffinePoint();
