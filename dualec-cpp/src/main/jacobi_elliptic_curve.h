@@ -86,7 +86,7 @@ public:
         return JacobiPoint(X3, Y3, Z3, m_field);
     }
 
-    JacobiPoint add(JacobiPoint const& P, AffinePoint const& Q)
+    JacobiPoint add(JacobiPoint const& P, AffinePoint const& Q) const
     {
         if (Q.identity())
             return JacobiPoint(P);
@@ -162,6 +162,27 @@ public:
         m_field.sub(Y3, T3, T4);
 
         return JacobiPoint(X3, Y3, Z3, m_field);
+    }
+
+    JacobiPoint scalar(JacobiPoint const& P, BigInt k) const
+    {
+        auto out = JacobiPoint(m_field); // identity
+        if (P.is_identity()) {
+            return out;
+        }
+        JacobiPoint tmp1(m_field), tmp2(m_field);
+        JacobiPoint _2p = P;
+        while (k > 0) {
+            if (k.operator&(static_cast<size_t>(0b1)) == 1) {
+                tmp1 = add(out, _2p.to_affine());
+                out = tmp1; // out = out + pp
+            }
+
+            tmp2 = _double(_2p);
+            _2p = tmp2; // pp = 2*pp
+            k >>= 1;    // k = k / 2
+        }
+        return out;
     }
 
 private:
