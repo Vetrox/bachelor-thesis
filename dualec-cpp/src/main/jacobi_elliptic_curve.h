@@ -3,6 +3,7 @@
 #include "affine_point.h"
 #include "forward.h"
 #include "jacobi_point.h"
+#include <optional>
 
 /* Defined over Y^2 = X^3 + (-3)*X*Z^4 + b*Z^6 */
 class JacobiEllipticCurve {
@@ -56,7 +57,12 @@ public:
         }
 
         // 12. Y3 <- Y3 / 2
-        m_field.divin(Y3, 2);
+        if (!inv_of_2.has_value()) {
+            Element i = 2;
+            m_field.invin(i);
+            const_cast<JacobiEllipticCurve*>(this)->inv_of_2.emplace(std::move(i));
+        }
+        m_field.mulin(Y3, inv_of_2.value());
 
         // 13. X3 <- T2^2
         m_field.mul(X3, T2, T2);
@@ -160,4 +166,6 @@ public:
 
 private:
     Zp m_field;
+
+    std::optional<BigInt> inv_of_2;
 };
