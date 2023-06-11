@@ -22,17 +22,17 @@ public:
     {
     }
 
-    Element x() const
+    Element const& x() const
     {
         return m_X;
     }
 
-    Element y() const
+    Element const& y() const
     {
         return m_Y;
     }
 
-    Element z() const
+    Element const& z() const
     {
         return m_Z;
     }
