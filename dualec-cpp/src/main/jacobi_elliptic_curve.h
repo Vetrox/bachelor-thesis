@@ -109,11 +109,14 @@ public:
 
         // 9. If T1 = 0 then
         if (T1 == 0) {
-            /* 9.1 If T2 = 0 then use Algorithm 3.21 to compute (X3 : Y3 : Z3 ) = 2(x2 : y2 : 1) and return(X3 : Y3 : Z3 ). */
-            return _double(JacobiPoint(Q.x(), Q.y(), 1, m_field));
-        } else {
-            // else return Infinity.
-            return JacobiPoint(m_field);
+            // 9.1 If T2 = 0
+            if (T2 == 0) {
+                // then use Algorithm 3.21 to compute (X3 : Y3 : Z3 ) = 2(x2 : y2 : 1) and return(X3 : Y3 : Z3 ).
+                return _double(JacobiPoint(Q.x(), Q.y(), 1, m_field));
+            } else {
+                // else return Infinity.
+                return JacobiPoint(m_field);
+            }
         }
 
         // 10. Z3 <- Z1 * T1
