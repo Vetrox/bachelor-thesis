@@ -17,7 +17,7 @@ public:
         m_field.init(m_b, b);
     }
 
-    void inv(AffinePoint& out, AffinePoint const& in) const;
+    void negate(AffinePoint& out, AffinePoint const& in) const;
     void _double(AffinePoint& out, AffinePoint const& in) const;
     void add(AffinePoint& out, AffinePoint const& p1, AffinePoint const& p2) const;
     void scalar(AffinePoint& out, AffinePoint const& p, BigInt k) const;

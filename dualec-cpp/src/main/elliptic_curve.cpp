@@ -70,7 +70,7 @@ void EllipticCurve::add(AffinePoint& out, AffinePoint const& p1, AffinePoint con
 
     {
         AffinePoint tmp1;
-        inv(tmp1, p1);
+        negate(tmp1, p1);
 
         if (tmp1 == p2) {
             out.setIdentity(true);
@@ -110,7 +110,7 @@ void EllipticCurve::add(AffinePoint& out, AffinePoint const& p1, AffinePoint con
     out.setY(out_y);
 }
 
-void EllipticCurve::inv(AffinePoint& out, AffinePoint const& in) const
+void EllipticCurve::negate(AffinePoint& out, AffinePoint const& in) const
 {
     if (in.identity()) {
         out.setIdentity(true);
