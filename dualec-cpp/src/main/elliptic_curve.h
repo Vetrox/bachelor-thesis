@@ -17,6 +17,11 @@ public:
         m_field.init(m_b, b);
     }
 
+    BigInt prime() const
+    {
+        return m_field.residu();
+    }
+
 private:
     void negate(AffinePoint& out, AffinePoint const& in) const;
     void _double(AffinePoint& out, AffinePoint const& in) const;
