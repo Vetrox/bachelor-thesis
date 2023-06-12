@@ -44,7 +44,7 @@ public:
 
     bool is_identity() const
     {
-        return m_Z == 0; // TODO: Consider X = Y = 1?
+        return m_Z == 0;
     }
 
     void negate()

@@ -165,9 +165,8 @@ JacobiPoint JacobiEllipticCurve::scalar(JacobiPoint const& P, BigInt k) const
             out = tmp1; // out = out + pp
         }
 
-        tmp2 = _double(_2p);
-        _2p = tmp2; // pp = 2*pp
-        k >>= 1;    // k = k / 2
+        _2p = _double(_2p); // pp = 2*pp
+        k >>= 1;            // k = k / 2
     }
     return out;
 }
