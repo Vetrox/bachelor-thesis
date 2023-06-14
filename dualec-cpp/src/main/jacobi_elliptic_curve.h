@@ -9,11 +9,8 @@
 /* Defined over Y^2 = X^3 + (-3)*X*Z^4 + b*Z^6 */
 class JacobiEllipticCurve : public EllipticCurve {
 public:
-    JacobiEllipticCurve(std::string const& name, BigInt const& prime, BigInt const& b)
-        : EllipticCurve(name,
-            prime,
-            BigInt("-3"),
-            b)
+    JacobiEllipticCurve(BigInt const& prime, BigInt const& b)
+        : EllipticCurve(prime, BigInt("-3"), b)
     {
     }
     virtual void scalar(AffinePoint& out, AffinePoint const& p, BigInt k) const override;

@@ -9,9 +9,8 @@
 // defined over field Z_p
 class EllipticCurve {
 public:
-    EllipticCurve(std::string name, BigInt prime, BigInt a, BigInt b)
+    EllipticCurve(BigInt prime, BigInt a, BigInt b)
         : m_field(prime)
-        , m_name(name)
     {
         m_field.init(m_a, a);
         m_field.init(m_b, b);
@@ -44,7 +43,6 @@ protected:
 private:
     void sqrt(BigInt& s1, BigInt& s2, BigInt const& z) const;
 
-    std::string m_name;
     Element m_a;
     Element m_b;
 };
