@@ -269,12 +269,12 @@ void generate_dQ(AffinePoint const& P, BigInt const& order_of_p, EllipticCurve c
     auto working_state = Dual_EC_DRBG_Instantiate(BitStr(random_input_entropy), BitStr(0), BitStr(0), security_strength, &curve);
     std::cout << "WorkingState: " << working_state.to_string() << std::endl;
 
-    auto random_bits = Dual_EC_DRBG_Generate(working_state, no_of_bits_to_return, BitStr(0));
+    auto random_bits = Dual_EC_DRBG_Generate(working_state, no_of_bits_to_return, {});
     return random_bits;
 }
 
 BitStr predict_next_rand_bits(AffinePoint const& point, BitStr& out_guess_for_next_s, BigInt const& d, DualEcCurve const& dec_curve, size_t seedlen, size_t outlen, bool log = false)
-{
+{ // TODO: teach predict_next_rand_bits about known adins
     if (log)
         std::cout << "predict_next_rand_bits(point: " << point.to_string() << " d: " << bigint_hex(d) << " seedlen: " << seedlen << ")";
     //  it holds that s2 = x(d * R)
