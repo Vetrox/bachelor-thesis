@@ -70,6 +70,7 @@ void Dual_EC_Truncate(BitStr& bitstr, size_t outlen)
     auto amount_to_add = bitstr.bitlength() - outlen;
     if (amount_to_add > 0) {
         std::cout << "ERROR: The caller should guarantee that this case isn't hit. Adding " << amount_to_add << " 0-bits" << std::endl;
+        abort();
         bitstr = bitstr + BitStr(BigInt(0), amount_to_add);
     }
 }
@@ -90,11 +91,11 @@ BitStr Hash_df(BitStr const& input_string, uint32_t no_of_bits_to_return)
 {
     size_t hash_outlen = 256; // bits
     if (no_of_bits_to_return > 255 * hash_outlen) {
-        DBG << "ERROR: Requested too many no_of_bits_to_return" << std::endl;
+        std::cout << "ERROR: Requested too many no_of_bits_to_return" << std::endl;
         abort();
     }
     // 1. temp = the Null string
-    BitStr temp(BigInt(0), 0);
+    BitStr temp(0);
 
     // 2. len = ceil(no_of_bits_to_return / outlen)
     auto len = ceildiv(no_of_bits_to_return, hash_outlen);
@@ -180,8 +181,10 @@ BitStr Dual_EC_DRBG_Generate(WorkingState& working_state, size_t requested_numbe
     size_t i = 0;
 
     do {
+        std::cout << "i: " << i << " adin: " << additional_input.as_hex_string() << std::endl;
         // 5. t = s XOR additional_input
         auto t = working_state.s ^ additional_input;
+        std::cout << "i: " << i << " t: " << t.as_hex_string() << std::endl;
 
         // 6. s = phi(x(t * P)). BACKDOOR: x(s * (d * Q)) = x(d * (s * Q))
         working_state.s = BitStr(Dual_EC_mul(t.as_big_int(), working_state.dec_curve.P, working_state.dec_curve.curve).x(), working_state.seedlen);
@@ -193,12 +196,12 @@ BitStr Dual_EC_DRBG_Generate(WorkingState& working_state, size_t requested_numbe
         // 8. temp = temp || (rightmost outlen bits of r)
         auto stripped_r = r.truncated_rightmost(working_state.outlen);
         auto amount_of_stripped_bits = static_cast<int>(r.bitlength()) - static_cast<int>(working_state.outlen);
-        std::cout << "Amount-of-stripped-bits: " << amount_of_stripped_bits << std::endl;
+        std::cout << "i: " << i << " amount-of-stripped-bits: " << amount_of_stripped_bits << std::endl;
         auto stripped_bits = r.truncated_leftmost(amount_of_stripped_bits);
         if (i == 0)
             stripped_bit_marker = stripped_bits.as_big_int();
         std::cout << "i: " << i << " r: " << stripped_r.as_hex_string() << " stripped_bits: " << stripped_bits.as_hex_string() << std::endl;
-        std::cout << "  R: " << Dual_EC_mul(working_state.s.as_big_int(), working_state.dec_curve.Q, working_state.dec_curve.curve).to_string() << std::endl;
+        std::cout << "i: " << i << " R: " << Dual_EC_mul(working_state.s.as_big_int(), working_state.dec_curve.Q, working_state.dec_curve.curve).to_string() << std::endl;
         temp = temp + stripped_r;
 
         // 9. additional_input=0
@@ -243,7 +246,7 @@ void generate_dQ(AffinePoint const& P, BigInt const& order_of_p, JacobiEllipticC
     while (true) {
         // pick random d
         if (determined)
-            out_d = BigInt(0x197febe5);
+            out_d = BigInt("430696793");
         else
             out_d = random_integer_iterator.randomInteger();
         if (Givaro::isZero(out_d))
@@ -266,9 +269,10 @@ void generate_dQ(AffinePoint const& P, BigInt const& order_of_p, JacobiEllipticC
 {
     auto random_input_entropy = random_bigint(BigInt(1) << 123);
     if (determined)
-        random_input_entropy = 0;
-    DBG << "Random input entropy: " << bigint_hex(random_input_entropy) << std::endl;
+        random_input_entropy = 0x35763dce;
+    std::cout << "Random input entropy: " << bigint_hex(random_input_entropy) << std::endl;
     auto working_state = Dual_EC_DRBG_Instantiate(BitStr(random_input_entropy), BitStr(0), BitStr(0), security_strength, &curve);
+
     std::cout << "WorkingState: " << working_state.to_string() << std::endl;
 
     auto random_bits = Dual_EC_DRBG_Generate(working_state, no_of_bits_to_return, {});
@@ -383,6 +387,10 @@ void simulate_backdoor(size_t security_strength)
 #ifdef SIMULATE_DUALEC
 int main()
 {
-    simulate_backdoor(128);
+    simulate_backdoor(256);
+    /*BitStr a = BitStr(BigInt(0xaaa123));
+    std::cout << a.debug_description() << std::endl;
+    auto b = a.truncated_leftmost(9);
+    std::cout << b.debug_description() << std::endl;*/
 }
 #endif
