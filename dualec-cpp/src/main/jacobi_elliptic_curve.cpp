@@ -79,7 +79,7 @@ JacobiPoint JacobiEllipticCurve::_double(JacobiPoint const& P) const
 
 JacobiPoint JacobiEllipticCurve::add(JacobiPoint const& P, AffinePoint const& Q) const
 {
-    if (Q.identity())
+    if (Q.is_identity())
         return JacobiPoint(P);
     if (P.is_identity())
         return JacobiPoint(Q.x(), Q.y(), 1, m_field);
@@ -159,7 +159,7 @@ void JacobiEllipticCurve::scalar(AffinePoint& out, AffinePoint const& p, BigInt 
 {
     auto tmp = JacobiPoint(m_field); // identity
     size_t n = k.bitsize();
-    if (p.identity() || n < 1) {
+    if (p.is_identity() || n < 1) {
         out = tmp.to_affine();
         return;
     }

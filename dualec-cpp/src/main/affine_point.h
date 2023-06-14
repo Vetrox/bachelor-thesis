@@ -15,7 +15,7 @@ public:
     {
     }
 
-    bool identity() const
+    bool is_identity() const
     {
         return m_identity;
     }

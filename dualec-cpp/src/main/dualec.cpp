@@ -321,7 +321,7 @@ BitStr brute_force_next_s(BitStr const& bits, size_t security_strength, BigInt d
                 AffinePoint guess_R1, guess_R2;
                 dec_curve.curve.lift_x(guess_R1, guess_R2, guess_for_r_x);
                 BitStr guess_for_next_s(0);
-                if (!guess_R1.identity()) {
+                if (!guess_R1.is_identity()) {
                     if (i == stripped_bit_marker)
                         std::cout << " " << guess_R1.to_string() << " " << guess_R2.to_string() << std::endl;
                     auto guess_next_rand_bits = predict_next_rand_bits(guess_R1, guess_for_next_s, d, dec_curve, seedlen, outlen, i == stripped_bit_marker);

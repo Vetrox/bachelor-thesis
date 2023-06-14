@@ -34,7 +34,7 @@ void EllipticCurve::lift_x(AffinePoint& r1, AffinePoint& r2, BigInt inp_x) const
 void EllipticCurve::scalar(AffinePoint& out, AffinePoint const& p, BigInt k) const
 {
     out.setIdentity(true);
-    if (p.identity()) {
+    if (p.is_identity()) {
         return;
     }
     AffinePoint tmp1, tmp2;
@@ -53,17 +53,17 @@ void EllipticCurve::scalar(AffinePoint& out, AffinePoint const& p, BigInt k) con
 
 void EllipticCurve::add(AffinePoint& out, AffinePoint const& p1, AffinePoint const& p2) const
 {
-    if (p1.identity() && p2.identity()) {
+    if (p1.is_identity() && p2.is_identity()) {
         out.setIdentity(true);
         return;
     }
 
-    if (p1.identity()) {
+    if (p1.is_identity()) {
         out = p2;
         return;
     }
 
-    if (p2.identity()) {
+    if (p2.is_identity()) {
         out = p1;
         return;
     }
@@ -112,7 +112,7 @@ void EllipticCurve::add(AffinePoint& out, AffinePoint const& p1, AffinePoint con
 
 void EllipticCurve::negate(AffinePoint& out, AffinePoint const& in) const
 {
-    if (in.identity()) {
+    if (in.is_identity()) {
         out.setIdentity(true);
         return;
     }
@@ -125,7 +125,7 @@ void EllipticCurve::negate(AffinePoint& out, AffinePoint const& in) const
 
 void EllipticCurve::_double(AffinePoint& out, AffinePoint const& in) const
 {
-    if (in.identity()) {
+    if (in.is_identity()) {
         out.setIdentity(true);
         return;
     }
