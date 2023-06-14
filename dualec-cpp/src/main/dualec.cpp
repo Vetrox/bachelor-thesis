@@ -5,6 +5,8 @@
 #include "elliptic_curve.h"
 #include "forward.h"
 #include "hash.h"
+#include "jacobi_elliptic_curve.h"
+#include "jacobi_point.h"
 #include <algorithm>
 #include <chrono>
 #include <cmath>
@@ -14,6 +16,7 @@
 #include <givaro/random-integer.h>
 #include <gmp++/gmp++_int.h>
 #include <limits>
+#include <ostream>
 #include <queue>
 #include <random>
 #include <ratio>
@@ -141,7 +144,7 @@ WorkingState Dual_EC_DRBG_Instantiate(BitStr entropy_input, BitStr nonce,
         .outlen = calculate_max_outlen(seedlen) };
 }
 
-AffinePoint Dual_EC_mul(BigInt scalar, AffinePoint const& point, EllipticCurve const& curve)
+AffinePoint Dual_EC_mul(BigInt scalar, AffinePoint const& point, JacobiEllipticCurve const& curve)
 {
     AffinePoint out;
     curve.scalar(out, point, scalar);
@@ -234,7 +237,7 @@ BigInt random_bigint(BigInt end_exclusive)
     return generator.randomInteger();
 }
 
-void generate_dQ(AffinePoint const& P, BigInt const& order_of_p, EllipticCurve const& curve, BigInt& out_d, AffinePoint& out_Q)
+void generate_dQ(AffinePoint const& P, BigInt const& order_of_p, JacobiEllipticCurve const& curve, BigInt& out_d, AffinePoint& out_Q)
 {
     Zp order_field(order_of_p);
     Givaro::RandomIntegerIterator<> random_integer_iterator(order_field);
