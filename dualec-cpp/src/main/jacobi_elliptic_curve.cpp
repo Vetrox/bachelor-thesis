@@ -1,4 +1,5 @@
 #include "jacobi_elliptic_curve.h"
+#include "affine_point.h"
 #include <cstdlib>
 #include <ios>
 #include <sys/types.h>
@@ -154,21 +155,22 @@ JacobiPoint JacobiEllipticCurve::add(JacobiPoint const& P, AffinePoint const& Q)
     return JacobiPoint(X3, Y3, Z3, m_field);
 }
 
-JacobiPoint JacobiEllipticCurve::scalar(JacobiPoint const& P, BigInt k) const
+void JacobiEllipticCurve::scalar(AffinePoint& out, AffinePoint const& p, BigInt k) const
 {
-    auto out = JacobiPoint(m_field); // identity
+    auto tmp = JacobiPoint(m_field); // identity
     size_t n = k.bitsize();
-    if (P.is_identity() || n < 1) {
-        return out;
+    if (p.identity() || n < 1) {
+        out = tmp.to_affine();
+        return;
     }
 
-    auto affine_P = P.to_affine();
     for (ssize_t i = n - 1; i >= 0; --i) {
         size_t mask = (static_cast<size_t>(1) << i);
-        out = _double(out);
+        tmp = _double(tmp);
         if (k.operator&(mask) != 0) {
-            out = add(out, affine_P);
+            tmp = add(tmp, p);
         }
     }
-    return out;
+    out = tmp.to_affine();
+    return;
 }

@@ -16,7 +16,7 @@ public:
             b)
     {
     }
-    JacobiPoint scalar(JacobiPoint const& P, BigInt k) const;
+    virtual void scalar(AffinePoint& out, AffinePoint const& p, BigInt k) const override;
 
     virtual std::string to_string() const override
     {
