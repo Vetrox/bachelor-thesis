@@ -1,4 +1,7 @@
 #include "jacobi_elliptic_curve.h"
+#include <cstdlib>
+#include <ios>
+#include <sys/types.h>
 JacobiPoint JacobiEllipticCurve::_double(JacobiPoint const& P) const
 {
     if (P.is_identity())
@@ -154,19 +157,18 @@ JacobiPoint JacobiEllipticCurve::add(JacobiPoint const& P, AffinePoint const& Q)
 JacobiPoint JacobiEllipticCurve::scalar(JacobiPoint const& P, BigInt k) const
 {
     auto out = JacobiPoint(m_field); // identity
-    if (P.is_identity()) {
+    size_t n = k.bitsize();
+    if (P.is_identity() || n < 1) {
         return out;
     }
-    JacobiPoint tmp1(m_field), tmp2(m_field);
-    JacobiPoint _2p = P;
-    while (k > 0) {
-        if (k.operator&(static_cast<size_t>(0b1)) == 1) {
-            tmp1 = add(out, _2p.to_affine());
-            out = tmp1; // out = out + pp
-        }
 
-        _2p = _double(_2p); // pp = 2*pp
-        k >>= 1;            // k = k / 2
+    auto affine_P = P.to_affine();
+    for (ssize_t i = n - 1; i >= 0; --i) {
+        size_t mask = (static_cast<size_t>(1) << i);
+        out = _double(out);
+        if (k.operator&(mask) != 0) {
+            out = add(out, affine_P);
+        }
     }
     return out;
 }
