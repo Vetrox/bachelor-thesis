@@ -129,7 +129,7 @@ WorkingState Dual_EC_DRBG_Instantiate(BitStr entropy_input, BitStr nonce,
     DBG << "Length of s: " << s.bitlength() << std::endl;
 
     // 3. reseed_counter = 0
-    size_t reseed_counter = 0;
+    // NOT IMPLEMENTED
 
     // 4. Using the security_strength and Table 4 in Section 10.3.1, select the smallest available curve that has a security strength >= security_strength. The values for seedlen, p, a, b, n, P, Q are determined by the curve
     if (curve == nullptr)
@@ -140,7 +140,6 @@ WorkingState Dual_EC_DRBG_Instantiate(BitStr entropy_input, BitStr nonce,
     return WorkingState { .s = std::move(s),
         .seedlen = seedlen,
         .dec_curve = std::move(*curve),
-        .reseed_counter = reseed_counter,
         .outlen = calculate_max_outlen(seedlen) };
 }
 
@@ -165,7 +164,7 @@ AffinePoint Dual_EC_mul(BigInt scalar, AffinePoint const& point, JacobiEllipticC
 BitStr Dual_EC_DRBG_Generate(WorkingState& working_state, size_t requested_number_of_bits, std::optional<BitStr> additional_input_string)
 {
     // 1. Check whether a reseed is required.
-    // Note: This isn't implemented yet.
+    // NOT IMPLEMENTED
 
     // 2. If additional_input_string = Null then additional_input = 0
     BitStr additional_input(0);
@@ -206,7 +205,7 @@ BitStr Dual_EC_DRBG_Generate(WorkingState& working_state, size_t requested_numbe
         additional_input = BitStr(0);
 
         // 10. reseed_counter = reseed_counter + 1
-        working_state.reseed_counter++;
+        // NOT IMPLEMENTED
 
         // 11. i = i + 1
         i++;
@@ -361,7 +360,6 @@ WorkingState brute_force_working_state(BitStr const& bits, size_t security_stren
         .s = s,
         .seedlen = pick_seedlen(security_strength),
         .dec_curve = dec_curve,
-        .reseed_counter = 0,
         .outlen = calculate_max_outlen(pick_seedlen(security_strength)),
     };
 }

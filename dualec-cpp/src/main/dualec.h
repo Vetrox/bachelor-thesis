@@ -8,7 +8,6 @@ struct WorkingState {
     BitStr s;
     size_t seedlen;
     DualEcCurve const& dec_curve;
-    size_t reseed_counter;
     size_t outlen;
 
     std::string to_string() const
@@ -16,7 +15,6 @@ struct WorkingState {
         return "WorkingState(s = " + s.as_hex_string()
             + " seedlen = " + std::to_string(seedlen)
             + " dec_curve = " + dec_curve.to_string()
-            + " reseed_counter = " + std::to_string(reseed_counter)
             + " outlen = " + std::to_string(outlen)
             + ")";
     }
