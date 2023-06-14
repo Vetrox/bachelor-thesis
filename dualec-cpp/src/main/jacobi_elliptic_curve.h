@@ -20,9 +20,9 @@ public:
         return "Jacobi" + EllipticCurve::to_string();
     }
 
-private:
     JacobiPoint _double(JacobiPoint const& P) const;
     JacobiPoint add(JacobiPoint const& P, AffinePoint const& Q) const;
 
+private:
     std::optional<BigInt> inv_of_2;
 };
