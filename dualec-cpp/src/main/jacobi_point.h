@@ -56,6 +56,8 @@ public:
     {
         if (m_Z == 0)
             return AffinePoint();
+        if (m_Z == 1)
+            return AffinePoint(m_X, m_Y);
 
         Element z_tmp;
         m_field.mul(z_tmp, m_Z, m_Z);
