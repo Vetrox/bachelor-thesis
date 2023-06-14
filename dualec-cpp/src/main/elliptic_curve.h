@@ -32,17 +32,17 @@ public:
 
     void lift_x(AffinePoint& r1, AffinePoint& r2, BigInt inp_x) const;
 
-    std::string to_string() const
+    virtual std::string to_string() const
     {
         return "EllipticCurve(Z_" + bigint_hex(m_field.residu())
             + ", y^2 = x^3 + " + bigint_hex(m_a) + "*x + " + bigint_hex(m_b) + ")";
     }
-
+protected:
+    Zp m_field;
 private:
     void sqrt(BigInt& s1, BigInt& s2, BigInt const& z) const;
 
+    std::string m_name;
     Element m_a;
     Element m_b;
-    Zp m_field;
-    std::string m_name;
 };

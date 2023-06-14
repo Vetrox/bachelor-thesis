@@ -1,23 +1,31 @@
 #pragma once
 
 #include "affine_point.h"
+#include "elliptic_curve.h"
 #include "forward.h"
 #include "jacobi_point.h"
 #include <optional>
 
 /* Defined over Y^2 = X^3 + (-3)*X*Z^4 + b*Z^6 */
-class JacobiEllipticCurve {
+class JacobiEllipticCurve : public EllipticCurve {
 public:
-    JacobiEllipticCurve(Zp field)
-        : m_field(field)
+    JacobiEllipticCurve(std::string const& name, BigInt const& prime, BigInt const& b)
+        : EllipticCurve(name,
+            prime,
+            BigInt("-3"),
+            b)
     {
     }
     JacobiPoint scalar(JacobiPoint const& P, BigInt k) const;
 
+    virtual std::string to_string() const override
+    {
+        return "Jacobi" + EllipticCurve::to_string();
+    }
+
 private:
     JacobiPoint _double(JacobiPoint const& P) const;
     JacobiPoint add(JacobiPoint const& P, AffinePoint const& Q) const;
-    Zp m_field;
 
     std::optional<BigInt> inv_of_2;
 };
