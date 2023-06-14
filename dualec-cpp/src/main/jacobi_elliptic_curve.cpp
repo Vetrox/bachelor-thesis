@@ -165,7 +165,7 @@ void JacobiEllipticCurve::scalar(AffinePoint& out, AffinePoint const& p, BigInt 
     }
 
     for (ssize_t i = n - 1; i >= 0; --i) {
-        size_t mask = (static_cast<size_t>(1) << i);
+        auto mask = BigInt(1) << i;
         tmp = _double(tmp);
         if (k.operator&(mask) != 0) {
             tmp = add(tmp, p);
