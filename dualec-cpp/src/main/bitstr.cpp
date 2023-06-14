@@ -39,7 +39,10 @@
      *       |pooo|oooo|000-|----|----|
      */
     size_t bitshift_total = bitlength() - new_length;
-    if (internal_bitlength() <= bitshift_total)
+    auto i = this->as_big_int();
+    i >>= bitshift_total;
+    return BitStr(i, new_length);
+    /*if (internal_bitlength() <= bitshift_total)
         return BitStr(std::unique_ptr<B[]>(), 0, new_length);
     size_t new_internal_bitlen = internal_bitlength() - bitshift_total;
     size_t new_byte_len = containerlen_for_bitlength<B>(new_internal_bitlen);
@@ -55,7 +58,7 @@
         if (it != box && bitshift_inner != 0 && it != box_end)
             *it |= (*dit) << (bits_per_word - bitshift_inner);
     }
-    return BitStr(std::unique_ptr<B[]>(box), new_byte_len, new_length);
+    return BitStr(std::unique_ptr<B[]>(box), new_byte_len, new_length);*/
 }
 
 [[nodiscard]] BigInt BitStr::as_big_int() const
