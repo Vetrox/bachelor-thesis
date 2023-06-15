@@ -128,7 +128,7 @@ DEC::WorkingState DEC::Instantiate(BitStr entropy_input, BitStr nonce,
     // 5. Return s, seedlen, p, a, b, n, P, Q, and a reseed_counter for the initial_working_state.
     return WorkingState { .s = std::move(s),
         .seedlen = seedlen,
-        .dec_curve = std::move(*curve),
+        .dec_curve = *curve,
         .outlen = calculate_max_outlen(seedlen) };
 }
 
