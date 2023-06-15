@@ -13,11 +13,11 @@ struct Curve {
 
     std::string to_string(size_t indent_level = 0) const
     {
-        std::string indent = std::string(" ", indent_level);
+        std::string indent = std::string(indent_level, ' ');
         return "DualECCurve(\n" + indent
-            + " curve: " + curve.to_string(indent_level + 2) + "\n" + indent
-            + " P: " + P.to_string() + "\n" + indent
-            + " Q: " + Q.to_string() + ")";
+            + "  curve: " + curve.to_string(indent_level + 4) + "\n" + indent
+            + "  P: " + P.to_string() + "\n" + indent
+            + "  Q: " + Q.to_string() + ")";
     }
 };
 

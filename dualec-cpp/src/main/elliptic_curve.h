@@ -30,10 +30,10 @@ public:
 
     virtual std::string to_string(size_t indent_level = 0) const
     {
-        std::string indent = std::string(" ", indent_level);
+        std::string indent = std::string(indent_level, ' ');
         return "EllipticCurve(\n" + indent
-            + " prime: " + bigint_hex(m_field.residu()) + "\n" + indent
-            + " y^2 = x^3 + " + bigint_hex(m_a) + "*x + " + bigint_hex(m_b) + ")";
+            + "  prime: " + bigint_hex(m_field.residu()) + "\n" + indent
+            + "  y^2 = x^3 + " + bigint_hex(m_a) + "*x + " + bigint_hex(m_b) + ")";
     }
 
 protected:

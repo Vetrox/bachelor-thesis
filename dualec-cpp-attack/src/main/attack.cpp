@@ -72,14 +72,14 @@ void generate_dQ(AffinePoint const& P, BigInt const& order_of_p, JacobiEllipticC
     return random_bits;
 }
 
-BitStr predict_next_rand_bits(AffinePoint const& point, BitStr& out_guess_for_next_s, BigInt const& d, DEC::Curve const& dec_curve, size_t seedlen, size_t outlen, bool log = false)
+BitStr predict_next_rand_bits(AffinePoint const& guess_R, BitStr& out_guess_for_next_s, BigInt const& d, DEC::Curve const& dec_curve, size_t seedlen, size_t outlen, bool log = false)
 { // TODO: teach predict_next_rand_bits about known adins
     if (log)
-        std::cout << "predict_next_rand_bits(point: " << point.to_string() << " d: " << bigint_hex(d) << " seedlen: " << seedlen << ")";
+        std::cout << "predict_next_rand_bits(point: " << guess_R.to_string() << " d: " << bigint_hex(d) << " seedlen: " << seedlen << ")" << std::endl;
     //  it holds that s2 = x(d * R)
-    out_guess_for_next_s = BitStr(DEC::mul(d, point, dec_curve.curve).x(), seedlen);
+    out_guess_for_next_s = BitStr(DEC::mul(d, guess_R, dec_curve.curve).x(), seedlen);
     if (log)
-        std::cout << " out_guess_for_next_s = " << out_guess_for_next_s.debug_description() << std::endl;
+        std::cout << "  out_guess_for_next_s = " << out_guess_for_next_s.debug_description() << std::endl;
     auto guess_for_next_r = DEC::mul(out_guess_for_next_s.as_big_int(), dec_curve.Q, dec_curve.curve).x();
     return BitStr(guess_for_next_r, outlen);
 }

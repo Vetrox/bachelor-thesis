@@ -14,12 +14,12 @@ struct WorkingState {
 
     std::string to_string(size_t indent_level = 0) const
     {
-        std::string indent = std::string(" ", indent_level);
+        std::string indent = std::string(indent_level, ' ');
         return "WorkingState(\n" + indent
-            + " s: " + s.as_hex_string() + "\n" + indent
-            + " seedlen: " + std::to_string(seedlen) + "\n" + indent
-            + " dec_curve: " + dec_curve.to_string(indent_level + 2) + "\n" + indent
-            + " outlen: " + std::to_string(outlen) + ")";
+            + "  s: " + s.as_hex_string() + "\n" + indent
+            + "  seedlen: " + std::to_string(seedlen) + "\n" + indent
+            + "  dec_curve: " + dec_curve.to_string(indent_level + 4) + "\n" + indent
+            + "  outlen: " + std::to_string(outlen) + ")";
     }
 };
 
