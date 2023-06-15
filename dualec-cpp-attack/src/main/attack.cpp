@@ -19,7 +19,7 @@ BigInt dual_ec_stripped_bits_first_round = -1;
 #endif
 
 static constexpr uint32_t max_threads = 15;
-static constexpr auto determined = false;
+static constexpr auto determined = true;
 static auto const no_of_threads = BigInt(std::min(max_threads, std::thread::hardware_concurrency() * 5));
 
 static std::stop_source stop_source;
@@ -37,7 +37,7 @@ void generate_dQ(AffinePoint const& P, BigInt const& order_of_p, JacobiEllipticC
     while (true) {
         // pick random d
         if (determined)
-            out_d = BigInt("430696793");
+            out_d = BigInt(0x62f102b);
         else
             out_d = random_integer_iterator.randomInteger();
         if (Givaro::isZero(out_d))
@@ -60,7 +60,7 @@ void generate_dQ(AffinePoint const& P, BigInt const& order_of_p, JacobiEllipticC
 {
     auto random_input_entropy = random_bigint(BigInt(1) << 123);
     if (determined)
-        random_input_entropy = 0x35763dce;
+        random_input_entropy = 0x2bcfe968;
     std::cout << "Random input entropy: " << bigint_hex(random_input_entropy) << std::endl;
     auto working_state = DEC::Instantiate(BitStr(random_input_entropy), BitStr(0), BitStr(0), security_strength, &curve);
 
@@ -75,11 +75,11 @@ void generate_dQ(AffinePoint const& P, BigInt const& order_of_p, JacobiEllipticC
 BitStr predict_next_rand_bits(AffinePoint const& guess_R, BitStr& out_guess_for_next_s, BigInt const& d, DEC::Curve const& dec_curve, size_t seedlen, size_t outlen, bool log = false)
 { // TODO: teach predict_next_rand_bits about known adins
     if (log)
-        std::cout << "predict_next_rand_bits(point: " << guess_R.to_string() << " d: " << bigint_hex(d) << " seedlen: " << seedlen << ")" << std::endl;
+        std::cout << "[DBG] predict_next_rand_bits(point: " << guess_R.to_string() << " d: " << bigint_hex(d) << " seedlen: " << seedlen << ")" << std::endl;
     //  it holds that s2 = x(d * R)
     out_guess_for_next_s = BitStr(DEC::mul(d, guess_R, dec_curve.curve).x(), seedlen);
     if (log)
-        std::cout << "  out_guess_for_next_s = " << out_guess_for_next_s.debug_description() << std::endl;
+        std::cout << "[DBG]  out_guess_for_next_s = " << out_guess_for_next_s.debug_description() << std::endl;
     auto guess_for_next_r = DEC::mul(out_guess_for_next_s.as_big_int(), dec_curve.Q, dec_curve.curve).x();
     return BitStr(guess_for_next_r, outlen);
 }
@@ -189,5 +189,5 @@ void simulate_backdoor(size_t security_strength)
 
 int main()
 {
-    simulate_backdoor(128);
+    simulate_backdoor(256);
 }
