@@ -20,7 +20,7 @@ target_link_options(${PROJECT_NAME} PUBLIC
     #-fsanitize=address,undefined,leak
 )
 
-target_include_directories(${PROJECT_NAME} PUBLIC ../dualec-cpp/src/include mbedtls/include)
+target_include_directories(${PROJECT_NAME} PUBLIC ../dualec-cpp/src/include src/include mbedtls/include)
 
 add_subdirectory(./mbedtls)
 

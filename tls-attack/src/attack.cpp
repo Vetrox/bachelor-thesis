@@ -1,4 +1,6 @@
+#include "commons.h"
 #include "bitstr.h"
+#include "dualec_curve.h"
 #include "mbedtls/cipher.h"
 #include <array>
 #include <bits/stdint-uintn.h>
@@ -11,7 +13,6 @@
 
 #define TLS_ATTACK_DETERMINISTIC
 
-typedef std::vector<uint8_t> barr;
 constexpr auto MASTER_SECRET_LEN = 48;
 
 static auto* cipher_info = mbedtls_cipher_info_from_type(MBEDTLS_CIPHER_CHACHA20_POLY1305);
@@ -190,41 +191,11 @@ void print_cipher_info()
     std::cout << std::endl;
 }
 
-int main()
+#if 0
+void awawaw()
 {
-    print_cipher_info();
-    barr pre_master_secret = expect_premaster;
-    barr server_hello_random;
-    barr client_hello_random;
-    server_hello_random.insert(server_hello_random.begin(), expect_random_bytes.begin(), expect_random_bytes.begin() + 32);
-    client_hello_random.insert(client_hello_random.begin(), expect_random_bytes.begin() + 32, expect_random_bytes.end());
-    std::cout << "Premaster secret: ";
-    for (auto const& b : pre_master_secret)
-        std::cout << std::hex << std::setw(2) << std::setfill('0') << static_cast<int>(b) << " ";
-    std::cout << std::endl;
-
-    std::cout << "Server random: ";
-    for (auto const& b : server_hello_random)
-        std::cout << std::hex << std::setw(2) << std::setfill('0') << static_cast<int>(b) << " ";
-    std::cout << std::endl;
-    std::cout << "Client random: ";
-    for (auto const& b : client_hello_random)
-        std::cout << std::hex << std::setw(2) << std::setfill('0') << static_cast<int>(b) << " ";
-    std::cout << std::endl;
-
-
-
     remove_leading_zero_bytes(pre_master_secret);
     auto master_secret = calculate_master_secret(pre_master_secret, server_hello_random, client_hello_random);
-
-    std::cout << "Master secret: ";
-    for (auto const& b : master_secret)
-        std::cout << std::hex << std::setw(2) << std::setfill('0') << static_cast<int>(b) << " ";
-    std::cout << std::endl;
-     std::cout << "Expected Master secret: ";
-    for (auto const& b : expect_master_secret)
-        std::cout << std::hex << std::setw(2) << std::setfill('0') << static_cast<int>(b) << " ";
-    std::cout << std::endl;
 
 
     barr random_;
@@ -234,5 +205,28 @@ int main()
     working_keys.print();
     encrypt(working_keys, {}, {});
     decrypt(working_keys, {}, {}, {}, 39);
+}
+#endif
+
+int main()
+{
+    setup_input();
+    /* Input:
+     *      TLS: server-random, client-random,
+     *      DH: generator, prime, bitlength of a (TODO: not transferred, but maybe inferred?), pubKeyServer = g^a (mod p), pubKeyClient = g^b (mod p).
+     *      DualEC: security-stength, Q, d, s.t. dQ = P
+     * Assumption:
+     *      server used DualEC to generate server-random and (a+1),
+     *      for now: used cipher: MBEDTLS_CIPHER_CHACHA20_POLY1305
+     * */
+    /* Step 1: Strip the first 4 bytes of server-random, because it's the unix timestamp. */
+    /* Step 2: Guess the first 4 bytes and number of stripped bits (depending on security strength) */
+    /* Step 3: Calculate the next state s_(i+1) */
+    /* Step 4: Generate enough random bits for a */
+    /* Step 5: Calculate g^a (mod p) and check if it matches pubKeyServer
+     *         If it didn't go to step 2.*/
+    /* Step 6: Calculate the pre-master-secret with pubKeyClient^a (mod p) */
+    /* Step 7: Calculate the master secret with the given information */
+    /* Step 8: Calculate the working_keys and decrpyt the message */
     return 0;
 }
