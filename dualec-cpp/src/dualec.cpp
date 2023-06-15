@@ -25,7 +25,7 @@ size_t DEC::pick_seedlen(size_t security_strength)
         return 384;
     if (security_strength <= 256)
         return 521;
-    DBG << "Invalid security strength requested." << std::endl;
+    std::cout << "Invalid security strength requested." << std::endl;
     abort();
 }
 
@@ -39,7 +39,7 @@ size_t DEC::calculate_max_outlen(size_t seedlen)
     case 521:
         return 504;
     default:
-        DBG << "Invalid seedlen provided" << std::endl;
+        std::cout << "Invalid seedlen provided" << std::endl;
         abort();
     }
 }
@@ -52,7 +52,7 @@ DEC::Curve const& DEC::pick_curve(size_t security_strength)
         return DEC::P384;
     if (security_strength <= 256)
         return DEC::P521;
-    DBG << "Invalid security strength" << std::endl;
+    std::cout << "Invalid security strength" << std::endl;
     abort();
 }
 
