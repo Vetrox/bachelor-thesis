@@ -10,7 +10,7 @@ set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 #These instructions search the directory tree when cmake is
 #invoked and put all files that match the pattern in the variables
 # `sources` and `data`.
-file(GLOB_RECURSE sources      src/*.cpp src/include/*.h)
+file(GLOB_RECURSE sources      src/*.cpp)
 # use globbing to find files automatically.
 
 ###############################################################################
