@@ -1,5 +1,6 @@
 #include "commons.h"
 #include "bitstr.h"
+#include "input.h"
 #include "dualec_curve.h"
 #include "mbedtls/cipher.h"
 #include <array>
