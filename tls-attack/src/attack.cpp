@@ -215,15 +215,16 @@ int main()
     /* Input:
      *      TLS: server-random, client-random,
      *      DH: generator, prime, bitlength of a (TODO: not transferred, but maybe inferred?), pubKeyServer = g^a (mod p), pubKeyClient = g^b (mod p).
-     *      DualEC: security-stength, Q, d, s.t. dQ = P
+     *      DualEC: security-stength, Q, d, s.t. dQ = P, adins used for generating, personalization string
      * Assumption:
      *      server used DualEC to generate server-random and (a+1),
      *      for now: used cipher: MBEDTLS_CIPHER_CHACHA20_POLY1305
      * */
     /* Step 1: Strip the first 4 bytes of server-random, because it's the unix timestamp. */
-    /* Step 2: Guess the first 4 bytes and number of stripped bits (depending on security strength) */
+    /* Step 2: Guess the last 4 bytes (bc they were stripped to make room for the unix timestamp)
+     *         and all stripped bits (depending on security strength) in between inner concatenations */
     /* Step 3: Calculate the next state s_(i+1) */
-    /* Step 4: Generate enough random bits for a */
+    /* Step 4: Generate enough random bits for a. Calculate a by subtracting 1 from the bits */
     /* Step 5: Calculate g^a (mod p) and check if it matches pubKeyServer
      *         If it didn't go to step 2.*/
     /* Step 6: Calculate the pre-master-secret with pubKeyClient^a (mod p) */
