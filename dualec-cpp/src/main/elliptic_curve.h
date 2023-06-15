@@ -28,10 +28,12 @@ public:
 
     void lift_x(AffinePoint& r1, AffinePoint& r2, BigInt inp_x) const;
 
-    virtual std::string to_string() const
+    virtual std::string to_string(size_t indent_level = 0) const
     {
-        return "EllipticCurve(Z_" + bigint_hex(m_field.residu())
-            + ", y^2 = x^3 + " + bigint_hex(m_a) + "*x + " + bigint_hex(m_b) + ")";
+        std::string indent = std::string(" ", indent_level);
+        return "EllipticCurve(\n" + indent
+            + " prime: " + bigint_hex(m_field.residu()) + "\n" + indent
+            + " y^2 = x^3 + " + bigint_hex(m_a) + "*x + " + bigint_hex(m_b) + ")";
     }
 
 protected:

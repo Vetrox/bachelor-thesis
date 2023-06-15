@@ -15,9 +15,9 @@ public:
     }
     virtual void scalar(AffinePoint& out, AffinePoint const& p, BigInt k) const override;
 
-    virtual std::string to_string() const override
+    virtual std::string to_string(size_t indent_level = 0) const override
     {
-        return "Jacobi" + EllipticCurve::to_string();
+        return "Jacobi" + EllipticCurve::to_string(indent_level);
     }
 
     JacobiPoint _double(JacobiPoint const& P) const;

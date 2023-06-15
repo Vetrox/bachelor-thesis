@@ -2,28 +2,16 @@
 #include "affine_point.h"
 #include "bitstr.h"
 #include "dualec_curve.h"
-#include "elliptic_curve.h"
 #include "forward.h"
 #include "hash.h"
 #include "jacobi_elliptic_curve.h"
-#include "jacobi_point.h"
 #include <algorithm>
-#include <chrono>
-#include <cmath>
 #include <cstdint>
 #include <cstdlib>
-#include <future>
-#include <givaro/random-integer.h>
-#include <gmp++/gmp++_int.h>
-#include <limits>
-#include <ostream>
-#include <queue>
-#include <random>
-#include <ratio>
+#include <iostream>
 #include <string>
 #include <sys/types.h>
-#include <thread>
-#include <unistd.h>
+#include <utility>
 
 #ifdef DEC_EXPORT_STRIPPED_BITS
 extern BigInt dual_ec_stripped_bits_first_round;
@@ -56,7 +44,7 @@ size_t DEC::calculate_max_outlen(size_t seedlen)
     }
 }
 
-DEC::DualEcCurve const& DEC::pick_curve(size_t security_strength)
+DEC::Curve const& DEC::pick_curve(size_t security_strength)
 {
     if (security_strength <= 128)
         return DEC::P256;
@@ -117,7 +105,7 @@ BitStr DEC::Hash_df(BitStr const& input_string, uint32_t no_of_bits_to_return)
 
 DEC::WorkingState DEC::Instantiate(BitStr entropy_input, BitStr nonce,
     BitStr personalization_string, size_t security_strength,
-    DualEcCurve const* curve)
+    Curve const* curve)
 {
     // 1. seed_material = entropy_input || nonce || personalization_string
     auto seed_material = entropy_input + nonce + personalization_string;

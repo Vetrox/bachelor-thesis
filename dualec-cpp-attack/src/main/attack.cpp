@@ -4,26 +4,15 @@
 #include "dualec_curve.h"
 #include "elliptic_curve.h"
 #include "forward.h"
-#include "hash.h"
 #include "jacobi_elliptic_curve.h"
-#include "jacobi_point.h"
 #include <algorithm>
-#include <chrono>
-#include <cmath>
 #include <cstdint>
 #include <cstdlib>
 #include <future>
 #include <givaro/random-integer.h>
-#include <gmp++/gmp++_int.h>
-#include <limits>
-#include <ostream>
 #include <queue>
-#include <random>
-#include <ratio>
 #include <string>
-#include <sys/types.h>
 #include <thread>
-#include <unistd.h>
 
 #ifdef DEC_EXPORT_STRIPPED_BITS
 BigInt dual_ec_stripped_bits_first_round = -1;
@@ -67,7 +56,7 @@ void generate_dQ(AffinePoint const& P, BigInt const& order_of_p, JacobiEllipticC
     }
 }
 
-[[nodiscard]] BitStr simulate_client_generation(DEC::DualEcCurve const& curve, size_t no_of_bits_to_return, size_t security_strength)
+[[nodiscard]] BitStr simulate_client_generation(DEC::Curve const& curve, size_t no_of_bits_to_return, size_t security_strength)
 {
     auto random_input_entropy = random_bigint(BigInt(1) << 123);
     if (determined)
@@ -75,13 +64,15 @@ void generate_dQ(AffinePoint const& P, BigInt const& order_of_p, JacobiEllipticC
     std::cout << "Random input entropy: " << bigint_hex(random_input_entropy) << std::endl;
     auto working_state = DEC::Instantiate(BitStr(random_input_entropy), BitStr(0), BitStr(0), security_strength, &curve);
 
-    std::cout << "WorkingState: " << working_state.to_string() << std::endl;
-
+    std::cout << "Instantiated...\n" << working_state.to_string(0) << std::endl;
+    std::cout << ">>> Generating..." << std::endl;
     auto random_bits = DEC::Generate(working_state, no_of_bits_to_return, {});
+    std::cout << "<<< Finished Generating" << std::endl;
+
     return random_bits;
 }
 
-BitStr predict_next_rand_bits(AffinePoint const& point, BitStr& out_guess_for_next_s, BigInt const& d, DEC::DualEcCurve const& dec_curve, size_t seedlen, size_t outlen, bool log = false)
+BitStr predict_next_rand_bits(AffinePoint const& point, BitStr& out_guess_for_next_s, BigInt const& d, DEC::Curve const& dec_curve, size_t seedlen, size_t outlen, bool log = false)
 { // TODO: teach predict_next_rand_bits about known adins
     if (log)
         std::cout << "predict_next_rand_bits(point: " << point.to_string() << " d: " << bigint_hex(d) << " seedlen: " << seedlen << ")";
@@ -99,7 +90,7 @@ static void push_worker(std::function<BitStr()> func)
     workers.push(std::async(std::launch::async, func));
 }
 
-[[nodiscard]] BitStr brute_force_next_s(BitStr const& bits, size_t security_strength, BigInt d, DEC::DualEcCurve const& dec_curve)
+[[nodiscard]] BitStr brute_force_next_s(BitStr const& bits, size_t security_strength, BigInt d, DEC::Curve const& dec_curve)
 {
     auto seedlen = DEC::pick_seedlen(security_strength);
     auto outlen = DEC::calculate_max_outlen(seedlen);
@@ -169,7 +160,7 @@ static void push_worker(std::function<BitStr()> func)
     abort();
 }
 
-DEC::WorkingState brute_force_working_state(BitStr const& bits, size_t security_strength, BigInt d, DEC::DualEcCurve const& dec_curve)
+DEC::WorkingState brute_force_working_state(BitStr const& bits, size_t security_strength, BigInt d, DEC::Curve const& dec_curve)
 {
     BitStr s = brute_force_next_s(bits, security_strength, d, dec_curve);
     return {
@@ -186,14 +177,14 @@ void simulate_backdoor(size_t security_strength)
     auto bad_curve = DEC::pick_curve(security_strength);
     BigInt d(-1);
     generate_dQ(bad_curve.P, bad_curve.order_of_p, bad_curve.curve, d, bad_curve.Q);
-    std::cout << "Produced backdoor d: " << bigint_hex(d) << " " << bad_curve.to_string() << std::endl;
+    std::cout << "Produced backdoor\n\td: " << bigint_hex(d) << "\n\tQ: " << bad_curve.Q.to_string() << std::endl;
 
     auto outlen = DEC::calculate_max_outlen(DEC::pick_seedlen(security_strength));
     auto random_bits = simulate_client_generation(bad_curve, outlen * 3, security_strength);
-    std::cout << "Got random bits: " << bytes_as_hex(random_bits.to_baked_array()) << std::endl;
+    std::cout << "Got random bits:\n\t" << bytes_as_hex(random_bits.to_baked_array()) << std::endl;
 
     auto working_state = brute_force_working_state(random_bits, security_strength, d, bad_curve);
-    std::cout << "SUCCESS!!!\nBrute-forced working-state: " << working_state.to_string() << std::endl;
+    std::cout << "SUCCESS!!!\nBrute-forced working-state:\n" << working_state.to_string(1) << std::endl;
 }
 
 int main()
