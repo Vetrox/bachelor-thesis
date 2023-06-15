@@ -3,7 +3,7 @@ project(tls-attack)            # this sets the project name
 
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
-file(GLOB_RECURSE sources      src/main/*.cpp src/main/*.h)
+file(GLOB_RECURSE sources    ../dualec-cpp/src/*.cpp  src/*.cpp)
 
 add_executable(${PROJECT_NAME} ${sources})
 
@@ -20,7 +20,7 @@ target_link_options(${PROJECT_NAME} PUBLIC
     #-fsanitize=address,undefined,leak
 )
 
-target_include_directories(${PROJECT_NAME} PUBLIC src/main mbedtls/include)
+target_include_directories(${PROJECT_NAME} PUBLIC ../dualec-cpp/src/include mbedtls/include)
 
 add_subdirectory(./mbedtls)
 
