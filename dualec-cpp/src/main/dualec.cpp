@@ -25,13 +25,11 @@
 #include <thread>
 #include <unistd.h>
 
-static constexpr uint32_t max_threads = 15;
-static constexpr auto determined = true;
-static auto const no_of_threads = BigInt(std::min(max_threads, std::thread::hardware_concurrency() * 5));
-static BigInt stripped_bit_marker = -1;
-static std::stop_source stop_source;
+#ifdef DEC_EXPORT_STRIPPED_BITS
+extern BigInt dual_ec_stripped_bits_first_round;
+#endif
 
-size_t pick_seedlen(size_t security_strength)
+size_t DEC::pick_seedlen(size_t security_strength)
 {
     if (security_strength <= 128)
         return 256;
@@ -43,7 +41,7 @@ size_t pick_seedlen(size_t security_strength)
     abort();
 }
 
-size_t calculate_max_outlen(size_t seedlen)
+size_t DEC::calculate_max_outlen(size_t seedlen)
 {
     switch (seedlen) {
     case 256:
@@ -58,11 +56,24 @@ size_t calculate_max_outlen(size_t seedlen)
     }
 }
 
-size_t ceildiv(size_t a, size_t b)
+DEC::DualEcCurve const& DEC::pick_curve(size_t security_strength)
+{
+    if (security_strength <= 128)
+        return DEC::P256;
+    if (security_strength <= 192)
+        return DEC::P384;
+    if (security_strength <= 256)
+        return DEC::P521;
+    DBG << "Invalid security strength" << std::endl;
+    abort();
+}
+
+static size_t ceildiv(size_t a, size_t b)
 {
     return a / b + (a % b > 0 ? 1 : 0);
 }
-void Dual_EC_Truncate(BitStr& bitstr, size_t outlen)
+
+void DEC::Truncate(BitStr& bitstr, size_t outlen)
 {
     /* string consisting of the leftmost outlen bits from bitstr */
     DBG << "Dual_EC_Truncate(bitstr: " << bitstr.debug_description() << " outlen: " << std::to_string(outlen) << std::endl;
@@ -75,19 +86,7 @@ void Dual_EC_Truncate(BitStr& bitstr, size_t outlen)
     }
 }
 
-DualEcCurve const& pick_curve(size_t security_strength)
-{
-    if (security_strength <= 128)
-        return Dual_EC_P256;
-    if (security_strength <= 192)
-        return Dual_EC_P384;
-    if (security_strength <= 256)
-        return Dual_EC_P521;
-    DBG << "Invalid security strength" << std::endl;
-    abort();
-}
-
-BitStr Hash_df(BitStr const& input_string, uint32_t no_of_bits_to_return)
+BitStr DEC::Hash_df(BitStr const& input_string, uint32_t no_of_bits_to_return)
 {
     size_t hash_outlen = 256; // bits
     if (no_of_bits_to_return > 255 * hash_outlen) {
@@ -112,11 +111,11 @@ BitStr Hash_df(BitStr const& input_string, uint32_t no_of_bits_to_return)
         counter++;
     }
     // 5. requested_bits = Leftmost (no_of_bits_to_return) of temp.
-    Dual_EC_Truncate(temp, no_of_bits_to_return);
+    DEC::Truncate(temp, no_of_bits_to_return);
     return temp;
 }
 
-WorkingState Dual_EC_DRBG_Instantiate(BitStr entropy_input, BitStr nonce,
+DEC::WorkingState DEC::Instantiate(BitStr entropy_input, BitStr nonce,
     BitStr personalization_string, size_t security_strength,
     DualEcCurve const* curve)
 {
@@ -137,6 +136,7 @@ WorkingState Dual_EC_DRBG_Instantiate(BitStr entropy_input, BitStr nonce,
         curve = &pick_curve(security_strength);
     else
         DBG << "Instantiate: Using custom curve" << std::endl;
+
     // 5. Return s, seedlen, p, a, b, n, P, Q, and a reseed_counter for the initial_working_state.
     return WorkingState { .s = std::move(s),
         .seedlen = seedlen,
@@ -144,14 +144,14 @@ WorkingState Dual_EC_DRBG_Instantiate(BitStr entropy_input, BitStr nonce,
         .outlen = calculate_max_outlen(seedlen) };
 }
 
-AffinePoint Dual_EC_mul(BigInt scalar, AffinePoint const& point, JacobiEllipticCurve const& curve)
+AffinePoint DEC::mul(BigInt scalar, AffinePoint const& point, JacobiEllipticCurve const& curve)
 {
     AffinePoint out;
     curve.scalar(out, point, scalar);
     return out;
 }
 
-[[nodiscard]] BitStr Dual_EC_Truncate_Right(BitStr const& bitstr, size_t new_length)
+BitStr DEC::Truncate_Right(BitStr const& bitstr, size_t new_length)
 {
     // adds 0s on the left if new_length > len(bitstr)
     ssize_t amount_to_add = new_length - bitstr.bitlength();
@@ -162,7 +162,7 @@ AffinePoint Dual_EC_mul(BigInt scalar, AffinePoint const& point, JacobiEllipticC
     }
 }
 
-BitStr Dual_EC_DRBG_Generate(WorkingState& working_state, size_t requested_number_of_bits, std::optional<BitStr> additional_input_string)
+BitStr DEC::Generate(DEC::WorkingState& working_state, size_t requested_number_of_bits, std::optional<BitStr> additional_input_string)
 {
     // 1. Check whether a reseed is required.
     // NOT IMPLEMENTED
@@ -171,7 +171,7 @@ BitStr Dual_EC_DRBG_Generate(WorkingState& working_state, size_t requested_numbe
     BitStr additional_input(0);
     if (additional_input_string.has_value()) { // Else additional_input = Hash_df (pad8 (additional_input), seedlen).
         size_t next_higher_8_bits = 8 * containerlen_for_bitlength<uint8_t>(additional_input_string.value().bitlength());
-        additional_input = Hash_df(Dual_EC_Truncate_Right(additional_input_string.value(), next_higher_8_bits), working_state.seedlen);
+        additional_input = Hash_df(DEC::Truncate_Right(additional_input_string.value(), next_higher_8_bits), working_state.seedlen);
     }
 
     // 3. temp = the Null string
@@ -187,21 +187,24 @@ BitStr Dual_EC_DRBG_Generate(WorkingState& working_state, size_t requested_numbe
         std::cout << "i: " << i << " t: " << t.as_hex_string() << std::endl;
 
         // 6. s = phi(x(t * P)). BACKDOOR: x(s * (d * Q)) = x(d * (s * Q))
-        working_state.s = BitStr(Dual_EC_mul(t.as_big_int(), working_state.dec_curve.P, working_state.dec_curve.curve).x(), working_state.seedlen);
+        working_state.s = BitStr(DEC::mul(t.as_big_int(), working_state.dec_curve.P, working_state.dec_curve.curve).x(), working_state.seedlen);
         std::cout << "i: " << i << " s: " << working_state.s.as_hex_string() << std::endl;
 
         // 7. r = phi(x(s * Q)). BACKDOOR: x(d * (s * Q)) * Q
-        auto r = BitStr(Dual_EC_mul(working_state.s.as_big_int(), working_state.dec_curve.Q, working_state.dec_curve.curve).x());
+        auto r = BitStr(DEC::mul(working_state.s.as_big_int(), working_state.dec_curve.Q, working_state.dec_curve.curve).x());
 
         // 8. temp = temp || (rightmost outlen bits of r)
         auto stripped_r = r.truncated_rightmost(working_state.outlen);
         auto amount_of_stripped_bits = static_cast<int>(r.bitlength()) - static_cast<int>(working_state.outlen);
         std::cout << "i: " << i << " amount-of-stripped-bits: " << amount_of_stripped_bits << std::endl;
         auto stripped_bits = r.truncated_leftmost(amount_of_stripped_bits);
+
+#ifdef DEC_EXPORT_STRIPPED_BITS
         if (i == 0)
-            stripped_bit_marker = stripped_bits.as_big_int();
+            dual_ec_stripped_bits_first_round = stripped_bits.as_big_int();
+#endif
         std::cout << "i: " << i << " r: " << stripped_r.as_hex_string() << " stripped_bits: " << stripped_bits.as_hex_string() << std::endl;
-        std::cout << "i: " << i << " R: " << Dual_EC_mul(working_state.s.as_big_int(), working_state.dec_curve.Q, working_state.dec_curve.curve).to_string() << std::endl;
+        std::cout << "i: " << i << " R: " << DEC::mul(working_state.s.as_big_int(), working_state.dec_curve.Q, working_state.dec_curve.curve).to_string() << std::endl;
         temp = temp + stripped_r;
 
         // 9. additional_input=0
@@ -221,176 +224,14 @@ BitStr Dual_EC_DRBG_Generate(WorkingState& working_state, size_t requested_numbe
         std::cout << "AssertionError: Temp should be i*outlen" << std::endl;
         abort();
     }
-    Dual_EC_Truncate(temp, requested_number_of_bits);
+    DEC::Truncate(temp, requested_number_of_bits);
     auto& returned_bits = temp;
 
     // 14. s = phi(x(s * P)). BACKDOOR: x(d * (s * Q)) * (d * Q) = d * r
     // NOTE: This step doesn't exist in SP-800-90 (2006)
-    working_state.s = BitStr(Dual_EC_mul(working_state.s.as_big_int(), working_state.dec_curve.P, working_state.dec_curve.curve).x(), working_state.seedlen);
+    working_state.s = BitStr(DEC::mul(working_state.s.as_big_int(), working_state.dec_curve.P, working_state.dec_curve.curve).x(), working_state.seedlen);
     std::cout << " s: " << working_state.s.as_hex_string() << std::endl;
 
     // 15. Return SUCCESS, returned_bits, and s, seedlen, p, a, b, n, P, Q, and a reseed_counter for the new_working_state.
     return returned_bits;
 }
-
-BigInt random_bigint(BigInt end_exclusive)
-{
-    auto generator = Givaro::RandomIntegerIterator<>(Zp(end_exclusive));
-    return generator.randomInteger();
-}
-
-void generate_dQ(AffinePoint const& P, BigInt const& order_of_p, JacobiEllipticCurve const& curve, BigInt& out_d, AffinePoint& out_Q)
-{
-    Zp order_field(order_of_p);
-    Givaro::RandomIntegerIterator<> random_integer_iterator(order_field);
-    while (true) {
-        // pick random d
-        if (determined)
-            out_d = BigInt("430696793");
-        else
-            out_d = random_integer_iterator.randomInteger();
-        if (Givaro::isZero(out_d))
-            continue;
-        // compute the inverse of d
-        BigInt e;
-        order_field.inv(e, out_d);
-        // compute Q based on P
-        curve.scalar(out_Q, P, e);
-
-        // perform sanity check
-        AffinePoint P2;
-        curve.scalar(P2, out_Q, out_d);
-        if (P2 == P)
-            return;
-    }
-}
-
-[[nodiscard]] BitStr simulate_client_generation(DualEcCurve const& curve, size_t no_of_bits_to_return, size_t security_strength)
-{
-    auto random_input_entropy = random_bigint(BigInt(1) << 123);
-    if (determined)
-        random_input_entropy = 0x35763dce;
-    std::cout << "Random input entropy: " << bigint_hex(random_input_entropy) << std::endl;
-    auto working_state = Dual_EC_DRBG_Instantiate(BitStr(random_input_entropy), BitStr(0), BitStr(0), security_strength, &curve);
-
-    std::cout << "WorkingState: " << working_state.to_string() << std::endl;
-
-    auto random_bits = Dual_EC_DRBG_Generate(working_state, no_of_bits_to_return, {});
-    return random_bits;
-}
-
-BitStr predict_next_rand_bits(AffinePoint const& point, BitStr& out_guess_for_next_s, BigInt const& d, DualEcCurve const& dec_curve, size_t seedlen, size_t outlen, bool log = false)
-{ // TODO: teach predict_next_rand_bits about known adins
-    if (log)
-        std::cout << "predict_next_rand_bits(point: " << point.to_string() << " d: " << bigint_hex(d) << " seedlen: " << seedlen << ")";
-    //  it holds that s2 = x(d * R)
-    out_guess_for_next_s = BitStr(Dual_EC_mul(d, point, dec_curve.curve).x(), seedlen);
-    if (log)
-        std::cout << " out_guess_for_next_s = " << out_guess_for_next_s.debug_description() << std::endl;
-    auto guess_for_next_r = Dual_EC_mul(out_guess_for_next_s.as_big_int(), dec_curve.Q, dec_curve.curve).x();
-    return BitStr(guess_for_next_r, outlen);
-}
-
-static std::queue<std::shared_future<BitStr>> workers;
-void push_worker(std::function<BitStr()> func)
-{
-    workers.push(std::async(std::launch::async, func));
-}
-
-BitStr brute_force_next_s(BitStr const& bits, size_t security_strength, BigInt d, DualEcCurve const& dec_curve)
-{
-    auto seedlen = pick_seedlen(security_strength);
-    auto outlen = calculate_max_outlen(seedlen);
-    auto stripped_amount_of_bits = seedlen - outlen;
-
-    auto outlen_bits = bits.truncated_leftmost(outlen);
-    auto next_rand_bits = BitStr(bits);
-    next_rand_bits = next_rand_bits.truncated_rightmost(bits.bitlength() - outlen);
-    next_rand_bits = next_rand_bits.truncated_leftmost(outlen);
-
-    std::cout << "Using " << outlen_bits.as_hex_string() << " to predict " << next_rand_bits.as_hex_string() << std::endl;
-
-    auto max_bound = BigInt(1) << stripped_amount_of_bits;
-    auto per_thread = max_bound / no_of_threads;
-    std::cout << "Pushing " << no_of_threads << " workers..." << std::endl;
-    for (BigInt thread_start(0), thread_end(per_thread); thread_end <= max_bound; thread_end += per_thread, thread_start += per_thread) {
-        auto lambda = [&dec_curve, &next_rand_bits, seedlen, outlen, d, thread_start, thread_end, stripped_amount_of_bits, outlen_bits]() {
-            for (BigInt i(thread_start); i < thread_end; i = i + 1) {
-                if (stop_source.get_token().stop_requested())
-                    break;
-                BitStr guess_for_stripped_bits_of_r(i, stripped_amount_of_bits);
-                auto guess_r_bitstr = guess_for_stripped_bits_of_r + outlen_bits;
-                auto guess_for_r_x = guess_r_bitstr.as_big_int();
-                AffinePoint guess_R1, guess_R2;
-                dec_curve.curve.lift_x(guess_R1, guess_R2, guess_for_r_x);
-                BitStr guess_for_next_s(0);
-                if (!guess_R1.is_identity()) {
-                    if (i == stripped_bit_marker)
-                        std::cout << " " << guess_R1.to_string() << " " << guess_R2.to_string() << std::endl;
-                    auto guess_next_rand_bits = predict_next_rand_bits(guess_R1, guess_for_next_s, d, dec_curve, seedlen, outlen, i == stripped_bit_marker);
-                    if (guess_next_rand_bits.as_big_int() == next_rand_bits.as_big_int()) {
-                        stop_source.request_stop();
-                        return guess_for_next_s;
-                    }
-                    guess_next_rand_bits = predict_next_rand_bits(guess_R2, guess_for_next_s, d, dec_curve, seedlen, outlen, i == stripped_bit_marker);
-                    if (guess_next_rand_bits.as_big_int() == next_rand_bits.as_big_int()) {
-                        stop_source.request_stop();
-                        return guess_for_next_s;
-                    }
-                }
-            }
-            return BitStr(0);
-        };
-        push_worker(lambda);
-    }
-    std::cout << "Finished pushing workers..." << std::endl;
-    while (!workers.empty()) {
-        auto ret = workers.front().get();
-        if (ret.bitlength() > 0) {
-            while (!workers.empty())
-                workers.pop();
-            return ret;
-        }
-        workers.pop();
-    }
-    std::cout << "Unexpected end of brute-force" << std::endl;
-    abort();
-}
-
-WorkingState brute_force_working_state(BitStr const& bits, size_t security_strength, BigInt d, DualEcCurve const& dec_curve)
-{
-    BitStr s = brute_force_next_s(bits, security_strength, d, dec_curve);
-    return {
-        .s = s,
-        .seedlen = pick_seedlen(security_strength),
-        .dec_curve = dec_curve,
-        .outlen = calculate_max_outlen(pick_seedlen(security_strength)),
-    };
-}
-
-void simulate_backdoor(size_t security_strength)
-{
-
-    auto bad_curve = pick_curve(security_strength);
-    BigInt d(-1);
-    generate_dQ(bad_curve.P, bad_curve.order_of_p, bad_curve.curve, d, bad_curve.Q);
-    std::cout << "Produced backdoor d: " << bigint_hex(d) << " " << bad_curve.to_string() << std::endl;
-
-    auto outlen = calculate_max_outlen(pick_seedlen(security_strength));
-    auto random_bits = simulate_client_generation(bad_curve, outlen * 3, security_strength);
-    std::cout << "Got random bits: " << bytes_as_hex(random_bits.to_baked_array()) << std::endl;
-
-    auto working_state = brute_force_working_state(random_bits, security_strength, d, bad_curve);
-    std::cout << "SUCCESS!!!\nBrute-forced working-state: " << working_state.to_string() << std::endl;
-}
-
-#ifdef SIMULATE_DUALEC
-int main()
-{
-    simulate_backdoor(256);
-    /*BitStr a = BitStr(BigInt(0xaaa123));
-    std::cout << a.debug_description() << std::endl;
-    auto b = a.truncated_leftmost(9);
-    std::cout << b.debug_description() << std::endl;*/
-}
-#endif

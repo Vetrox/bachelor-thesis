@@ -10,7 +10,7 @@ set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 #These instructions search the directory tree when cmake is
 #invoked and put all files that match the pattern in the variables
 # `sources` and `data`.
-file(GLOB_RECURSE sources      src/main/*.cpp src/main/*.h)
+file(GLOB_RECURSE sources     ../dualec-cpp/src/main/*.cpp src/main/*.cpp src/main/*.h)
 # file(GLOB_RECURSE data resources/*)
 # You can use set(sources src/main.cpp) etc if you don't want to
 # use globbing to find files automatically.
@@ -27,7 +27,7 @@ add_executable(dualec-attack ${sources})# ${data})
 target_compile_options(dualec-attack PUBLIC -std=c++2a -O3 -Wall -Wextra -fdiagnostics-color=always
     #-ggdb
     #-DDEBUG
-    -DSIMULATE_DUALEC
+    -DDEC_EXPORT_STRIPPED_BITS
     #-fsanitize=address,undefined,leak
 -pedantic -Wcast-align -Wcast-qual -Wctor-dtor-privacy -Wdisabled-optimization -Wformat=2 -Winit-self -Wlogical-op -Wmissing-include-dirs -Wnoexcept -Wold-style-cast -Woverloaded-virtual -Wredundant-decls -Wshadow -Wsign-promo -Wstrict-null-sentinel -Wstrict-overflow=5 -Wswitch-default -Wundef -Wno-unused
 )
@@ -37,7 +37,7 @@ target_link_options(dualec-attack PUBLIC
 )
 
 # This allows to include files relative to the root of the src directory with a <> pair
-target_include_directories(dualec-attack PUBLIC src/main)
+target_include_directories(dualec-attack PUBLIC ../dualec-cpp/src/main src/main)
 
 # This copies all resource files in the build directory.
 # We need this, because we want to work with paths relative to the executable.
