@@ -105,7 +105,7 @@ static void push_worker(std::function<BitStr()> func)
 
     auto max_bound = BigInt(1) << stripped_amount_of_bits;
     auto per_thread = max_bound / no_of_threads;
-    std::cout << "Pushing " << no_of_threads << " workers..." << std::endl;
+    std::cout << "Pushing " << no_of_threads << " workers... ";
     for (BigInt thread_start(0), thread_end(per_thread); thread_end <= max_bound; thread_end += per_thread, thread_start += per_thread) {
         auto lambda = [&dec_curve, &next_rand_bits, seedlen, outlen, d, thread_start, thread_end, stripped_amount_of_bits, outlen_bits]() {
             for (BigInt i(thread_start); i < thread_end; i = i + 1) {
@@ -146,7 +146,7 @@ static void push_worker(std::function<BitStr()> func)
         };
         push_worker(lambda);
     }
-    std::cout << "Finished pushing workers..." << std::endl;
+    std::cout << "done." << std::endl;
     while (!workers.empty()) {
         auto ret = workers.front().get();
         if (ret.bitlength() > 0) {
@@ -189,5 +189,5 @@ void simulate_backdoor(size_t security_strength)
 
 int main()
 {
-    simulate_backdoor(256);
+    simulate_backdoor(192);
 }

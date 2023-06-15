@@ -9,7 +9,7 @@
 #include <memory>
 #include <ostream>
 
-[[nodiscard]] MArray<BitStr::B> BitStr::to_baked_array() const
+MArray<BitStr::B> BitStr::to_baked_array() const
 {
     size_t new_byte_len = containerlen_for_bitlength<B>(bitlength());
     auto* box = new uint8_t[new_byte_len];
@@ -24,44 +24,20 @@
     return s;
 }
 
-[[nodiscard]] BitStr BitStr::truncated_leftmost(size_t new_length) const
+BitStr BitStr::truncated_leftmost(size_t new_length) const
 {
     DBG << "BitStr::truncated_leftmost(this: " << debug_description() << " new_length: " << new_length << std::endl;
     if (new_length > bitlength()) {
         std::cout << "Wrong usage of truncate" << std::endl;
         abort();
     }
-    /*                            cut
-     *                              |
-     *  |000p|oooo|oooo|00--|----|----|
-     *      ^bitlen     ^internal_bitlen
-     * new:
-     *       |pooo|oooo|000-|----|----|
-     */
     size_t bitshift_total = bitlength() - new_length;
     auto i = this->as_big_int();
     i >>= bitshift_total;
-    return BitStr(i, new_length);
-    /*if (internal_bitlength() <= bitshift_total)
-        return BitStr(std::unique_ptr<B[]>(), 0, new_length);
-    size_t new_internal_bitlen = internal_bitlength() - bitshift_total;
-    size_t new_byte_len = containerlen_for_bitlength<B>(new_internal_bitlen);
-    size_t bitshift_inner = bitshift_total % bits_per_word;
-    auto* box = new B[new_byte_len];
-    auto* box_end = box + new_byte_len;
-
-    auto dit = m_data_begin.get();
-    for (auto it = box; it != box_end; ++dit) {
-        *it = static_cast<B>(0);
-        *it |= (*dit) >> bitshift_inner;
-        ++it;
-        if (it != box && bitshift_inner != 0 && it != box_end)
-            *it |= (*dit) << (bits_per_word - bitshift_inner);
-    }
-    return BitStr(std::unique_ptr<B[]>(box), new_byte_len, new_length);*/
+    return BitStr(std::move(i), new_length);
 }
 
-[[nodiscard]] BigInt BitStr::as_big_int() const
+BigInt BitStr::as_big_int() const
 {
     if (m_data_len == 0 || m_bitlen == 0 || m_data_begin.get() == nullptr)
         return BigInt(0);
@@ -70,30 +46,14 @@
     return i;
 }
 
-[[nodiscard]] BitStr BitStr::operator^(BitStr const& other) const
+BitStr BitStr::operator^(BitStr const& other) const
 {
     DBG << "BitStr::operator^(this: " << debug_description() << " other: " << other.debug_description() << ")" << std::endl;
     size_t new_bitlen = std::max(bitlength(), other.bitlength());
-    size_t new_wordt_length = containerlen_for_bitlength<B>(new_bitlen);
-    auto box = new B[new_wordt_length];
-    auto box_end = box + new_wordt_length;
-
-    auto dit1 = m_data_begin.get(), dit2 = other.m_data_begin.get();
-    for (auto it = box; it != box_end; ++it) {
-        *it = static_cast<B>(0);
-        if (dit1 && dit1 != data_end()) {
-            *it ^= *dit1;
-            ++dit1;
-        }
-        if (dit2 && dit2 != other.data_end()) {
-            *it ^= *dit2;
-            ++dit2;
-        }
-    }
-    return BitStr(std::unique_ptr<B[]>(box), new_wordt_length, new_bitlen);
+    return BitStr((this->as_big_int() ^ other.as_big_int()), new_bitlen);
 }
 
-[[nodiscard]] BitStr BitStr::truncated_rightmost(size_t new_length) const
+BitStr BitStr::truncated_rightmost(size_t new_length) const
 {
     DBG << "truncated_rightmost(" << std::to_string(new_length) << ")" << std::endl;
     if (new_length > m_bitlen) {
@@ -132,7 +92,7 @@ BitStr& BitStr::operator=(BitStr&& other)
     return *this;
 }
 
-[[nodiscard]] BitStr BitStr::operator+(BitStr const& other) const
+BitStr BitStr::operator+(BitStr const& other) const
 {
     DBG << "BitStr::operator+(this: " << debug_description() << " other: " << other.debug_description() << ")" << std::endl;
     size_t new_data_len = containerlen_for_bitlength<B>(internal_bitlength() + other.bitlength());
@@ -170,7 +130,7 @@ BitStr& BitStr::operator=(BitStr&& other)
     return BitStr(std::unique_ptr<B[]>(box), new_data_len, bitlength() + other.bitlength());
 }
 
-[[nodiscard]] std::string BitStr::as_hex_string() const
+std::string BitStr::as_hex_string() const
 {
     std::stringstream ss;
     if (m_data_begin.get() == nullptr || m_data_len == 0 || m_bitlen == 0)
@@ -207,7 +167,7 @@ std::string bin_from_bitset_of_size(size_t used_bits, uint8_t value)
     }
 }
 
-[[nodiscard]] std::string BitStr::as_bin_string() const
+std::string BitStr::as_bin_string() const
 {
     std::string ret = "";
     if (m_data_begin.get() == nullptr || m_data_len == 0 || m_bitlen == 0)
@@ -227,7 +187,7 @@ std::string bin_from_bitset_of_size(size_t used_bits, uint8_t value)
     return ret;
 }
 
-[[nodiscard]] std::string BitStr::debug_description() const
+std::string BitStr::debug_description() const
 {
     auto diff = static_cast<ssize_t>(bitlength()) - static_cast<ssize_t>(m_data_len * bits_per_word);
     return "BitStr(bitlen: "
@@ -263,7 +223,7 @@ BitStr::BitStr(BigInt const& i, size_t bitlen)
     DBG << "BitStr(BigInt&,size_t) constructor: " << debug_description() << std::endl;
 }
 
-[[nodiscard]] BitStr::B* BitStr::data_end() const
+BitStr::B* BitStr::data_end() const
 {
     return m_data_begin.get() + m_data_len;
 }

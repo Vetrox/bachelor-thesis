@@ -12,12 +12,6 @@
 #include <sstream>
 #include <string>
 
-template<typename T>
-static size_t containerlen_for_bitlength(size_t bitlen)
-{
-    return bitlen / (sizeof(T) * 8) + ((bitlen % (sizeof(T) * 8) > 0) ? 1 : 0);
-}
-
 class BitStr {
     using B = uint8_t;
     static constexpr auto bits_per_word = sizeof(B) * 8;

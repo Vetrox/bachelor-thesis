@@ -30,3 +30,9 @@ public:
 
 std::string bigint_hex(BigInt const& i);
 std::string bytes_as_hex(MArray<uint8_t> const&);
+
+template<typename T>
+static size_t containerlen_for_bitlength(size_t bitlen)
+{
+    return bitlen / (sizeof(T) * 8) + ((bitlen % (sizeof(T) * 8) > 0) ? 1 : 0);
+}
