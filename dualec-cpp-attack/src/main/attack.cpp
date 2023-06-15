@@ -6,13 +6,17 @@
 #include "forward.h"
 #include "jacobi_elliptic_curve.h"
 #include <algorithm>
+#include <chrono>
+#include <cstddef>
 #include <cstdint>
 #include <cstdlib>
 #include <future>
 #include <givaro/random-integer.h>
+#include <iomanip>
 #include <queue>
 #include <string>
 #include <thread>
+#include <vector>
 
 #ifdef DEC_EXPORT_STRIPPED_BITS
 BigInt dual_ec_stripped_bits_first_round = -1;
@@ -85,6 +89,8 @@ BitStr predict_next_rand_bits(AffinePoint const& guess_R, BitStr& out_guess_for_
 }
 
 static std::queue<std::shared_future<BitStr>> workers;
+static std::vector<int> progess;
+
 static void push_worker(std::function<BitStr()> func)
 {
     workers.push(std::async(std::launch::async, func));
@@ -106,10 +112,15 @@ static void push_worker(std::function<BitStr()> func)
     auto max_bound = BigInt(1) << stripped_amount_of_bits;
     auto per_thread = max_bound / no_of_threads;
     std::cout << "Pushing " << no_of_threads << " workers... ";
-    for (BigInt thread_start(0), thread_end(per_thread); thread_end <= max_bound; thread_end += per_thread, thread_start += per_thread) {
-        auto lambda = [&dec_curve, &next_rand_bits, seedlen, outlen, d, thread_start, thread_end, stripped_amount_of_bits, outlen_bits]() {
+
+    progess.resize(no_of_threads);
+    auto* progress_bucket = &progess[0];
+    for (BigInt thread_start(0), thread_end(per_thread); thread_end <= max_bound; thread_end += per_thread, thread_start += per_thread, ++progress_bucket) {
+        auto lambda = [&dec_curve, &next_rand_bits, seedlen, outlen, d, thread_start, thread_end, stripped_amount_of_bits, outlen_bits, progress_bucket]() {
+            auto stoken = stop_source.get_token();
             for (BigInt i(thread_start); i < thread_end; i = i + 1) {
-                if (stop_source.get_token().stop_requested())
+                *progress_bucket = (i-thread_start+1)*100 / (thread_end-thread_start);
+                if (stoken.stop_requested())
                     break;
                 BitStr guess_for_stripped_bits_of_r(i, stripped_amount_of_bits);
                 auto guess_r_bitstr = guess_for_stripped_bits_of_r + outlen_bits;
@@ -147,8 +158,23 @@ static void push_worker(std::function<BitStr()> func)
         push_worker(lambda);
     }
     std::cout << "done." << std::endl;
+
+    std::cout << "Progress:" << std::endl;
+    for (size_t i = 0; i < no_of_threads; ++i)
+        std::cout << " T" << std::setfill('0') << std::setw(2) << i << " ";
+    std::cout << std::endl;
+    auto stoken = stop_source.get_token();
+    while (!stoken.stop_requested()) {
+        std::cout << "\r";
+        for (auto const& p : progess)
+            std::cout << std::setfill(' ') << std::right << std::setw(3) << p << "% ";
+        std::cout << std::flush;
+        std::this_thread::sleep_for(std::chrono::milliseconds(250));
+    }
+    std::cout << std::endl;
+
     while (!workers.empty()) {
-        auto ret = workers.front().get();
+        auto ret = workers.front().get(); // blocking until finished by stop_source
         if (ret.bitlength() > 0) {
             while (!workers.empty())
                 workers.pop();
