@@ -17,4 +17,4 @@ struct Input {
     BigInt dec_secret_d;
 };
 
-Input setup_input();
+[[nodiscard]] Input setup_input();
