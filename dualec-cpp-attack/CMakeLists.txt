@@ -27,8 +27,8 @@ add_executable(dualec-attack ${sources})# ${data})
 target_compile_options(dualec-attack PUBLIC -std=c++2a -O3 -Wall -Wextra -fdiagnostics-color=always
     #-ggdb
     #-DDEBUG
+    -DSIMULATE_DUALEC
     #-fsanitize=address,undefined,leak
-    -DMBEDTLS_ALLOW_PRIVATE_ACCESS
 -pedantic -Wcast-align -Wcast-qual -Wctor-dtor-privacy -Wdisabled-optimization -Wformat=2 -Winit-self -Wlogical-op -Wmissing-include-dirs -Wnoexcept -Wold-style-cast -Woverloaded-virtual -Wredundant-decls -Wshadow -Wsign-promo -Wstrict-null-sentinel -Wstrict-overflow=5 -Wswitch-default -Wundef -Wno-unused
 )
 
@@ -37,7 +37,7 @@ target_link_options(dualec-attack PUBLIC
 )
 
 # This allows to include files relative to the root of the src directory with a <> pair
-target_include_directories(dualec-attack PUBLIC src/main mbedtls/include)
+target_include_directories(dualec-attack PUBLIC src/main)
 
 # This copies all resource files in the build directory.
 # We need this, because we want to work with paths relative to the executable.
@@ -51,16 +51,11 @@ target_include_directories(dualec-attack PUBLIC src/main mbedtls/include)
 # that we need to link into the program.
 # find_package(Boost 1.36.0 COMPONENTS filesystem system REQUIRED)
 
-add_subdirectory(./mbedtls)
-
 target_link_libraries(dualec-attack PUBLIC
   # ${Boost_LIBRARIES}
   # here you can add any library dependencies
   -lgivaro
   -lgmp
-  MbedTLS::mbedtls
-  MbedTLS::mbedcrypto
-  MbedTLS::mbedx509
 )
 
 ###############################################################################

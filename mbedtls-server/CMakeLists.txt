@@ -25,7 +25,7 @@ file(GLOB_RECURSE sources    ssl/*.cpp ../dualec-cpp/src/main/*.cpp)
 add_executable(dualec-attack ${sources})# ${data})
 
 # Just for example add some compiler flags.
-target_compile_options(dualec-attack PUBLIC -std=c++2a -O0 -Wall -Wextra -fdiagnostics-color=always
+target_compile_options(dualec-attack PUBLIC -std=c++2a -O3 -Wall -Wextra -fdiagnostics-color=always
     -ggdb
     -DDEBUG
     -DMBEDTLS_ALLOW_PRIVATE_ACCESS # access private entropy to seed DualEC
