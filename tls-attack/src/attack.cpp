@@ -211,7 +211,7 @@ void awawaw()
 
 int main()
 {
-    setup_input();
+    auto input = setup_input();
     /* Input:
      *      TLS: server-random, client-random,
      *      DH: generator, prime, bitlength of a (TODO: not transferred, but maybe inferred?), pubKeyServer = g^a (mod p), pubKeyClient = g^b (mod p).
@@ -219,10 +219,13 @@ int main()
      * Assumption:
      *      server used DualEC to generate server-random and (a+1),
      *      for now: used cipher: MBEDTLS_CIPHER_CHACHA20_POLY1305
-     * */
+     */
     /* Step 1: Strip the first 4 bytes of server-random, because it's the unix timestamp. */
-    /* Step 2: Guess the last 4 bytes (bc they were stripped to make room for the unix timestamp)
-     *         and all stripped bits (depending on security strength) in between inner concatenations */
+    barr inner_dec_serv_rand = barr(input.server_random.begin() + 4, input.server_random.end());
+    /* Step 2: Guess the last 4 bytes (because they were stripped to make room for the unix timestamp)
+     *         and the stripped bits from the front */
+    BitStr guessed_last4;
+    BitStr guessed_stripped_bits;
     /* Step 3: Calculate the next state s_(i+1) */
     /* Step 4: Generate enough random bits for a. Calculate a by subtracting 1 from the bits */
     /* Step 5: Calculate g^a (mod p) and check if it matches pubKeyServer
