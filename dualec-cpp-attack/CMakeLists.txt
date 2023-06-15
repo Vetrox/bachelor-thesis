@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 3.0) # setting this is required
 project(dualec-attack)              # this sets the project name
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
-file(GLOB_RECURSE sources     ../dualec-cpp/src/*.cpp  src/main/*.cpp)
+file(GLOB_RECURSE sources     ../dualec-cpp/src/*.cpp  src/*.cpp)
 
 add_executable(${PROJECT_NAME} ${sources})
 
@@ -18,7 +18,7 @@ target_link_options(${PROJECT_NAME} PRIVATE
     #-fsanitize=address,undefined,leak
 )
 
-target_include_directories(${PROJECT_NAME} PRIVATE ../dualec-cpp/src/include src/main)
+target_include_directories(${PROJECT_NAME} PRIVATE ../dualec-cpp/src/include src)
 
 target_link_libraries(${PROJECT_NAME} PRIVATE
   -lgivaro
