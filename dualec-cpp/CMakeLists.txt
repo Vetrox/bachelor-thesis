@@ -34,7 +34,7 @@ target_link_options(dualec PUBLIC
 )
 
 # This allows to include files relative to the root of the src directory with a <> pair
-target_include_directories(dualec PUBLIC src/main)
+target_include_directories(dualec PUBLIC src/include)
 
 # This copies all resource files in the build directory.
 # We need this, because we want to work with paths relative to the executable.
