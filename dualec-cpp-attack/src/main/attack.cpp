@@ -22,9 +22,8 @@
 BigInt dual_ec_stripped_bits_first_round = -1;
 #endif
 
-static constexpr uint32_t max_threads = 15;
-static constexpr auto determined = true;
-static auto const no_of_threads = BigInt(std::min(max_threads, std::thread::hardware_concurrency() * 5));
+static constexpr auto determined = false;
+static BigInt no_of_threads = std::thread::hardware_concurrency() * 3;
 
 static std::stop_source stop_source;
 
@@ -213,7 +212,12 @@ void simulate_backdoor(size_t security_strength)
     std::cout << "SUCCESS!!!\nBrute-forced working-state:\n" << working_state.to_string(1) << std::endl;
 }
 
-int main()
+int main(int argc, char const** argv)
 {
-    simulate_backdoor(192);
+    if (argc > 2)
+        no_of_threads = BigInt(argv[2]);
+    auto security_strength = 128;
+    if (argc > 1)
+        security_strength = BigInt(argv[1]);
+    simulate_backdoor(security_strength);
 }
