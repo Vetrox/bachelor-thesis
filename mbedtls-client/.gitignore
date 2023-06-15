@@ -1,6 +1,6 @@
 *compile_commands.json
 .cache/clangd
-dualec-attack
+client
 *.cmake
 Makefile
 CMakeFiles

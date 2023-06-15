@@ -1,30 +1,11 @@
 #include <mbedtls/build_info.h>
-
 #include <mbedtls/platform.h>
-
-#if !defined(MBEDTLS_BIGNUM_C) || !defined(MBEDTLS_ENTROPY_C) ||     \
-    !defined(MBEDTLS_SSL_TLS_C) || !defined(MBEDTLS_SSL_CLI_C) ||    \
-    !defined(MBEDTLS_NET_C) || !defined(MBEDTLS_RSA_C) ||            \
-    !defined(MBEDTLS_PEM_PARSE_C) || !defined(MBEDTLS_CTR_DRBG_C) || \
-    !defined(MBEDTLS_X509_CRT_PARSE_C)
-int main(void)
-{
-    mbedtls_printf("MBEDTLS_BIGNUM_C and/or MBEDTLS_ENTROPY_C and/or "
-                   "MBEDTLS_SSL_TLS_C and/or MBEDTLS_SSL_CLI_C and/or "
-                   "MBEDTLS_NET_C and/or MBEDTLS_RSA_C and/or "
-                   "MBEDTLS_CTR_DRBG_C and/or MBEDTLS_X509_CRT_PARSE_C "
-                   "not defined.\n");
-    mbedtls_exit(0);
-}
-#else
-
 #include "mbedtls/net_sockets.h"
 #include "mbedtls/debug.h"
 #include "mbedtls/ssl.h"
 #include "mbedtls/entropy.h"
 #include "mbedtls/ctr_drbg.h"
 #include "mbedtls/error.h"
-// #include "test/certs.h"
 
 #include <string.h>
 
@@ -34,15 +15,14 @@ int main(void)
 
 #define DEBUG_LEVEL 1
 
-
 static void my_debug(void *ctx, int level,
                      const char *file, int line,
                      const char *str)
 {
     ((void) level);
 
-    mbedtls_fprintf((FILE *) ctx, "%s:%04d: %s", file, line, str);
-    fflush((FILE *) ctx);
+    mbedtls_fprintf(static_cast<FILE *> ( ctx), "%s:%04d: %s", file, line, str);
+    fflush(static_cast<FILE *> ( ctx));
 }
 
 int my_generate(void *p_rng, unsigned char *output, size_t output_len, const unsigned char *additional, size_t add_len)
@@ -95,7 +75,7 @@ int main(void)
 
     mbedtls_entropy_init(&entropy);
     if ((ret = mbedtls_ctr_drbg_seed(&ctr_drbg, my_drbg_random, &entropy,
-                                     (const unsigned char *) pers,
+                                     reinterpret_cast<const unsigned char *>(pers),
                                      strlen(pers))) != 0) {
         mbedtls_printf(" failed\n  ! mbedtls_ctr_drbg_seed returned %d\n", ret);
         goto exit;
@@ -108,17 +88,7 @@ int main(void)
      */
     mbedtls_printf("  . Loading the CA root certificate ...");
     fflush(stdout);
-/*
-    ret = mbedtls_x509_crt_parse(&cacert, (const unsigned char *) mbedtls_test_cas_pem,
-                                 mbedtls_test_cas_pem_len);
-    if (ret < 0) {
-        mbedtls_printf(" failed\n  !  mbedtls_x509_crt_parse returned -0x%x\n\n",
-                       (unsigned int) -ret);
-        goto exit;
-    }
 
-    mbedtls_printf(" ok (%d skipped)\n", ret);
-*/
     /*
      * 1. Start the connection
      */
@@ -177,7 +147,7 @@ int main(void)
     while ((ret = mbedtls_ssl_handshake(&ssl)) != 0) {
         if (ret != MBEDTLS_ERR_SSL_WANT_READ && ret != MBEDTLS_ERR_SSL_WANT_WRITE) {
             mbedtls_printf(" failed\n  ! mbedtls_ssl_handshake returned -0x%x\n\n",
-                           (unsigned int) -ret);
+                           static_cast<unsigned int>(-ret));
             goto exit;
         }
     }
@@ -212,7 +182,7 @@ int main(void)
     mbedtls_printf("  > Write to server:");
     fflush(stdout);
 
-    len = sprintf((char *) buf, GET_REQUEST);
+    len = sprintf(reinterpret_cast<char *>(buf), GET_REQUEST);
 
     while ((ret = mbedtls_ssl_write(&ssl, buf, len)) <= 0) {
         if (ret != MBEDTLS_ERR_SSL_WANT_READ && ret != MBEDTLS_ERR_SSL_WANT_WRITE) {
@@ -222,7 +192,7 @@ int main(void)
     }
 
     len = ret;
-    mbedtls_printf(" %d bytes written\n\n%s", len, (char *) buf);
+    mbedtls_printf(" %d bytes written\n\n%s", len, reinterpret_cast<char *>(buf));
 
     /*
      * 7. Read the HTTP response
@@ -254,7 +224,7 @@ int main(void)
         }
 
         len = ret;
-        mbedtls_printf(" %d bytes read\n\n%s", len, (char *) buf);
+        mbedtls_printf(" %d bytes read\n\n%s", len, reinterpret_cast<char *>(buf));
     } while (1);
 
     mbedtls_ssl_close_notify(&ssl);
@@ -281,6 +251,3 @@ exit:
 
     mbedtls_exit(exit_code);
 }
-#endif /* MBEDTLS_BIGNUM_C && MBEDTLS_ENTROPY_C && MBEDTLS_SSL_TLS_C &&
-          MBEDTLS_SSL_CLI_C && MBEDTLS_NET_C && MBEDTLS_RSA_C &&
-          MBEDTLS_PEM_PARSE_C && MBEDTLS_CTR_DRBG_C && MBEDTLS_X509_CRT_PARSE_C */

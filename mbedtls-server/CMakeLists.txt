@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.0) # setting this is required
-project(dualec-attack)            # this sets the project name
+project(server)            # this sets the project name
 
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 set(CMAKE_BUILD_TYPE Debug)
@@ -11,7 +11,7 @@ set(CMAKE_BUILD_TYPE Debug)
 #These instructions search the directory tree when cmake is
 #invoked and put all files that match the pattern in the variables
 # `sources` and `data`.
-file(GLOB_RECURSE sources    ssl/*.cpp ../dualec-cpp/src/main/*.cpp)
+file(GLOB_RECURSE sources    ssl/*.cpp ../dualec-cpp/src/*.cpp)
 # file(GLOB_RECURSE data resources/*)
 # You can use set(sources src/main.cpp) etc if you don't want to
 # use globbing to find files automatically.
@@ -22,23 +22,23 @@ file(GLOB_RECURSE sources    ssl/*.cpp ../dualec-cpp/src/main/*.cpp)
 
 # The data is just added to the executable, because in some IDEs (QtCreator)
 # files are invisible when they are not explicitly part of the project.
-add_executable(dualec-attack ${sources})# ${data})
+add_executable(${PROJECT_NAME} ${sources})# ${data})
 
 # Just for example add some compiler flags.
-target_compile_options(dualec-attack PUBLIC -std=c++2a -O3 -Wall -Wextra -fdiagnostics-color=always
+target_compile_options(${PROJECT_NAME} PUBLIC -std=c++2a -O3 -Wall -Wextra -fdiagnostics-color=always
     -ggdb
     -DDEBUG
     -DMBEDTLS_ALLOW_PRIVATE_ACCESS # access private entropy to seed DualEC
     #-fsanitize=address,undefined,leak
--pedantic -Wcast-align -Wcast-qual -Wctor-dtor-privacy -Wdisabled-optimization -Wformat=2 -Winit-self -Wlogical-op -Wmissing-include-dirs -Wnoexcept -Wold-style-cast -Woverloaded-virtual -Wredundant-decls -Wshadow -Wsign-promo -Wstrict-null-sentinel -Wstrict-overflow=5 -Wswitch-default -Wundef -Wno-unused
+-pedantic -Wcast-align -Wcast-qual -Wctor-dtor-privacy -Wdisabled-optimization -Wformat=2 -Winit-self -Wlogical-op -Wmissing-include-dirs -Wnoexcept -Wold-style-cast -Woverloaded-virtual -Wredundant-decls -Wshadow -Wsign-promo -Wstrict-null-sentinel -Wswitch-default -Wundef -Wno-unused
 )
 
-target_link_options(dualec-attack PUBLIC
+target_link_options(${PROJECT_NAME} PUBLIC
     #-fsanitize=address,undefined,leak
 )
 
 # This allows to include files relative to the root of the src directory with a <> pair
-target_include_directories(dualec-attack PUBLIC mbedtls/include ../dualec-cpp/src/main)
+target_include_directories(${PROJECT_NAME} PUBLIC mbedtls/include ../dualec-cpp/src/include)
 
 # This copies all resource files in the build directory.
 # We need this, because we want to work with paths relative to the executable.
@@ -54,7 +54,7 @@ target_include_directories(dualec-attack PUBLIC mbedtls/include ../dualec-cpp/sr
 
 add_subdirectory(./mbedtls)
 
-target_link_libraries(dualec-attack PUBLIC
+target_link_libraries(${PROJECT_NAME} PUBLIC
   # ${Boost_LIBRARIES}
   # here you can add any library dependencies
   -lgivaro
@@ -70,7 +70,7 @@ target_link_libraries(dualec-attack PUBLIC
 
 # All install commands get the same destination. This allows us to use paths
 # relative to the executable.
-install(TARGETS dualec-attack DESTINATION example_destination)
+install(TARGETS ${PROJECT_NAME} DESTINATION example_destination)
 
 # Now comes everything we need, to create a package
 # there are a lot more variables you can set, and some

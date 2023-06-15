@@ -204,7 +204,7 @@ reset:
     mbedtls_printf("  > Write to client:");
     fflush(stdout);
 
-    len = sprintf((char *) buf, HTTP_RESPONSE,
+    len = sprintf(reinterpret_cast<char*>(buf), HTTP_RESPONSE,
                   mbedtls_ssl_get_ciphersuite(&ssl));
 
     while ((ret = mbedtls_ssl_write(&ssl, buf, len)) <= 0) {
@@ -220,7 +220,7 @@ reset:
     }
 
     len = ret;
-    mbedtls_printf(" %d bytes written\n\n%s\n", len, (char *) buf);
+    mbedtls_printf(" %d bytes written\n\n%s\n", len, reinterpret_cast<char *>(buf));
 
     mbedtls_printf("  . Closing the connection...");
 
