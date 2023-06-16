@@ -16,7 +16,6 @@ struct Input {
     DEC::Curve dec_curve;
     BigInt dec_secret_d;
     BitStr dec_adin;
-    std::string dec_personalization_string;
 };
 
 [[nodiscard]] Input setup_input();

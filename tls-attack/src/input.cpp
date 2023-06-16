@@ -23,8 +23,7 @@ Input setup_input()
             .order_of_p = BigInt("115792089210356248762697446949407573529996955224135760342422259061068512044369"), // TODO: CAN BE CALCULATED
             .Q = AffinePoint(BigInt("58122190547351619314832142482958009588534653900841396129684563264131116700560"), BigInt("53567662391920079536836225565042724814092473002585219702054150877606765064388")),
         },
-        .dec_secret_d = 0x10ed1df5
-        .dec_adin = ...;
-        .dec_personalization_string = ...;
+        .dec_secret_d = 0x10ed1df5a,
+        .dec_adin = BitStr(0),
     };
 }
