@@ -17,7 +17,6 @@ struct Input {
     DEC::Curve dec_curve;
     BigInt dec_secret_d;
     BitStr dec_adin;
-    size_t msg_container_length;
     BigInt msg_iv_offset;
     barr msg_container;
 };
