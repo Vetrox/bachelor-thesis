@@ -144,6 +144,13 @@ barr encrypt(WorkingKeys wk, barr data, barr add_data) {
 
 barr decrypt(WorkingKeys wk, barr enc_input, barr ad_input, barr iv_input, size_t decrypted_len)
 {
+    std::cout << ">>> decrypt\n\t";
+    print_barr(enc_input);
+    std::cout << "\n\t";
+    print_barr(ad_input);
+    std::cout << "\n\t";
+    print_barr(iv_input);
+    std::cout << std::endl;
 
     mbedtls_cipher_context_t c;
     mbedtls_cipher_init(&c);
@@ -162,14 +169,7 @@ barr decrypt(WorkingKeys wk, barr enc_input, barr ad_input, barr iv_input, size_
             &dec_output.front(), dec_output.size(),
             &olen, 16);
 #ifdef TLS_ATTACK_DETERMINISTIC
-    std::cout << "Client decrypted: ";
-    print_barr(dec_output);
-    std::cout << std::endl;
-    std::cout << "ASCII: ";
-    for (auto const& o : dec_output)
-        std::cout << o;
-    std::cout << std::endl;
-#endif
+    #endif
     return dec_output;
 }
 
@@ -181,23 +181,6 @@ void print_cipher_info()
     std::cout << "\n\tiv-size: " << cipher_info->iv_size;
     std::cout << std::endl;
 }
-
-#if 0
-void awawaw()
-{
-    remove_leading_zero_bytes(pre_master_secret);
-    auto master_secret = calculate_master_secret(pre_master_secret, server_hello_random, client_hello_random);
-
-
-    barr random_;
-    random_.insert(random_.end(), server_hello_random.begin(), server_hello_random.end());
-    random_.insert(random_.end(), client_hello_random.begin(), client_hello_random.end());
-    auto working_keys = generate_working_keys(master_secret, random_);
-    working_keys.print();
-    encrypt(working_keys, {}, {});
-    decrypt(working_keys, {}, {}, {}, 39);
-}
-#endif
 
 void calculate_s_from_r(BitStr& opt1, BitStr& opt2, BigInt const& r, Input const& input)
 {
@@ -394,16 +377,20 @@ int main()
 
     /* AEAD = message_len. record = header + encrypted_message + tag (16 bytes) */
     auto aead = aead_from_contentlen(input.msg_container_length);
-    std::cout << "USING AEAD::: "<< std::endl;
-    print_barr(aead);
 
     auto decrypt_buffer_len = 128;
     auto iv = bitstr_from_barr(working_keys.client_enc_iv).as_big_int() - input.msg_iv_offset;
     auto iv_arr = BitStr(iv, cipher_info->iv_size*8).to_baked_array();
     auto iv_barr = barr(iv_arr.data(), iv_arr.data() + iv_arr.size());
-    std::cout << "USING CLIENT IV::: "<< std::endl;
-    print_barr(iv_barr);
-    //encrypt(working_keys, {}, {});
-    decrypt(working_keys, input.msg_encrypted, aead, iv_barr, decrypt_buffer_len);
+    // encrypt(working_keys, {}, {});
+    auto decrypted = decrypt(working_keys, input.msg_encrypted, aead, iv_barr, decrypt_buffer_len);
+    std::cout << "Client decrypted: ";
+    print_barr(decrypted);
+    std::cout << std::endl;
+    std::cout << "ASCII: ";
+    for (auto const& o : decrypted)
+        std::cout << o;
+    std::cout << std::endl;
+
     return 0;
 }
