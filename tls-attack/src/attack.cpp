@@ -382,6 +382,8 @@ int main()
     auto working_keys = generate_working_keys(master_secret, random_);
     working_keys.print();
 
+
+    // AEAD:::: message =  header_size + encrypted_size + tag_size
     //encrypt(working_keys, {}, {});
     //decrypt(working_keys, {}, {}, {}, 39);
     return 0;
