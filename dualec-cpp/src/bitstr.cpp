@@ -206,7 +206,7 @@ std::string BitStr::debug_description() const
 BitStr::BitStr(BigInt const& i, size_t bitlen)
 {
     if (bitlen > 0) {
-        auto container_len = containerlen_for_bitlength<B>(i.bitsize());
+        auto container_len = containerlen_for_bitlength<B>(i == 0 ? 0 : i.bitsize());
         if (container_len > 0) {
             auto* data = new B[container_len];
             (void)static_cast<B*>(mpz_export(data, nullptr,
