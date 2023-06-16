@@ -19,8 +19,7 @@ struct Input {
     BitStr dec_adin;
     size_t msg_container_length;
     BigInt msg_iv_offset;
-    barr msg_encrypted;
-
+    barr msg_container;
 };
 
 [[nodiscard]] Input setup_input();

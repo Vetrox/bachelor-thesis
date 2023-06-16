@@ -376,14 +376,14 @@ int main()
     working_keys.print();
 
     /* AEAD = message_len. record = header + encrypted_message + tag (16 bytes) */
-    auto aead = aead_from_contentlen(input.msg_container_length);
+    auto aead = aead_from_contentlen(input.msg_container.size());
 
     auto decrypt_buffer_len = 128;
     auto iv = bitstr_from_barr(working_keys.client_enc_iv).as_big_int() - input.msg_iv_offset;
     auto iv_arr = BitStr(iv, cipher_info->iv_size*8).to_baked_array();
     auto iv_barr = barr(iv_arr.data(), iv_arr.data() + iv_arr.size());
     // encrypt(working_keys, {}, {});
-    auto decrypted = decrypt(working_keys, input.msg_encrypted, aead, iv_barr, decrypt_buffer_len);
+    auto decrypted = decrypt(working_keys, input.msg_container, aead, iv_barr, decrypt_buffer_len);
     std::cout << "Client decrypted: ";
     print_barr(decrypted);
     std::cout << std::endl;
