@@ -27,8 +27,10 @@ MArray<BitStr::B> BitStr::to_baked_array() const
 BitStr BitStr::truncated_leftmost(size_t new_length) const
 {
     DBG << "BitStr::truncated_leftmost(this: " << debug_description() << " new_length: " << new_length << std::endl;
+    if (new_length == 0)
+        return BitStr(0);
     if (new_length > bitlength()) {
-        std::cout << "Wrong usage of truncate" << std::endl;
+        std::cout << "Wrong usage of truncate (leftmost). Requested bitlength was " << new_length << " but this->bitlengt() is " << bitlength() << std::endl;
         abort();
     }
     size_t bitshift_total = bitlength() - new_length;
@@ -56,8 +58,10 @@ BitStr BitStr::operator^(BitStr const& other) const
 BitStr BitStr::truncated_rightmost(size_t new_length) const
 {
     DBG << "truncated_rightmost(" << std::to_string(new_length) << ")" << std::endl;
+    if (new_length == 0)
+        return BitStr(0);
     if (new_length > m_bitlen) {
-        std::cout << "Wrong usage of truncate" << std::endl;
+        std::cout << "Wrong usage of truncate (rightmost). Requested bitlength was " << new_length << " but this->bitlengt() is " << bitlength() << std::endl;
         abort();
     }
     if (new_length == 0 || m_bitlen == 0 || m_data_len == 0 || m_data_begin.get() == nullptr)

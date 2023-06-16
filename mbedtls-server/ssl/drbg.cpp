@@ -69,13 +69,13 @@ int my_generate(void *p_rng, unsigned char *output, size_t output_len, const uns
         abort();
     }
 
-    auto adin = BitStr(BigInt(0), add_len);
+    std::optional<BitStr> adin;
     if (additional && add_len > 0) {
         auto* buf = new uint8_t[add_len];
         memcpy(buf, additional, add_len);
         adin = BitStr(std::unique_ptr<uint8_t[]>(buf), add_len);
     }
-    LEAK << "adin: " << adin.as_hex_string() << std::endl;
+    LEAK << "adin: " << (adin.has_value() ? "<empty>" : adin->as_hex_string()) << std::endl;
     auto rt = DEC::Generate(working_state.value(), output_len*8, std::move(adin));
     auto baked_rt = rt.to_baked_array();
     if (baked_rt.size() != output_len) {
