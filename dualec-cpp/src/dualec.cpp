@@ -169,14 +169,14 @@ BitStr DEC::Generate(DEC::WorkingState& working_state, size_t requested_number_o
     size_t i = 0;
 
     do {
-        std::cout << "i: " << i << " adin: " << additional_input.as_hex_string() << std::endl;
+        DEC_PRINT << "i: " << i << " adin: " << additional_input.as_hex_string() << std::endl;
         // 5. t = s XOR additional_input
         auto t = working_state.s ^ additional_input;
-        std::cout << "i: " << i << " t: " << t.as_hex_string() << std::endl;
+        DEC_PRINT << "i: " << i << " t: " << t.as_hex_string() << std::endl;
 
         // 6. s = phi(x(t * P)). BACKDOOR: x(s * (d * Q)) = x(d * (s * Q))
         working_state.s = BitStr(DEC::mul(t.as_big_int(), working_state.dec_curve.P, working_state.dec_curve.curve).x(), working_state.seedlen);
-        std::cout << "i: " << i << " s: " << working_state.s.as_hex_string() << std::endl;
+        DEC_PRINT << "i: " << i << " s: " << working_state.s.as_hex_string() << std::endl;
 
         // 7. r = phi(x(s * Q)). BACKDOOR: x(d * (s * Q)) * Q
         auto r = BitStr(DEC::mul(working_state.s.as_big_int(), working_state.dec_curve.Q, working_state.dec_curve.curve).x());
@@ -184,15 +184,15 @@ BitStr DEC::Generate(DEC::WorkingState& working_state, size_t requested_number_o
         // 8. temp = temp || (rightmost outlen bits of r)
         auto stripped_r = r.truncated_rightmost(working_state.outlen);
         auto amount_of_stripped_bits = static_cast<int>(r.bitlength()) - static_cast<int>(working_state.outlen);
-        std::cout << "i: " << i << " amount-of-stripped-bits: " << amount_of_stripped_bits << std::endl;
+        DEC_PRINT << "i: " << i << " amount-of-stripped-bits: " << amount_of_stripped_bits << std::endl;
         auto stripped_bits = r.truncated_leftmost(amount_of_stripped_bits);
 
 #ifdef DEC_EXPORT_STRIPPED_BITS
         if (i == 0)
             dual_ec_stripped_bits_first_round = stripped_bits.as_big_int();
 #endif
-        std::cout << "i: " << i << " r: " << stripped_r.as_hex_string() << " stripped_bits: " << stripped_bits.as_hex_string() << std::endl;
-        std::cout << "i: " << i << " R: " << DEC::mul(working_state.s.as_big_int(), working_state.dec_curve.Q, working_state.dec_curve.curve).to_string() << std::endl;
+        DEC_PRINT << "i: " << i << " r: " << stripped_r.as_hex_string() << " stripped_bits: " << stripped_bits.as_hex_string() << std::endl;
+        DEC_PRINT << "i: " << i << " R: " << DEC::mul(working_state.s.as_big_int(), working_state.dec_curve.Q, working_state.dec_curve.curve).to_string() << std::endl;
         temp = temp + stripped_r;
 
         // 9. additional_input=0
@@ -218,7 +218,7 @@ BitStr DEC::Generate(DEC::WorkingState& working_state, size_t requested_number_o
     // 14. s = phi(x(s * P)). BACKDOOR: x(d * (s * Q)) * (d * Q) = d * r
     // NOTE: This step doesn't exist in SP-800-90 (2006)
     working_state.s = BitStr(DEC::mul(working_state.s.as_big_int(), working_state.dec_curve.P, working_state.dec_curve.curve).x(), working_state.seedlen);
-    std::cout << " s: " << working_state.s.as_hex_string() << std::endl;
+    DEC_PRINT << " s: " << working_state.s.as_hex_string() << std::endl;
 
     // 15. Return SUCCESS, returned_bits, and s, seedlen, p, a, b, n, P, Q, and a reseed_counter for the new_working_state.
     return returned_bits;

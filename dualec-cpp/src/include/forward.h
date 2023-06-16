@@ -6,10 +6,15 @@
 #ifdef DUALEC_DEBUG
 #    define DBG std::cout
 #else
-#    define DBG    \
-        if (false) \
-        std::cout
+#    define DBG if (false) std::cout
 #endif
+
+#ifdef DUALEC_GENERATE_PRINT
+#   define DEC_PRINT std::cout
+#else
+#   define DEC_PRINT if (false) std::cout
+#endif
+
 
 typedef Givaro::Integer BigInt;
 typedef Givaro::Modular<BigInt> Zp;
