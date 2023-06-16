@@ -7,6 +7,7 @@
 struct Input {
     barr server_random;
     barr client_random;
+    barr server_session_id;
     BigInt dh_generator;
     BigInt dh_prime;
     BigInt dh_bitlen_of_a;

