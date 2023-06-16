@@ -54,7 +54,7 @@ barr prf(barr secret, std::string label, barr seed, size_t dst_len)
 }
 
 /* See https://tools.ietf.org/html/rfc5246#section-8.1 */
-barr calculate_master_secret(barr const& pre_master_secret, barr const& server_hello_random, barr const& client_hello_random)
+[[nodiscard]] barr calculate_master_secret(barr const& pre_master_secret, barr const& server_hello_random, barr const& client_hello_random)
 {
     barr random;
     random.insert(random.end(), client_hello_random.begin(), client_hello_random.end());
@@ -93,15 +93,7 @@ WorkingKeys generate_working_keys(barr master_secret, barr random_seed)
 {
     WorkingKeys wk;
     barr keyblk = prf(master_secret, "key expansion", random_seed, 256);
-#ifdef TLS_ATTACK_DETERMINISTIC
-    std::cout << "key block: ";
-    print_barr(keyblk);
-    std::cout << std::endl;
-    std::cout << "expected key block: ";
-    print_barr(expect_keyblock);
-    std::cout << std::endl;
-    // Observed testcase keylen: 32, minlen: 16, ivlen: 12, maclen: 0
-#endif
+    // TODO maybe old Observed testcase keylen: 32, minlen: 16, ivlen: 12, maclen: 0
 
     auto keylen = cipher_info->key_bitlen / 8;
     auto ivlen = cipher_info->iv_size;
@@ -124,10 +116,6 @@ WorkingKeys generate_working_keys(barr master_secret, barr random_seed)
 }
 
 barr encrypt(WorkingKeys wk, barr data, barr add_data) {
-#ifdef TLS_ATTACK_DETERMINISTIC
-    data = { 0x14, 0x00, 0x00, 0x0c, 0xaf, 0x90, 0x68, 0x34, 0xca, 0x30, 0xb4, 0x0b, 0x34, 0x63, 0xb6, 0x3f};
-    add_data = { 0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x16,0x03,0x03,0x00,0x10 };
-#endif
     constexpr auto taglen = 16;
 
     mbedtls_cipher_context_t c;
@@ -156,11 +144,6 @@ barr encrypt(WorkingKeys wk, barr data, barr add_data) {
 
 barr decrypt(WorkingKeys wk, barr enc_input, barr ad_input, barr iv_input, size_t decrypted_len)
 {
-#ifdef TLS_ATTACK_DETERMINISTIC
-    ad_input = {0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x01, 0x17, 0x03, 0x03, 0x00, 0x12};
-    enc_input = {0x62, 0x47, 0x85, 0xb3, 0x81, 0x32, 0xab, 0x9e, 0x87, 0x56, 0xf8, 0x22, 0x22, 0x38, 0xa4, 0x1b, 0x15, 0xa0, 0x38, 0xad, 0x2c, 0x80, 0x59, 0x44, 0x6d, 0xcf, 0x0c, 0xeb, 0x24, 0x74, 0x68, 0xa7, 0xcb, 0xa8};
-    iv_input = {0x39, 0x37, 0xb9, 0x5d, 0x63, 0xf4, 0x15, 0x45, 0xb2, 0x3a, 0xe8, 0xfe};
-#endif
 
     mbedtls_cipher_context_t c;
     mbedtls_cipher_init(&c);
@@ -386,7 +369,20 @@ int main()
     BigInt server_private = guess_server_private_key(inner_dec_serv_rand, validify_bits, input);
     std::cout << "SUCCESS!!! server private key is:\n\t" << bigint_hex(server_private) << std::endl;
     /* Step 6: Calculate the pre-master-secret with pubKeyClient^a (mod p) */
+    auto pms = Givaro::powmod(input.dh_pubkey_client, server_private, input.dh_prime);
+    auto pms_arr = BitStr(pms).to_baked_array();
+    auto pre_master_secret = barr(pms_arr.data(), pms_arr.data() + pms_arr.size());
     /* Step 7: Calculate the master secret with the given information */
+    remove_leading_zero_bytes(pre_master_secret);
+    auto master_secret = calculate_master_secret(pre_master_secret, input.server_random, input.client_random);
     /* Step 8: Calculate the working_keys and decrpyt the message */
+    barr random_;
+    random_.insert(random_.end(), input.server_random.begin(), input.server_random.end());
+    random_.insert(random_.end(), input.client_random.begin(), input.client_random.end());
+    auto working_keys = generate_working_keys(master_secret, random_);
+    working_keys.print();
+
+    //encrypt(working_keys, {}, {});
+    //decrypt(working_keys, {}, {}, {}, 39);
     return 0;
 }
