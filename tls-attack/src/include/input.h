@@ -15,7 +15,7 @@ struct Input {
     uint8_t dec_security_strength;
     DEC::Curve dec_curve;
     BigInt dec_secret_d;
-    std::vector<BitStr> dec_adins;
+    BitStr dec_adin;
     std::string dec_personalization_string;
 };
 

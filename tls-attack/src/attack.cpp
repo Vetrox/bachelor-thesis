@@ -5,12 +5,14 @@
 #include "mbedtls/cipher.h"
 #include <array>
 #include <bits/stdint-uintn.h>
+#include <gmp++/gmp++_int.h>
 #include <iomanip>
 #include <ios>
 #include <iostream>
 #include <string>
 #include <vector>
 #include <mbedtls/ssl.h>
+#include "dualec.h"
 
 #define TLS_ATTACK_DETERMINISTIC
 
@@ -209,9 +211,32 @@ void awawaw()
 }
 #endif
 
+void calculate_s_from_r(BitStr& opt1, BitStr& opt2, BigInt const& r, Input const& input)
+{
+    AffinePoint R1, R2;
+    input.dec_curve.curve.lift_x(R1, R2, r);
+     //  it holds that s2 = x(d * R)
+    opt1 = BitStr(DEC::mul(input.dec_secret_d, R1, input.dec_curve.curve).x(), DEC::pick_seedlen(input.dec_security_strength));
+    opt2 = BitStr(DEC::mul(input.dec_secret_d, R2, input.dec_curve.curve).x(), DEC::pick_seedlen(input.dec_security_strength));
+}
+
+BitStr bitstr_from_barr(barr input)
+{
+    BitStr out = BitStr(0);
+    for (auto const& b : input)
+        out = out + BitStr(BigInt(b));
+    return out;
+}
+
 int main()
 {
     auto input = setup_input();
+    auto working_state = DEC::WorkingState {
+            .s = BitStr(-1),
+            .seedlen = DEC::pick_seedlen(input.dec_security_strength),
+            .dec_curve = input.dec_curve,
+            .outlen = DEC::calculate_max_outlen(DEC::pick_seedlen(input.dec_security_strength))};
+
     /* Input:
      *      TLS: server-random, client-random,
      *      DH: generator, prime, bitlength of a (TODO: not transferred, but maybe inferred?), pubKeyServer = g^a (mod p), pubKeyClient = g^b (mod p).
@@ -221,15 +246,28 @@ int main()
      *      for now: used cipher: MBEDTLS_CIPHER_CHACHA20_POLY1305
      */
     /* Step 1: Strip the first 4 bytes of server-random, because it's the unix timestamp. */
-    barr inner_dec_serv_rand = barr(input.server_random.begin() + 4, input.server_random.end());
+    barr inner_dec_serv_rand_barr = barr(input.server_random.begin() + 4, input.server_random.end());
+    BitStr inner_dec_serv_rand = bitstr_from_barr(inner_dec_serv_rand_barr);
     /* Step 2: Guess the last 4 bytes (because they were stripped to make room for the unix timestamp)
      *         and the stripped bits from the front */
-    BitStr guessed_last4;
-    BitStr guessed_stripped_bits;
+    BitStr guessed_last4 = BitStr(-1);
+    BitStr guessed_stripped_bits = BitStr(-1);
+    BitStr guessed_r = guessed_stripped_bits + inner_dec_serv_rand + guessed_last4;
     /* Step 3: Calculate the next state s_(i+1) */
-    /* Step 4: Generate enough random bits for a. Calculate a by subtracting 1 from the bits */
-    /* Step 5: Calculate g^a (mod p) and check if it matches pubKeyServer
-     *         If it didn't go to step 2.*/
+    BitStr s_opt1 = BitStr(0), s_opt2 = BitStr(0);
+    calculate_s_from_r(s_opt1, s_opt2, guessed_r.as_big_int(), input);
+
+    for (auto const& s : {s_opt1, s_opt2}) {
+        working_state.s = BitStr(std::move(s));
+        /* Step 4: Generate enough random bits for a. Calculate a by subtracting 1 from the bits */
+        auto a_bits = DEC::Generate(working_state, input.dh_bitlen_of_a, input.dec_adin);
+        auto a = a_bits.as_big_int() - 1;
+        /* Step 5: Calculate g^a (mod p) and check if it matches pubKeyServer
+         *         If it didn't go to step 2.*/
+        auto ga = Givaro::powmod(input.dh_generator, a, input.dh_prime);
+        if (ga == input.dh_pubkey_server) // sadge
+            abort();
+    }
     /* Step 6: Calculate the pre-master-secret with pubKeyClient^a (mod p) */
     /* Step 7: Calculate the master secret with the given information */
     /* Step 8: Calculate the working_keys and decrpyt the message */
