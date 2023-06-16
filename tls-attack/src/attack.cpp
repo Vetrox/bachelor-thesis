@@ -352,6 +352,16 @@ BigInt guess_server_private_key(BitStr const& inner_dec_serv_rand, BitStr const&
     abort();
 }
 
+barr aead_from_contentlen(size_t content_length)
+{
+    size_t message_len = content_length - 16;
+    /* content = record - header */
+    barr aead = {0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x01, 0x17, 0x03, 0x03, 0xaa, 0xaa};
+    aead[aead.size() - 2] = (message_len & 0xff00) >> 8;
+    aead[aead.size() - 1] = message_len & 0xff;
+    return aead;
+}
+
 int main()
 {
     auto input = setup_input();
