@@ -243,10 +243,13 @@ std::optional<BigInt> try_calc_private_key(BitStr const& guessed_stripped_bits, 
     for (auto const& s : {s_opt1, s_opt2}) {
         working_state.s = BitStr(std::move(s));
         /* Step 3.1: Generate server-session-id last 2 bytes */
-        auto to_validify = DEC::Generate(working_state, 2*8, {} /* in between, so adin=0 internally */);
+        auto to_validify = BitStr(DEC::mul(working_state.s.as_big_int(), working_state.dec_curve.Q, working_state.dec_curve.curve).x())
+            .truncated_rightmost(working_state.outlen)
+            .truncated_leftmost(2*8);
         if (to_validify.as_big_int() != validify_bits.as_big_int())
             continue;
-        std::cout << "Possible s found: " << s.as_hex_string() << std::endl;
+        working_state.s = BitStr(DEC::mul(working_state.s.as_big_int(), working_state.dec_curve.P, working_state.dec_curve.curve).x(), working_state.seedlen);
+        std::cout << "Possible s found: " << working_state.s.as_hex_string() << std::endl;
         /* Step 4: Generate enough random bits for a. Calculate a by subtracting 1 from the bits */
         auto a_bits = DEC::Generate(working_state, input.dh_bitlen_of_a, input.dec_adin);
         auto a = a_bits.as_big_int() - 1;
