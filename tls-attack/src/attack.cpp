@@ -221,8 +221,10 @@ void calculate_s_from_r(BitStr& opt1, BitStr& opt2, BigInt const& r, Input const
     AffinePoint R1, R2;
     input.dec_curve.curve.lift_x(R1, R2, r);
      //  it holds that s2 = x(d * R)
-    opt1 = BitStr(DEC::mul(input.dec_secret_d, R1, input.dec_curve.curve).x(), DEC::pick_seedlen(input.dec_security_strength));
-    opt2 = BitStr(DEC::mul(input.dec_secret_d, R2, input.dec_curve.curve).x(), DEC::pick_seedlen(input.dec_security_strength));
+    if (!R1.is_identity())
+        opt1 = BitStr(DEC::mul(input.dec_secret_d, R1, input.dec_curve.curve).x(), DEC::pick_seedlen(input.dec_security_strength));
+    if (!R2.is_identity())
+        opt2 = BitStr(DEC::mul(input.dec_secret_d, R2, input.dec_curve.curve).x(), DEC::pick_seedlen(input.dec_security_strength));
 }
 
 BitStr bitstr_from_barr(barr input)
@@ -235,12 +237,14 @@ BitStr bitstr_from_barr(barr input)
 
 std::optional<BigInt> try_calc_private_key(BitStr const& guessed_stripped_bits, BitStr const& validify_bits, BitStr const& inner_dec_serv_rand, Input const& input, DEC::WorkingState& working_state)
 {
-    BitStr guessed_r = /*guessed_stripped_bits*/BitStr(BigInt(0xdd00)) + inner_dec_serv_rand;
+    BitStr guessed_r = guessed_stripped_bits + inner_dec_serv_rand;
     /* Step 3: Calculate the next state s_(i+1) */
-    BitStr s_opt1 = BitStr(0), s_opt2 = BitStr(0);
+    BitStr s_opt1 = BitStr(0), s_opt2 = BitStr(0); // default
     calculate_s_from_r(s_opt1, s_opt2, guessed_r.as_big_int(), input);
 
     for (auto const& s : {s_opt1, s_opt2}) {
+        if (s.as_big_int() == 0)
+            continue;
         working_state.s = BitStr(std::move(s));
         /* Step 3.1: Generate server-session-id last 2 bytes */
         auto to_validify = BitStr(DEC::mul(working_state.s.as_big_int(), working_state.dec_curve.Q, working_state.dec_curve.curve).x())
@@ -249,7 +253,7 @@ std::optional<BigInt> try_calc_private_key(BitStr const& guessed_stripped_bits, 
         if (to_validify.as_big_int() != validify_bits.as_big_int())
             continue;
         working_state.s = BitStr(DEC::mul(working_state.s.as_big_int(), working_state.dec_curve.P, working_state.dec_curve.curve).x(), working_state.seedlen);
-        std::cout << "Possible s found: " << working_state.s.as_hex_string() << std::endl;
+        std::cout << "\nPossible s found: " << working_state.s.as_hex_string() << std::endl;
         /* Step 4: Generate enough random bits for a. Calculate a by subtracting 1 from the bits */
         auto a_bits = DEC::Generate(working_state, input.dh_bitlen_of_a, input.dec_adin);
         auto a = a_bits.as_big_int() - 1;
@@ -266,7 +270,7 @@ struct Iterator {
     Iterator(BigInt start, BigInt end_excl)
         : m_start(std::move(start))
         , m_end(std::move(end_excl))
-        , m_current(start - 1)
+        , m_current(m_start)
     {
     }
     BigInt m_start;
@@ -274,7 +278,8 @@ struct Iterator {
     [[nodiscard]] BigInt current() const { if (m_current >= m_end) abort();
         return m_current; }
     [[nodiscard]] bool has_next() const { return m_current + 1 < m_end; }
-    BigInt advance() { return ++m_current; }
+    BigInt advance() {
+        return m_current++; }
     [[nodiscard]] int percentage() const { return (current()-m_start+2)*100 / (m_end-m_start); }
 private:
     BigInt m_current;
@@ -317,8 +322,7 @@ BigInt guess_server_private_key(BitStr const& inner_dec_serv_rand, BitStr const&
             while (guesser.has_next() && !stoken.stop_requested()) {
                 *progress_bucket = guesser.percentage();
                 auto guess = BitStr(guesser.advance(), stripped_amount_of_bits);
-                BitStr guessed_stripped_bits = guess.truncated_rightmost(stripped_amount_of_bits);
-                auto result = try_calc_private_key(guessed_stripped_bits, validify_bits, inner_dec_serv_rand, input, working_state);
+                auto result = try_calc_private_key(guess, validify_bits, inner_dec_serv_rand, input, working_state);
                 if (result.has_value()) {
                     stop_source.request_stop();
                     *finish_bucket = 1;
