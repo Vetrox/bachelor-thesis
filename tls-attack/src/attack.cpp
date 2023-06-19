@@ -15,6 +15,7 @@
 #include <vector>
 #include <mbedtls/ssl.h>
 #include "dualec.h"
+#include "mbedtls/error.h"
 #include <queue>
 #include <future>
 
@@ -142,34 +143,37 @@ barr encrypt(WorkingKeys wk, barr data, barr add_data) {
     return output;
 }
 
-barr decrypt(WorkingKeys wk, barr enc_input, barr ad_input, barr iv_input, size_t decrypted_len)
+barr decrypt(WorkingKeys wk, barr enc_input, barr ad_input, barr iv_input, size_t decrypted_len, bool from_server)
 {
-    std::cout << ">>> decrypt\n\t";
+    /*std::cout << ">>> decrypt\n\t";
     print_barr(enc_input);
     std::cout << "\n\t";
     print_barr(ad_input);
     std::cout << "\n\t";
     print_barr(iv_input);
-    std::cout << std::endl;
+    std::cout << std::endl;*/
 
     mbedtls_cipher_context_t c;
     mbedtls_cipher_init(&c);
     mbedtls_cipher_setup(&c, cipher_info);
-    mbedtls_cipher_set_iv(&c, &wk.server_enc_iv.front(), wk.server_enc_iv.size());
-    // mbedtls_cipher_setkey(&c, &wk.server_write_key.front(), wk.server_write_key.size()*8, MBEDTLS_ENCRYPT);
-    mbedtls_cipher_setkey(&c, &wk.client_write_key.front(), wk.client_write_key.size()*8, MBEDTLS_DECRYPT);
+    if (from_server) {
+        mbedtls_cipher_setkey(&c, &wk.server_write_key.front(), wk.server_write_key.size()*8, MBEDTLS_DECRYPT);
+    } else {
+        mbedtls_cipher_setkey(&c, &wk.client_write_key.front(), wk.client_write_key.size()*8, MBEDTLS_DECRYPT);
+    }
 
     barr dec_output;
     dec_output.resize(decrypted_len);
     size_t olen;
-    mbedtls_cipher_auth_decrypt_ext(&c,
+    auto ret = mbedtls_cipher_auth_decrypt_ext(&c,
             &iv_input.front(), iv_input.size(),
             &ad_input.front(), ad_input.size(),
             &enc_input.front(), enc_input.size(),
             &dec_output.front(), dec_output.size(),
             &olen, 16);
-#ifdef TLS_ATTACK_DETERMINISTIC
-    #endif
+    if (ret < 0)
+        std::cout << "RET: " << mbedtls_high_level_strerr(ret) << std::endl;
+        
     return dec_output;
 }
 
@@ -370,8 +374,7 @@ int main()
     std::cout << "SUCCESS!!! server private key is:\n\t" << bigint_hex(server_private) << std::endl;
     /* Step 6: Calculate the pre-master-secret with pubKeyClient^a (mod p) */
     auto pms = Givaro::powmod(input.dh_pubkey_client, server_private, input.dh_prime);
-    auto pms_arr = BitStr(pms).to_baked_array();
-    auto pre_master_secret = barr(pms_arr.data(), pms_arr.data() + pms_arr.size());
+    auto pre_master_secret = barr_from_bitstr(BitStr(pms));
     /* Step 7: Calculate the master secret with the given information */
     remove_leading_zero_bytes(pre_master_secret);
     auto master_secret = calculate_master_secret(pre_master_secret, input.server_random, input.client_random);
@@ -383,22 +386,23 @@ int main()
     working_keys.print();
 
 
-    static auto decrypt_buffer_len = 128;
-    /* AEAD = message_len. record = header + encrypted_message + tag (16 bytes) */
-    auto aead = aead_from_contentlen(input.messages[0].container.size());
+    static auto decrypt_buffer_len = 2000;
 
-    auto iv = bitstr_from_barr(working_keys.client_enc_iv).as_big_int() - input.messages[0].iv_offset;
-    auto iv_arr = BitStr(iv, cipher_info->iv_size*8).to_baked_array();
-    auto iv_barr = barr(iv_arr.data(), iv_arr.data() + iv_arr.size());
+    for (auto const& msg : input.messages) {
+        /* AEAD = message_len. record = header + encrypted_message + tag (16 bytes) */
+        auto aead = aead_from_contentlen(msg.container.size());
 
-    auto decrypted = decrypt(working_keys, input.messages[0].container, aead, iv_barr, decrypt_buffer_len);
-    std::cout << "Client decrypted: ";
-    print_barr(decrypted);
-    std::cout << std::endl;
-    std::cout << "ASCII: ";
-    for (auto const& o : decrypted)
-        std::cout << o;
-    std::cout << std::endl;
+        auto iv = bitstr_from_barr(msg.from_server ? working_keys.server_enc_iv : working_keys.client_enc_iv).as_big_int() - msg.iv_offset;
+        auto iv_barr = barr_from_bitstr(BitStr(iv, cipher_info->iv_size*8));
+
+        auto decrypted = decrypt(working_keys, msg.container, aead, iv_barr, decrypt_buffer_len, msg.from_server);
+        std::cout << ">>>" << (msg.from_server ? "Server" : "Client") << " decrypted:\n";
+        for (auto const& o : decrypted) {
+            if (o == 0) break;
+            std::cout << o;
+        }
+        std::cout << std::endl;
+    }
 
     return 0;
 }

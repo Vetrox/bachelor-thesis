@@ -7,6 +7,7 @@
 struct Message {
     BigInt iv_offset; // in case we missed a packet.
     barr container; // record without header.
+    bool from_server = false;
 };
 
 struct Input {
