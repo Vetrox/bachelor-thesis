@@ -345,6 +345,13 @@ barr aead_from_contentlen(size_t content_length)
     return aead;
 }
 
+barr barr_from_bitstr(BitStr input)
+{
+    auto input_arr = input.to_baked_array();
+    auto iv_barr = barr(input_arr.data(), input_arr.data() + input_arr.size());
+    return iv_barr;
+}
+
 int main()
 {
     auto input = setup_input();
@@ -375,15 +382,16 @@ int main()
     auto working_keys = generate_working_keys(master_secret, random_);
     working_keys.print();
 
-    /* AEAD = message_len. record = header + encrypted_message + tag (16 bytes) */
-    auto aead = aead_from_contentlen(input.msg_container.size());
 
-    auto decrypt_buffer_len = 128;
-    auto iv = bitstr_from_barr(working_keys.client_enc_iv).as_big_int() - input.msg_iv_offset;
+    static auto decrypt_buffer_len = 128;
+    /* AEAD = message_len. record = header + encrypted_message + tag (16 bytes) */
+    auto aead = aead_from_contentlen(input.messages[0].container.size());
+
+    auto iv = bitstr_from_barr(working_keys.client_enc_iv).as_big_int() - input.messages[0].iv_offset;
     auto iv_arr = BitStr(iv, cipher_info->iv_size*8).to_baked_array();
     auto iv_barr = barr(iv_arr.data(), iv_arr.data() + iv_arr.size());
-    // encrypt(working_keys, {}, {});
-    auto decrypted = decrypt(working_keys, input.msg_container, aead, iv_barr, decrypt_buffer_len);
+
+    auto decrypted = decrypt(working_keys, input.messages[0].container, aead, iv_barr, decrypt_buffer_len);
     std::cout << "Client decrypted: ";
     print_barr(decrypted);
     std::cout << std::endl;

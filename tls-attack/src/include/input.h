@@ -4,6 +4,11 @@
 #include "dualec_curve.h"
 #include "forward.h"
 
+struct Message {
+    BigInt iv_offset; // in case we missed a packet.
+    barr container; // record without header.
+};
+
 struct Input {
     barr server_random;
     barr client_random;
@@ -17,8 +22,7 @@ struct Input {
     DEC::Curve dec_curve;
     BigInt dec_secret_d;
     BitStr dec_adin;
-    BigInt msg_iv_offset;
-    barr msg_container;
+    std::vector<Message> messages;
 };
 
 [[nodiscard]] Input setup_input();
