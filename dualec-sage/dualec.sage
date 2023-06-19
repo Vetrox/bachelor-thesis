@@ -251,14 +251,6 @@ def Dual_EC_DRBG_Generate(working_state: WorkingState, requested_number_of_bits,
         returned_bits: The pseudorandom bits to be returned to the generate function.
         s, seedlen, p, a, b, n, P, Q, and a reseed_counter for the new_working_state
     """
-    # If the input of additional_input is not supported by an
-    # implementation, then step 2 of the generate process becomes:
-    # additional_input = 0.
-    # Alternatively, generate steps 2 and 9 are omitted, the additional_input term is
-    # omitted from step 5, and the “go to step 5” in step 12 is to the step that now sets
-    # t = s.
-
-
     # 1. Check whether a reseed is required.
     # Note: This isn't supported.
 
@@ -307,11 +299,10 @@ def Dual_EC_DRBG_Generate(working_state: WorkingState, requested_number_of_bits,
     # 13. returned_bits = Truncate(temp, i * outlen, requested_number_of_bits).
     if len(temp) != i * working_state.outlen:
         raise AssertionError("Temp must be a multiple of outlen.")
-    if len(temp) < requested_number_of_bits:
-        raise AssertionError("Temp must be longer than the requested number of bits, otherwise we wouldn't get the requested entropy.")
-    returned_bits = Dual_EC_Truncate(temp, i * working_state.outlen, requested_number_of_bits)
+    returned_bits = Dual_EC_Truncate(temp, len(temp), requested_number_of_bits)
 
     # 14. s = phi(x(s * P)).
+    # Note: This isn't present in the 2006 variant of DualEC.
     working_state.s = cast_to_bitlen(Dual_EC_phi(Dual_EC_x(Dual_EC_mul(num_from_bitstr(working_state.s), working_state.dual_ec_curve.P))), working_state.seedlen)
 
     # 15. Return SUCCESS, returned_bits, and s, seedlen, p, a, b, n, P, Q, and a reseed_counter for the new_working_state.
@@ -498,9 +489,9 @@ def generate_Q(P):
     """ generates d * Q = P and returns d and Q"""
     while True:
         # pick a random d
-        d = Integer(secrets.randbelow(P.order() - 1)) + 1 # TODO: check the upper bound
+        d = Integer(secrets.randbelow(P.order() - 1)) + 1
         # compute the inverse of d
-        e = d^-1 % P.order() # TODO: check if we compute in the right field
+        e = d^-1 % P.order()
         # compute Q based on P
         Q = e * P
         # perform the sanity check
@@ -510,6 +501,7 @@ def generate_Q(P):
 
 if __name__ == "__main__":
     if len(sys.argv) > 2:
+        # Example showing the DualEC generation process
         entropy_str = "" if len(sys.argv) < 4 else sys.argv[3]
         bits, t = init_and_generate(bitstr_from_bytes(bytes(entropy_str, encoding="utf-8")), Integer(sys.argv[2]), Integer(sys.argv[1]), pick_curve(int(sys.argv[1])))
         print(bits)
