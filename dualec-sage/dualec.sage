@@ -418,7 +418,7 @@ def attack_backdoor(security_strength):
     curve = pick_curve(security_strength)
     curve_name = curve.name
     print(f"Picking {curve_name}")
-    d, Q = generate_Q(curve.P)
+    d, Q = generate_pQ(curve.P)
     x,y = Q.xy()
     print(f"produced backdoor d: {d.hex()}, Q: ({x.lift().hex()}, {y.lift().hex()})")
     curve.Q = Q
@@ -485,19 +485,18 @@ def init_and_generate(input_randomness, requested_amount_of_bits, security_stren
     diff = time.monotonic() - start_time
     return returned_bits, (diff * 1000)
 
-def generate_Q(P):
-    """ generates d * Q = P and returns d and Q"""
-    while True:
-        # pick a random d
-        d = Integer(secrets.randbelow(P.order() - 1)) + 1
-        # compute the inverse of d
-        e = d^-1 % P.order()
-        # compute Q based on P
-        Q = e * P
-        # perform the sanity check
-        if d * Q == P:
-            break
-    return (d, Q)
+def generate_pQ(P):
+    """ generates P = d * Q and returns d and Q"""
+    # pick a random d
+    d = Integer(secrets.randbelow(P.order() - 1)) + 1
+    # compute the inverse of d modulo ord(P)
+    e = d^-1 % P.order()
+    # compute Q as d^-1 * P
+    Q = e * P
+    # perform the sanity check
+    if d * Q == P:
+        return (d, Q)
+    raise AssertionError("d should be picked so that it's invertible.")
 
 if __name__ == "__main__":
     if len(sys.argv) > 2:
