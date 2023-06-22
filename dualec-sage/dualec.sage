@@ -418,7 +418,7 @@ def attack_backdoor(security_strength):
     curve = pick_curve(security_strength)
     curve_name = curve.name
     print(f"Picking {curve_name}")
-    d, Q = generate_pQ(curve.P)
+    d, Q = generate_dQ(curve.P)
     x,y = Q.xy()
     print(f"produced backdoor d: {d.hex()}, Q: ({x.lift().hex()}, {y.lift().hex()})")
     curve.Q = Q
@@ -485,7 +485,7 @@ def init_and_generate(input_randomness, requested_amount_of_bits, security_stren
     diff = time.monotonic() - start_time
     return returned_bits, (diff * 1000)
 
-def generate_pQ(P):
+def generate_dQ(P):
     """ generates P = d * Q and returns d and Q"""
     # pick a random d
     d = Integer(secrets.randbelow(P.order() - 1)) + 1
