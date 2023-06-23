@@ -7,10 +7,10 @@
 namespace DEC {
 
 struct WorkingState {
-    BitStr s;
-    size_t seedlen;
-    Curve const& dec_curve;
-    size_t outlen;
+    BitStr s;               // secret state s; len(s) = seedlen
+    size_t seedlen;         // 256, 384, 521
+    Curve const& dec_curve; // DualEC curve that may be custom
+    size_t outlen;          // about 15 bits shorter than seedlen
 
     std::string to_string(size_t indent_level = 0) const
     {
@@ -27,6 +27,7 @@ struct WorkingState {
     BitStr personalization_string, size_t security_strength,
     Curve const* curve = nullptr);
 [[nodiscard]] BitStr Generate(WorkingState&, size_t requested_number_of_bits, std::optional<BitStr> additional_input);
+
 [[nodiscard]] BitStr Hash_df(BitStr const& input_string, uint32_t no_of_bits_to_return);
 void Truncate(BitStr& bitstr, size_t outlen);
 [[nodiscard]] AffinePoint mul(BigInt scalar, AffinePoint const& point, JacobiEllipticCurve const& curve);
