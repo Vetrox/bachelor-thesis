@@ -33,7 +33,7 @@ BigInt get_entropy(BigInt end_exclusive)
     return Givaro::RandomIntegerIterator<>(Zp(end_exclusive), 0, end_exclusive).random();
 }
 
-void generate_dQ(AffinePoint const& P, BigInt const& order_of_p, JacobiEllipticCurve const& curve, BigInt& out_d, AffinePoint& out_Q)
+void generate_dQ(AffinePoint const& P, BigInt const& order_of_p, EllipticCurve const& curve, BigInt& out_d, AffinePoint& out_Q)
 {
     Zp order_field(order_of_p);
     Givaro::RandomIntegerIterator<> random_integer_iterator(Zp(order_of_p - 1), 0, order_of_p - 1);

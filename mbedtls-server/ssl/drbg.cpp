@@ -1,4 +1,5 @@
 #include "dualec_curve.h"
+#include "elliptic_curve.h"
 #include "mbedtls/entropy.h"
 #include <cstddef>
 #include <cstring>
@@ -13,7 +14,7 @@ static DEC::Curve bad_curve = DEC::pick_curve(security_strength);
 #define LEAK std::cout << "[LEAK] "
 
 
-static void generate_dQ(AffinePoint const& P, BigInt const& order_of_p, JacobiEllipticCurve const& curve, BigInt& out_d, AffinePoint& out_Q)
+static void generate_dQ(AffinePoint const& P, BigInt const& order_of_p, EllipticCurve const& curve, BigInt& out_d, AffinePoint& out_Q)
 {
     Zp order_field(order_of_p);
     Givaro::RandomIntegerIterator<> random_integer_iterator(Zp(order_of_p - 1), 0, order_of_p - 1);

@@ -132,7 +132,7 @@ DEC::WorkingState DEC::Instantiate(BitStr entropy_input, BitStr nonce,
         .outlen = calculate_max_outlen(seedlen) };
 }
 
-AffinePoint DEC::mul(BigInt scalar, AffinePoint const& point, JacobiEllipticCurve const& curve)
+AffinePoint DEC::mul(BigInt scalar, AffinePoint const& point, EllipticCurve const& curve)
 {
     AffinePoint out;
     curve.scalar(out, point, scalar);

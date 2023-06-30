@@ -30,7 +30,7 @@ struct WorkingState {
 
 [[nodiscard]] BitStr Hash_df(BitStr const& input_string, uint32_t no_of_bits_to_return);
 void Truncate(BitStr& bitstr, size_t outlen);
-[[nodiscard]] AffinePoint mul(BigInt scalar, AffinePoint const& point, JacobiEllipticCurve const& curve);
+[[nodiscard]] AffinePoint mul(BigInt scalar, AffinePoint const& point, EllipticCurve const& curve);
 [[nodiscard]] BitStr Truncate_Right(BitStr const& bitstr, size_t new_length);
 
 size_t pick_seedlen(size_t security_strength);
