@@ -16,24 +16,22 @@ static DEC::Curve bad_curve = DEC::pick_curve(security_strength);
 static void generate_dQ(AffinePoint const& P, BigInt const& order_of_p, JacobiEllipticCurve const& curve, BigInt& out_d, AffinePoint& out_Q)
 {
     Zp order_field(order_of_p);
-    Givaro::RandomIntegerIterator<> random_integer_iterator(order_field);
-    while (true) {
-        // pick random d
-        out_d = random_integer_iterator.randomInteger();
-        if (Givaro::isZero(out_d))
-            continue;
-        // compute the inverse of d
-        BigInt e;
-        order_field.inv(e, out_d);
-        // compute Q based on P
-        curve.scalar(out_Q, P, e);
+    Givaro::RandomIntegerIterator<> random_integer_iterator(Zp(order_of_p - 1), 0, order_of_p - 1);
+    // pick random d
+    out_d = random_integer_iterator.randomInteger() + 1;
+    // compute the inverse of d
+    BigInt e;
+    order_field.inv(e, out_d);
+    // compute Q based on P
+    curve.scalar(out_Q, P, e);
 
-        // perform sanity check
-        AffinePoint P2;
-        curve.scalar(P2, out_Q, out_d);
-        if (P2 == P)
-            return;
-    }
+    // perform sanity check
+    AffinePoint P2;
+    curve.scalar(P2, out_Q, out_d);
+    if (P2 == P)
+        return;
+    std::cout << "ERROR: Unreachable" << std::endl;
+    abort();
 }
 
 void init_working_state(mbedtls_entropy_context& entropy, std::string personalization_string) {
@@ -44,6 +42,7 @@ void init_working_state(mbedtls_entropy_context& entropy, std::string personaliz
     auto buf_len = entropy.accumulator.total[0]; // same here
     auto* buf_copy = new uint8_t[buf_len];
     memcpy(buf_copy, buf, buf_len);
+    auto input_entropy = BitStr(std::unique_ptr<uint8_t[]>(buf_copy), buf_len);
 
     auto pers_copy_len = personalization_string.length();
     auto* pers_copy = new uint8_t[pers_copy_len];
@@ -54,7 +53,7 @@ void init_working_state(mbedtls_entropy_context& entropy, std::string personaliz
 
     std::copy(personalization_string.begin(), personalization_string.end(), pers_copy);
     working_state.emplace(DEC::Instantiate(
-                BitStr(std::unique_ptr<uint8_t[]>(buf_copy), buf_len), /* entropy input */
+                input_entropy, /* entropy input */
                 BitStr(0), /* mbedtls doesn't use nonces internally */
                 BitStr(std::unique_ptr<uint8_t[]>(pers_copy), pers_copy_len),
                 security_strength, &bad_curve));
