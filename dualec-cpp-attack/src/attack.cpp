@@ -11,6 +11,7 @@
 #include <cstdint>
 #include <cstdlib>
 #include <future>
+#include <givaro/givrandom.h>
 #include <givaro/random-integer.h>
 #include <iomanip>
 #include <queue>
@@ -27,41 +28,35 @@ static BigInt no_of_threads = std::thread::hardware_concurrency() * 3;
 
 static std::stop_source stop_source;
 
-BigInt random_bigint(BigInt end_exclusive)
+BigInt get_entropy(BigInt end_exclusive)
 {
-    auto generator = Givaro::RandomIntegerIterator<>(Zp(end_exclusive));
-    return generator.randomInteger();
+    return Givaro::RandomIntegerIterator<>(Zp(end_exclusive), 0, end_exclusive).random();
 }
 
 void generate_dQ(AffinePoint const& P, BigInt const& order_of_p, JacobiEllipticCurve const& curve, BigInt& out_d, AffinePoint& out_Q)
 {
     Zp order_field(order_of_p);
-    Givaro::RandomIntegerIterator<> random_integer_iterator(order_field);
-    while (true) {
-        // pick random d
-        if (determined)
-            out_d = BigInt(0x62f102b);
-        else
-            out_d = random_integer_iterator.randomInteger();
-        if (Givaro::isZero(out_d))
-            continue;
-        // compute the inverse of d
-        BigInt e;
-        order_field.inv(e, out_d);
-        // compute Q based on P
-        curve.scalar(out_Q, P, e);
+    Givaro::RandomIntegerIterator<> random_integer_iterator(Zp(order_of_p - 1), 0, order_of_p - 1);
+    // pick random d
+    out_d = determined ? BigInt(0x62f102b) : (random_integer_iterator.randomInteger() + 1);
+    // compute the inverse of d
+    BigInt e;
+    order_field.inv(e, out_d);
+    // compute Q based on P
+    curve.scalar(out_Q, P, e);
 
-        // perform sanity check
-        AffinePoint P2;
-        curve.scalar(P2, out_Q, out_d);
-        if (P2 == P)
-            return;
-    }
+    // perform sanity check
+    AffinePoint P2;
+    curve.scalar(P2, out_Q, out_d);
+    if (P2 == P)
+        return;
+    std::cout << "ERROR: Unreachable" << std::endl;
+    abort();
 }
 
 [[nodiscard]] BitStr simulate_client_generation(DEC::Curve const& curve, size_t no_of_bits_to_return, size_t security_strength)
 {
-    auto random_input_entropy = random_bigint(BigInt(1) << 123);
+    auto random_input_entropy = get_entropy(BigInt(1) << security_strength);
     if (determined)
         random_input_entropy = 0x2bcfe968;
     std::cout << "Random input entropy: " << bigint_hex(random_input_entropy) << std::endl;
