@@ -1,0 +1,9 @@
+*compile_commands.json
+.cache/clangd
+curve-test
+*.cmake
+Makefile
+CMakeFiles
+CMakeCache.txt
+*.ninja*
+callgrind*
