@@ -266,6 +266,7 @@ static void push_worker(std::function<std::optional<BitStr>()> func)
 
 BigInt guess_server_private_key(BitStr const& inner_dec_serv_rand, BitStr const& validify_bits, Input const& input)
 {
+    std::cout << "Using the following curve: " << input.dec_curve.to_string() << std::endl;
     std::stop_source stop_source;
 
     auto stripped_amount_of_bits = DEC::pick_seedlen(input.dec_security_strength) - DEC::calculate_max_outlen(DEC::pick_seedlen(input.dec_security_strength));
@@ -329,9 +330,10 @@ BigInt guess_server_private_key(BitStr const& inner_dec_serv_rand, BitStr const&
     while (!workers.empty()) {
         auto ret = workers.front().get(); // blocking until finished by stop_source
         if (ret.has_value()) {
+            auto ri = ret.value().as_big_int();
             while (!workers.empty())
                 workers.pop();
-            return ret.value().as_big_int();
+            return ri;
         }
         workers.pop();
     }
