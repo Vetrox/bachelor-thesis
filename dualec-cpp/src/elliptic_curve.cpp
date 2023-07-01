@@ -4,7 +4,7 @@ void EllipticCurve::sqrt(BigInt& s1, BigInt& s2, BigInt const& z) const
 {
     // ASSUMES Givaro::legendre(z, m_field.residu()) == 1
     auto abx = Givaro::IntSqrtModDom<>();
-    abx.sqrootmod(s1, z, m_field.residu());
+    abx.sqrootmodprime(s1, z, m_field.residu());
     m_field.sub(s2, m_field.zero, s1);
 }
 
