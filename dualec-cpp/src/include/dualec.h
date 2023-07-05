@@ -10,7 +10,7 @@ struct WorkingState {
     BitStr s;               // secret state s; len(s) = seedlen
     size_t seedlen;         // 256, 384, 521
     Curve const& dec_curve; // DualEC curve that may be custom
-    size_t outlen;          // about 15 bits shorter than seedlen
+    size_t outlen;          // about 16-17 bits shorter than seedlen
 
     std::string to_string(size_t indent_level = 0) const
     {
