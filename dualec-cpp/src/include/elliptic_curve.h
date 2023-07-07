@@ -2,7 +2,6 @@
 #include "affine_point.h"
 #include "forward.h"
 #include "givaro/givintsqrootmod.h"
-#include "jacobi_point.h"
 #include <gmp++/gmp++_int.h>
 #include <ostream>
 
@@ -26,12 +25,6 @@ public:
     void _double(AffinePoint& out, AffinePoint const& in) const;
     void add(AffinePoint& out, AffinePoint const& p1, AffinePoint const& p2) const;
     virtual void scalar(AffinePoint& out, AffinePoint const& p, BigInt k) const;
-    virtual void scalar(JacobiPoint& out, AffinePoint const& p, BigInt k) const
-    {
-        std::cout << "no use default" << std::endl;
-        abort();
-        scalar(dynamic_cast<AffinePoint&>(out), p, k);
-    }
 
     void lift_x(AffinePoint& r1, AffinePoint& r2, BigInt inp_x) const;
 

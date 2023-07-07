@@ -75,10 +75,10 @@ BitStr predict_next_rand_bits(AffinePoint const& guess_R, BitStr& out_guess_for_
     if (log)
         std::cout << "[DBG] predict_next_rand_bits(point: " << guess_R.to_string() << " d: " << bigint_hex(d) << " seedlen: " << seedlen << ")" << std::endl;
     //  it holds that s2 = x(d * R)
-    out_guess_for_next_s = BitStr(DEC::mul(d, guess_R, dec_curve.curve), seedlen);
+    out_guess_for_next_s = BitStr(DEC::mul(d, guess_R, dec_curve.curve).x(), seedlen);
     if (log)
         std::cout << "[DBG]  out_guess_for_next_s = " << out_guess_for_next_s.debug_description() << std::endl;
-    auto guess_for_next_r = DEC::mul(out_guess_for_next_s.as_big_int(), dec_curve.Q, dec_curve.curve);
+    auto guess_for_next_r = DEC::mul(out_guess_for_next_s.as_big_int(), dec_curve.Q, dec_curve.curve).x();
     return BitStr(guess_for_next_r, outlen);
 }
 

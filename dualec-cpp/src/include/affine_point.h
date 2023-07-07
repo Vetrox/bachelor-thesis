@@ -15,7 +15,7 @@ public:
     {
     }
 
-    virtual bool is_identity() const
+    bool is_identity() const
     {
         return m_identity;
     }
@@ -34,12 +34,12 @@ public:
         m_y = y;
     }
 
-    virtual Element x() const
+    Element x() const
     {
         return m_x;
     }
 
-    virtual Element y() const
+    Element y() const
     {
         return m_y;
     }

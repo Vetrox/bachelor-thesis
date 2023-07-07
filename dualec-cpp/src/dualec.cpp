@@ -5,7 +5,6 @@
 #include "forward.h"
 #include "hash.h"
 #include "jacobi_elliptic_curve.h"
-#include "jacobi_point.h"
 #include <algorithm>
 #include <cstdint>
 #include <cstdlib>
@@ -133,11 +132,11 @@ DEC::WorkingState DEC::Instantiate(BitStr entropy_input, BitStr nonce,
         .outlen = calculate_max_outlen(seedlen) };
 }
 
-BigInt DEC::mul(BigInt scalar, AffinePoint const& point, EllipticCurve const& curve)
+AffinePoint DEC::mul(BigInt scalar, AffinePoint const& point, EllipticCurve const& curve)
 {
-    auto out = JacobiPoint(Zp(curve.prime()));
+    AffinePoint out;
     curve.scalar(out, point, scalar);
-    return out.jacobi_x();
+    return out;
 }
 
 BitStr DEC::Truncate_Right(BitStr const& bitstr, size_t new_length)
@@ -176,11 +175,11 @@ BitStr DEC::Generate(DEC::WorkingState& working_state, size_t requested_number_o
         DEC_PRINT << "i: " << i << " t: " << t.as_hex_string() << std::endl;
 
         // 6. s = phi(x(t * P)). BACKDOOR: x(s * (d * Q)) = x(d * (s * Q))
-        working_state.s = BitStr(DEC::mul(t.as_big_int(), working_state.dec_curve.P, working_state.dec_curve.curve), working_state.seedlen);
+        working_state.s = BitStr(DEC::mul(t.as_big_int(), working_state.dec_curve.P, working_state.dec_curve.curve).x(), working_state.seedlen);
         DEC_PRINT << "i: " << i << " s: " << working_state.s.as_hex_string() << std::endl;
 
         // 7. r = phi(x(s * Q)). BACKDOOR: x(d * (s * Q)) * Q
-        auto r = BitStr(DEC::mul(working_state.s.as_big_int(), working_state.dec_curve.Q, working_state.dec_curve.curve));
+        auto r = BitStr(DEC::mul(working_state.s.as_big_int(), working_state.dec_curve.Q, working_state.dec_curve.curve).x());
 
         // 8. temp = temp || (rightmost outlen bits of r)
         auto stripped_r = r.truncated_rightmost(working_state.outlen);
@@ -193,6 +192,7 @@ BitStr DEC::Generate(DEC::WorkingState& working_state, size_t requested_number_o
             dual_ec_stripped_bits_first_round = stripped_bits.as_big_int();
 #endif
         DEC_PRINT << "i: " << i << " r: " << stripped_r.as_hex_string() << " stripped_bits: " << stripped_bits.as_hex_string() << std::endl;
+        DEC_PRINT << "i: " << i << " R: " << DEC::mul(working_state.s.as_big_int(), working_state.dec_curve.Q, working_state.dec_curve.curve).to_string() << std::endl;
         temp = temp + stripped_r;
 
         // 9. additional_input=0
@@ -217,7 +217,7 @@ BitStr DEC::Generate(DEC::WorkingState& working_state, size_t requested_number_o
 
     // 14. s = phi(x(s * P)). BACKDOOR: x(d * (s * Q)) * (d * Q) = d * r
     // NOTE: This step doesn't exist in SP-800-90 (2006)
-    working_state.s = BitStr(DEC::mul(working_state.s.as_big_int(), working_state.dec_curve.P, working_state.dec_curve.curve), working_state.seedlen);
+    working_state.s = BitStr(DEC::mul(working_state.s.as_big_int(), working_state.dec_curve.P, working_state.dec_curve.curve).x(), working_state.seedlen);
     DEC_PRINT << " s: " << working_state.s.as_hex_string() << std::endl;
 
     // 15. Return SUCCESS, returned_bits, and s, seedlen, p, a, b, n, P, Q, and a reseed_counter for the new_working_state.
