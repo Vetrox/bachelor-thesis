@@ -13,7 +13,14 @@ public:
         : EllipticCurve(prime, BigInt("-3"), b)
     {
     }
-    virtual void scalar(AffinePoint& out, AffinePoint const& p, BigInt k) const override;
+    virtual void scalar(JacobiPoint& out, AffinePoint const& p, BigInt k) const override;
+    virtual void scalar(AffinePoint& out, AffinePoint const& p, BigInt k) const override
+    {
+        auto o = JacobiPoint(m_field);
+        scalar(o, p, std::move(k));
+        out = AffinePoint(o.x(), o.y());
+    }
+
 
     virtual std::string to_string(size_t indent_level = 0) const override
     {

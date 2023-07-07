@@ -2,8 +2,9 @@
 
 #include "affine_point.h"
 #include "forward.h"
+#include <optional>
 
-class JacobiPoint {
+class JacobiPoint : public AffinePoint {
 public:
     JacobiPoint(Zp field)
         : JacobiPoint(1, 1, 0, field)
@@ -22,61 +23,116 @@ public:
     {
     }
 
-    Element const& x() const
+    Element x() const override
+    {
+        if (!m_cache_affine_x.has_value()) {
+            Element i;
+            if (is_identity()) {
+                std::cout << "used x at infinity" << std::endl;
+                abort(); // fast optimization accessor shouldn't be called with infinity
+            }
+            if (jacobi_z() == 1)
+                i = jacobi_x();
+            else
+                m_field.mul(i, m_X, z_sq_inv());
+            const_cast<JacobiPoint*>(this)->m_cache_affine_x.emplace(std::move(i));
+        }
+        return m_cache_affine_x.value();
+    }
+
+    Element y() const override
+    {
+        if (!m_cache_affine_y.has_value()) {
+            Element i;
+            if (is_identity())
+                abort(); // fast optimization accessor shouldn't be called with infinity
+            if (jacobi_z() == 1)
+                i = jacobi_y();
+            else
+                m_field.mul(i, m_Y, z_qube_inv());
+            const_cast<JacobiPoint*>(this)->m_cache_affine_y.emplace(std::move(i));
+        }
+        return m_cache_affine_y.value();
+    }
+
+    Element const& jacobi_x() const
     {
         return m_X;
     }
 
-    Element const& y() const
+    Element const& jacobi_y() const
     {
         return m_Y;
     }
 
-    Element const& z() const
+    Element const& jacobi_z() const
     {
         return m_Z;
     }
 
     std::string to_string() const
     {
-        return "(" + bigint_hex(x()) + ":" + bigint_hex(y()) + ":" + bigint_hex(z()) + ")";
+        return "(" + bigint_hex(jacobi_x()) + ":" + bigint_hex(jacobi_y()) + ":" + bigint_hex(jacobi_z()) + ")";
     }
 
-    bool is_identity() const
+    bool is_identity() const override
     {
         return m_Z == 0;
     }
 
-    void negate()
+    /*void negate()
     {
         m_field.negin(m_Y);
-    }
+    }*/
 
+    /*
     AffinePoint to_affine() const
     {
-        if (m_Z == 0)
+        if (is_identity())
             return AffinePoint();
-        if (m_Z == 1)
-            return AffinePoint(m_X, m_Y);
-
-        Element z_tmp;
-        m_field.mul(z_tmp, m_Z, m_Z);
-
-        Element res_x;
-        m_field.div(res_x, m_X, z_tmp);
-
-        Element res_y;
-        m_field.mulin(z_tmp, m_Z);
-        m_field.div(res_y, m_Y, z_tmp);
-
-        return AffinePoint(res_x, res_y);
-    }
+        return AffinePoint(affine_x(), affine_y());
+    }*/
 
 private:
+    Element z_qube_inv() const {
+        if (!m_cache_z_qube_inv.has_value()) {
+            Element z_tmp = z_sq();
+            m_field.mulin(z_tmp, m_Z);
+            m_field.invin(z_tmp);
+            const_cast<JacobiPoint*>(this)->m_cache_z_qube_inv.emplace(std::move(z_tmp));
+        }
+        return m_cache_z_qube_inv.value();
+    }
+
+    Element z_sq_inv() const {
+        if (!m_cache_z_sq_inv.has_value()) {
+            Element tmp = z_sq();
+            m_field.invin(tmp);
+            const_cast<JacobiPoint*>(this)->m_cache_z_sq_inv.emplace(std::move(tmp));
+        }
+        return m_cache_z_sq_inv.value();
+    }
+
+    Element z_sq() const {
+        if (!m_cache_z_sq.has_value()) {
+            Element z_tmp;
+            m_field.mul(z_tmp, m_Z, m_Z);
+            const_cast<JacobiPoint*>(this)->m_cache_z_sq.emplace(std::move(z_tmp));
+        }
+        return m_cache_z_sq.value();
+    }
+
+
     /* c = 2, d = 3. a (in the elliptic curve) = -3 */
     Element m_X;
     Element m_Y;
     Element m_Z;
+
+    std::optional<Element> m_cache_affine_x;
+    std::optional<Element> m_cache_affine_y;
+    std::optional<Element> m_cache_z_sq;
+    std::optional<Element> m_cache_z_sq_inv;
+    std::optional<Element> m_cache_z_qube_inv;
 
     Zp m_field;
 };
