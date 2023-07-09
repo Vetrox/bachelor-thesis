@@ -342,8 +342,8 @@ int main()
      *      DH: generator, prime, bitlength of a, pubKeyServer = g^a (mod p), pubKeyClient = g^b (mod p).
      *      DualEC: security-stength, Q, d, s.t. dQ = P, adins used for generating, personalization string
      * Assumption:
-     *      server used DualEC to generate server-random and (a+1),
-     *      for now: used cipher: MBEDTLS_CIPHER_CHACHA20_POLY1305
+     *      server used DualEC to generate server-session-id and (a+1),
+     *      used cipher: MBEDTLS_CIPHER_CHACHA20_POLY1305
      */
     /* Step 1: Take the first 30 bytes of server-session-id (for 128 security strength) */
     BitStr inner_dec_serv_rand = bitstr_from_barr(barr(input.server_session_id.begin(), input.server_session_id.begin() + 30));

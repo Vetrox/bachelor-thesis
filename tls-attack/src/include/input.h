@@ -5,8 +5,8 @@
 #include "forward.h"
 
 struct Message {
-    BigInt iv_offset; // in case we missed a packet.
-    barr container; // record without header.
+    BigInt iv_offset; // message offset uniquely per peer
+    barr container; // message tls-record without header
     bool from_server = false;
 };
 
