@@ -181,7 +181,7 @@ BitStr bitstr_from_barr(barr input)
     return out;
 }
 
-std::optional<BigInt> try_calc_private_key(BitStr const& guessed_stripped_bits, BitStr const& validify_bits, BitStr const& inner_dec_serv_rand, Input const& input, DEC::WorkingState& working_state)
+std::optional<BigInt> try_calc_private_key(BitStr const& guessed_stripped_bits, BitStr const& validate_bits, BitStr const& inner_dec_serv_rand, Input const& input, DEC::WorkingState& working_state)
 {
     BitStr guessed_r = guessed_stripped_bits + inner_dec_serv_rand;
     /* Step 3: Calculate the next state s_(i+1) */
@@ -196,7 +196,7 @@ std::optional<BigInt> try_calc_private_key(BitStr const& guessed_stripped_bits, 
         auto to_validify = BitStr(DEC::mul(working_state.s.as_big_int(), working_state.dec_curve.Q, working_state.dec_curve.curve).x())
             .truncated_rightmost(working_state.outlen)
             .truncated_leftmost(2*8);
-        if (to_validify.as_big_int() != validify_bits.as_big_int())
+        if (to_validify.as_big_int() != validate_bits.as_big_int())
             continue;
         working_state.s = BitStr(DEC::mul(working_state.s.as_big_int(), working_state.dec_curve.P, working_state.dec_curve.curve).x(), working_state.seedlen);
         std::cout << "\nPossible s found: " << working_state.s.as_hex_string() << std::endl;
