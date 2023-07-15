@@ -189,14 +189,14 @@ std::optional<BigInt> try_calc_private_key(BitStr const& guessed_stripped_bits, 
     calculate_s_from_r(s_opt1, s_opt2, guessed_r.as_big_int(), input);
 
     for (auto const& s : {s_opt1, s_opt2}) {
-        if (s.as_big_int() == 0)
+        if (s.as_big_int() == 0) [[likely]]
             continue;
         working_state.s = BitStr(std::move(s));
         /* Step 3.1: Generate server-session-id last 2 bytes */
         auto to_validify = BitStr(DEC::mul(working_state.s.as_big_int(), working_state.dec_curve.Q, working_state.dec_curve.curve).x())
             .truncated_rightmost(working_state.outlen)
             .truncated_leftmost(2*8);
-        if (to_validify.as_big_int() != validate_bits.as_big_int())
+        if (to_validify.as_big_int() != validate_bits.as_big_int()) [[likely]]
             continue;
         working_state.s = BitStr(DEC::mul(working_state.s.as_big_int(), working_state.dec_curve.P, working_state.dec_curve.curve).x(), working_state.seedlen);
         std::cout << "\nPossible s found: " << working_state.s.as_hex_string() << std::endl;
