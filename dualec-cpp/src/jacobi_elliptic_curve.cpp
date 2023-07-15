@@ -61,16 +61,16 @@ JacobiPoint JacobiEllipticCurve::_double(JacobiPoint const& P) const
     // 14. T1 <- 2 * T3
     m_field.mul(T1, 2, T3);
 
-    // 15. X3 <- X3 − T1
+    // 15. X3 <- X3 - T1
     m_field.subin(X3, T1);
 
-    // 16. T1 <- T3 − X3
+    // 16. T1 <- T3 - X3
     m_field.sub(T1, T3, X3);
 
     // 17. T1 <- T1 * T2
     m_field.mulin(T1, T2);
 
-    // 18. Y3 <- T1 − Y3
+    // 18. Y3 <- T1 - Y3
     m_field.negin(Y3);
     m_field.addin(Y3, T1);
 
@@ -98,10 +98,10 @@ JacobiPoint JacobiEllipticCurve::add(JacobiPoint const& P, AffinePoint const& Q)
     // 6. T2 <- T2 * y2
     m_field.mulin(T2, Q.y());
 
-    // 7. T1 <- T1 − X1
+    // 7. T1 <- T1 - X1
     m_field.subin(T1, P.x());
 
-    // 8. T2 <- T2 − Y1
+    // 8. T2 <- T2 - Y1
     m_field.subin(T2, P.y());
 
     // 9. If T1 = 0 then
@@ -134,13 +134,13 @@ JacobiPoint JacobiEllipticCurve::add(JacobiPoint const& P, AffinePoint const& Q)
     // 15. X3 <- T2^2
     m_field.mul(X3, T2, T2);
 
-    // 16. X3 <- X3 − T1
+    // 16. X3 <- X3 - T1
     m_field.subin(X3, T1);
 
-    // 17. X3 <- X3 − T4
+    // 17. X3 <- X3 - T4
     m_field.subin(X3, T4);
 
-    // 18. T3 <- T3 − X3
+    // 18. T3 <- T3 - X3
     m_field.subin(T3, X3);
 
     // 19. T3 <- T3 * T2
@@ -149,7 +149,7 @@ JacobiPoint JacobiEllipticCurve::add(JacobiPoint const& P, AffinePoint const& Q)
     // 20. T4 <- T4 * Y1
     m_field.mulin(T4, P.y());
 
-    // 21. Y3 <- T3 − T4
+    // 21. Y3 <- T3 - T4
     m_field.sub(Y3, T3, T4);
 
     return JacobiPoint(X3, Y3, Z3, m_field);

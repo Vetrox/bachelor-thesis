@@ -71,7 +71,7 @@ void generate_dQ(AffinePoint const& P, BigInt const& order_of_p, EllipticCurve c
 }
 
 BitStr predict_next_rand_bits(AffinePoint const& guess_R, BitStr& out_guess_for_next_s, BigInt const& d, DEC::Curve const& dec_curve, size_t seedlen, size_t outlen, bool log = false)
-{ // TODO: teach predict_next_rand_bits about known adins
+{
     if (log)
         std::cout << "[DBG] predict_next_rand_bits(point: " << guess_R.to_string() << " d: " << bigint_hex(d) << " seedlen: " << seedlen << ")" << std::endl;
     //  it holds that s2 = x(d * R)
