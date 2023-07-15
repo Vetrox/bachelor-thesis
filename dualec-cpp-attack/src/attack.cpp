@@ -200,7 +200,7 @@ void simulate_backdoor(size_t security_strength)
     std::cout << "Produced backdoor\n\td: " << bigint_hex(d) << "\n\tQ: " << bad_curve.Q.to_string() << std::endl;
 
     auto outlen = DEC::calculate_max_outlen(DEC::pick_seedlen(security_strength));
-    auto random_bits = simulate_client_generation(bad_curve, outlen * 3, security_strength);
+    auto random_bits = simulate_client_generation(bad_curve, outlen * 2, security_strength);
     std::cout << "Got random bits:\n\t" << bytes_as_hex(random_bits.to_baked_array()) << std::endl;
 
     auto working_state = brute_force_working_state(random_bits, security_strength, d, bad_curve);
