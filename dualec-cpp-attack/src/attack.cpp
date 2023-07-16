@@ -24,7 +24,7 @@ BigInt dual_ec_stripped_bits_first_round = -1;
 #endif
 
 static constexpr auto determined = false;
-static BigInt no_of_threads = std::thread::hardware_concurrency() * 3;
+static BigInt no_of_threads = std::max(std::thread::hardware_concurrency() / 2, 1u);
 
 static std::stop_source stop_source;
 
