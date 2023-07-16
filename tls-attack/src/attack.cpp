@@ -24,7 +24,7 @@
 constexpr auto MASTER_SECRET_LEN = 48;
 
 static auto* cipher_info = mbedtls_cipher_info_from_type(MBEDTLS_CIPHER_CHACHA20_POLY1305);
-static BigInt no_of_threads = 11;
+static BigInt no_of_threads = std::max(std::thread::hardware_concurrency() / 2, 1u);
 
 void remove_leading_zero_bytes(barr& input)
 {
