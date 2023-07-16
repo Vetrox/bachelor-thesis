@@ -14,7 +14,7 @@ int main(int argc, char const** argv)
     if (argc > 1)
         TEST_SIZE = BigInt(argv[1]);
     auto const& dec_curve = argc > 2 ? DEC::pick_curve(BigInt(argv[2])) : DEC::P521;
-    std::cout << "Using the following curve: " + dec_curve.curve.to_string() << std::endl;
+    std::cout << "TEST_SIZE: " << TEST_SIZE << ". Using the following curve: " + dec_curve.curve.to_string() << std::endl;
     auto gen = dec_curve.P;
     AffinePoint out;
 
